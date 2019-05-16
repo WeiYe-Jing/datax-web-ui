@@ -1,6 +1,7 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
+     comming soon
+    <!-- <div class="dashboard-text">name: {{ name }}</div> -->
   </div>
 </template>
 
