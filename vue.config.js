@@ -27,7 +27,7 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
-    port: 8080,
+    port: port,
     open: false,
     overlay: {
       warnings: false,
@@ -37,7 +37,7 @@ module.exports = {
       // change xxx-api/login => mock/login
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
-        target: `http://localhost:${port}`,
+        target: `http://localhost:8080`,
         changeOrigin: true
       }
     }
