@@ -221,8 +221,8 @@ export default {
       console.log('删除')
       const idList = []
       idList.push(row.id)
-      //拼成 idList=xx
-      //多个比较麻烦，这里不处理
+      // 拼成 idList=xx
+      // 多个比较麻烦，这里不处理
       deletePlugin({ idList: row.id }).then(response => {
         this.fetchData()
         this.$notify({
