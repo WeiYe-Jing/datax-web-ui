@@ -16,8 +16,10 @@
   },
   "dependencies": {
     "axios": "0.18.1",
+    "codemirror": "^5.47.0",
     "element-ui": "2.7.2",
     "js-cookie": "2.2.0",
+    "jsonlint": "^1.6.3",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "path-to-regexp": "2.4.0",
