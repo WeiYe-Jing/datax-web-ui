@@ -57,7 +57,8 @@ export default {
       this.listLoading = true;
       getList().then(response => {
         console.log(response);
-        this.list = response.records;
+        const { records } = response
+        this.list = records;
         this.listLoading = false;
       });
     }

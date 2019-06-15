@@ -44,16 +44,20 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const res = response.data
-
-    if (res.records === undefined) {
+    const { data } = response
+    const { code } = data
+    // 状态码为0表示成功
+    if (code !== 0) {
+      const { message } = data
       Message({
-        message: res.message || 'error',
+        message: message || 'error',
         type: 'error',
         duration: 5 * 1000
       })
-      return Promise.reject(res.message || 'error')
+      return Promise.reject(message || 'error')
     } else {
+      const { data: res } = data
+      // 返回数据
       return res
     }
 
