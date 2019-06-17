@@ -69,9 +69,21 @@ export const constantRoutes = [
       },
       {
         path: 'plugin',
-        name: '插件查看',
+        name: 'DataxPlugin',
         component: () => import('@/views/datax/plugin/index'),
         meta: { title: '插件查看', icon: 'table' }
+      },
+      {
+        path: 'jobConfig',
+        name: 'jobConfig',
+        component: () => import('@/views/datax/jobConfig/index'),
+        meta: { title: '作业配置', icon: 'table' }
+      },
+      {
+        path: 'jobLog',
+        name: 'DataxJobLog',
+        component: () => import('@/views/datax/jobLog/index'),
+        meta: { title: '抽取日志', icon: 'table' }
       }
     ]
   },
