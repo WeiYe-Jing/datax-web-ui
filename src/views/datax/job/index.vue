@@ -26,7 +26,42 @@ export default {
   components: { JsonEditor },
   data() {
     return {
-      templateJson: JSON.parse('{"job":{"setting":{"speed":{"channel":3},"errorLimit":{"record":0,"percentage":0.02}},"content":[{"reader":{"name":"mysqlreader","parameter":{"username":"root","password":"root","column":["id","name"],"splitPk":"db_id","connection":[{"table":["table"],"jdbcUrl":["jdbc:mysql://127.0.0.1:3306/database"]}]}},"writer":{"name":"streamwriter","parameter":{"print":true}}}]}}'),
+      templateJson: {
+        "job": {
+          "content": [
+            {
+              "reader": {
+                "name": "streamreader",
+                "parameter": {
+                  "sliceRecordCount": 10,
+                  "column": [
+                    {
+                      "type": "long",
+                      "value": "10"
+                    },
+                    {
+                      "type": "string",
+                      "value": "hello，你好，世界-DataX"
+                    }
+                  ]
+                }
+              },
+              "writer": {
+                "name": "streamwriter",
+                "parameter": {
+                  "encoding": "UTF-8",
+                  "print": true
+                }
+              }
+            }
+          ],
+          "setting": {
+            "speed": {
+              "channel": 5
+            }
+          }
+        }
+      },
       pluginList: [1, 2],
       pluginId: undefined
     };
