@@ -9,3 +9,11 @@ export function runJob(data) {
     data
   })
 }
+
+export function runJobLog(data) {
+  return request({
+    url: '/runJobLog',
+    method: 'post',
+    data
+  })
+}

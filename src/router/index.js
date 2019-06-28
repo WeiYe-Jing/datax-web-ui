@@ -78,12 +78,6 @@ export const constantRoutes = [
         name: 'jobConfig',
         component: () => import('@/views/datax/jobConfig/index'),
         meta: { title: '作业配置', icon: 'table' }
-      },
-      {
-        path: 'jobLog',
-        name: 'DataxJobLog',
-        component: () => import('@/views/datax/jobLog/index'),
-        meta: { title: '抽取日志', icon: 'table' }
       }
     ]
   },

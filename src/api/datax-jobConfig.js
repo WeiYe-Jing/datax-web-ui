@@ -40,3 +40,11 @@ export function deleted(data) {
     params: data
   })
 }
+
+export function viewJobLog(params) {
+  return request({
+    url: '/viewJobLog',
+    method: 'get',
+    params
+  })
+}
