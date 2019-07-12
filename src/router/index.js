@@ -130,6 +130,33 @@ export const asyncRoutes = [
       }
     ]
   },
+  {
+    path: '/datax',
+    component: Layout,
+    redirect: '/datax/job',
+    name: 'Example',
+    meta: { title: 'datax', icon: 'example' },
+    children: [
+      {
+        path: 'job',
+        name: '同步任务',
+        component: () => import('@/views/datax/job/index'),
+        meta: { title: '同步任务', icon: 'table', affix: true }
+      },
+      {
+        path: 'plugin',
+        name: 'DataxPlugin',
+        component: () => import('@/views/datax/plugin/index'),
+        meta: { title: '插件查看', icon: 'table' }
+      },
+      {
+        path: 'jobConfig',
+        name: 'jobConfig',
+        component: () => import('@/views/datax/jobConfig/index'),
+        meta: { title: '作业配置', icon: 'table' }
+      }
+    ]
+  },
   toolRouter,
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
