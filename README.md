@@ -2,7 +2,7 @@
 
 [后端项目github地址](https://github.com/huzekang/springboot-datax.git)
 
-该项目由 [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template/) 修改而来
+该项目由 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) 修改而来
 
 ## 说明
 
@@ -23,7 +23,3 @@ npm install
 ```
 npm run build:prod
 ```
-
-## 其他
-
-非专业前端，业余写的
