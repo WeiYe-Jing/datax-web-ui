@@ -154,6 +154,12 @@ export const asyncRoutes = [
         name: 'jobConfig',
         component: () => import('@/views/datax/jobConfig/index'),
         meta: { title: '作业配置', icon: 'table' }
+      },
+      {
+        path: 'jdbcDatasource',
+        name: 'jdbcDatasource',
+        component: () => import('@/views/datax/jdbc-datasource/index'),
+        meta: { title: 'jdbc数据源管理', icon: 'table' }
       }
     ]
   },
