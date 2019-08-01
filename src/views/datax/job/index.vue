@@ -90,7 +90,7 @@ export default {
       }
       // 根据是否有 jobId 调不同的接口
       if (this.jobId === undefined) {
-        runJob(this.templateJson).then(response => {
+        runJob(obj).then(response => {
           this.$notify({
             title: 'Success',
             message: '启动成功',
