@@ -11,6 +11,7 @@ const name = defaultSettings.title || 'DATAX-ADMIN' // page title
 // use administrator privileges to execute the command line.
 // For example, Mac: sudo npm run
 const port = 8081 // dev port
+const apiPort = 8066
 
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
@@ -37,7 +38,7 @@ module.exports = {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       //代理 /dev-api/api 到 http://localhost:8066/api
       [process.env.VUE_APP_API]: {
-        target: `http://localhost:8066/api`,
+        target: `http://localhost:${apiPort}/api`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_API]: ''

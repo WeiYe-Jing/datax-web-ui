@@ -130,8 +130,7 @@ export default {
       total: 0,
       listQuery: {
         current: 1,
-        size: 10,
-        pluginName: undefined
+        size: 10
       },
       pluginTypeOptions: ['reader', 'writer'],
       dialogPluginVisible: false,
