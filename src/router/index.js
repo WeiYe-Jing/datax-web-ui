@@ -160,6 +160,12 @@ export const asyncRoutes = [
         name: 'jdbcDatasource',
         component: () => import('@/views/datax/jdbc-datasource/index'),
         meta: { title: 'jdbc数据源管理', icon: 'table' }
+      },
+      {
+        path: 'jsonBuild',
+        name: 'jsonBuild',
+        component: () => import('@/views/datax/json-build/index'),
+        meta: { title: 'datax json构建', icon: 'table' }
       }
     ]
   },
