@@ -158,7 +158,7 @@ export default {
         this.loading = false
       })
     },
-    // reader 获取表名
+    // 获取表名
     getTables(type) {
       if (type === 'reader') {
         const obj = {
@@ -170,7 +170,7 @@ export default {
         })
       } else if (type === 'writer') {
         const obj = {
-          datasourceId: this.readerForm.datasourceId
+          datasourceId: this.writerForm.datasourceId
         }
         // 组装
         dsQueryApi.getTables(obj).then(response => {
