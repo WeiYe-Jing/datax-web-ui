@@ -4,6 +4,7 @@
       <el-steps :active="active" finish-status="success">
         <el-step title="步骤 1" description="构建reader">1</el-step>
         <el-step title="步骤 2" description="构建writer">2</el-step>
+        <el-step title="步骤 3" description="字段映射">2</el-step>
       </el-steps>
 
       <!-- <el-button style="margin-top: 12px;" @click="last">上一步</el-button> -->
@@ -39,13 +40,19 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="querySql" prop="querySql">
+            <el-input v-model="readerForm.querySql" placeholder="sql查询，一般用于多表关联查询时才用" />
+            <el-button @click.prevent="getColumns('reader')">解析字段</el-button>
+          </el-form-item>
           <el-form-item label="字段">
-            <el-transfer
-              v-model="readerForm.columns"
-              filterable
-              :data="rColumnList"
-              :titles="['可选字段', '抽取的字段']"
-            />
+            <el-checkbox v-model="readerForm.checkAll" :indeterminate="readerForm.isIndeterminate" @change="rHandleCheckAllChange">全选</el-checkbox>
+            <div style="margin: 15px 0;" />
+            <el-checkbox-group v-model="readerForm.columns" @change="rHandleCheckedChange">
+              <el-checkbox v-for="c in rColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item label="where" prop="where">
+            <el-input v-model="readerForm.where" placeholder="where条件" />
           </el-form-item>
         </el-form>
       </div>
@@ -89,18 +96,26 @@
             </el-select>
           </el-form-item>
           <el-form-item label="字段">
-            <el-transfer
+            <!-- <el-transfer
               v-model="writerForm.columns"
               :disabled="ifStreamWriter"
               filterable
               :data="wColumnList"
               :titles="['可选字段', '抽取的字段']"
-            />
+            /> -->
+            <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
+            <div style="margin: 15px 0;" />
+            <el-checkbox-group v-model="writerForm.columns" @change="wHandleCheckedChange">
+              <el-checkbox v-for="c in wColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="beforeBuildJson">构建</el-button>
           </el-form-item>
         </el-form>
+      </div>
+      <div v-show="active===3" class="step2">
+        33
       </div>
     </div>
     <!-- <div style="margin-bottom: 100px;" /> -->
@@ -131,7 +146,11 @@ export default {
       readerForm: {
         datasourceId: undefined,
         tableName: '',
-        columns: []
+        columns: [],
+        where: '',
+        querySql: '',
+        checkAll: false,
+        isIndeterminate: true
       },
       // 是否用streamwriter
       ifStreamWriter: true,
@@ -141,7 +160,9 @@ export default {
       writerForm: {
         datasourceId: undefined,
         tableName: '',
-        columns: []
+        columns: [],
+        checkAll: false,
+        isIndeterminate: true
       }
     }
   },
@@ -193,8 +214,10 @@ export default {
           })
         }
       } else {
-        // 切回第一步
-        this.active = 1
+        if (this.active++ === 3) {
+          // 切回第一步
+          this.active = 1
+        }
       }
     },
     // reader 数据源切换
@@ -212,25 +235,36 @@ export default {
       // 获取可用表
       this.getTables('writer')
     },
+    getTableColumns() {
+      const obj = {
+        datasourceId: this.readerForm.datasourceId,
+        tableName: this.readerForm.tableName
+      }
+      dsQueryApi.getColumns(obj).then(response => {
+        this.rColumnList = response
+        this.readerForm.columns = response
+      })
+    },
+    getColumnsByQuerySql() {
+      const obj = {
+        datasourceId: this.readerForm.datasourceId,
+        querySql: this.readerForm.querySql
+      }
+      dsQueryApi.getColumnsByQuerySql(obj).then(response => {
+        this.rColumnList = response
+        this.readerForm.columns = response
+      })
+    },
     // 获取表字段
     getColumns(type) {
       if (type === 'reader') {
-        const obj = {
-          datasourceId: this.readerForm.datasourceId,
-          tableName: this.readerForm.tableName
+        if (this.readerForm.querySql !== '') {
+          this.getColumnsByQuerySql()
+        } else {
+          this.getTableColumns()
         }
-        dsQueryApi.getColumns(obj).then(response => {
-          const data = []
-          console.log(response)
-          response.forEach(e => {
-            data.push({
-              key: e,
-              label: e,
-              disabled: false
-            })
-          })
-          this.rColumnList = data
-        })
+        this.readerForm.checkAll = true
+        this.readerForm.isIndeterminate = false
       } else if (type === 'writer') {
         const obj = {
           datasourceId: this.writerForm.datasourceId,
@@ -250,7 +284,6 @@ export default {
           this.wColumnList = data
         })
       }
-      // 组装
     },
     // 表切换
     rTbChange(t) {
@@ -280,7 +313,9 @@ export default {
         ifStreamWriter: this.ifStreamWriter,
         writerDatasourceId: this.writerForm.datasourceId,
         writerTables: [this.writerForm.tableName],
-        writerColumns: this.writerForm.columns
+        writerColumns: this.writerForm.columns,
+        whereParams: this.readerForm.where,
+        querySql: this.readerForm.querySql
       }
       console.info(obj)
       // 调api
@@ -288,6 +323,24 @@ export default {
         console.log(response)
         this.configJson = JSON.parse(response)
       })
+    },
+    rHandleCheckAllChange(val) {
+      this.readerForm.columns = val ? this.rColumnList : []
+      this.readerForm.isIndeterminate = false
+    },
+    rHandleCheckedChange(value) {
+      const checkedCount = value.length
+      this.readerForm.checkAll = checkedCount === this.rColumnList.length
+      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rColumnList.length
+    },
+    wHandleCheckAllChange(val) {
+      this.writerForm.columns = val ? this.wColumnList : []
+      this.writerForm.isIndeterminate = false
+    },
+    wHandleCheckedChange(value) {
+      const checkedCount = value.length
+      this.writerForm.checkAll = checkedCount === this.wColumnList.length
+      this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.wColumnList.length
     }
   }
 }
