@@ -109,6 +109,9 @@
               <el-checkbox v-for="c in wColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
+          <el-form-item label="preSql" prop="preSql">
+            <el-input v-model="writerForm.preSql" placeholder="preSql" />
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="beforeBuildJson">构建</el-button>
           </el-form-item>
@@ -162,7 +165,8 @@ export default {
         tableName: '',
         columns: [],
         checkAll: false,
-        isIndeterminate: true
+        isIndeterminate: true,
+        preSql: ''
       }
     }
   },
@@ -243,6 +247,8 @@ export default {
       dsQueryApi.getColumns(obj).then(response => {
         this.rColumnList = response
         this.readerForm.columns = response
+        this.readerForm.checkAll = true
+        this.readerForm.isIndeterminate = false
       })
     },
     getColumnsByQuerySql() {
@@ -253,6 +259,8 @@ export default {
       dsQueryApi.getColumnsByQuerySql(obj).then(response => {
         this.rColumnList = response
         this.readerForm.columns = response
+        this.readerForm.checkAll = true
+        this.readerForm.isIndeterminate = false
       })
     },
     // 获取表字段
@@ -263,25 +271,16 @@ export default {
         } else {
           this.getTableColumns()
         }
-        this.readerForm.checkAll = true
-        this.readerForm.isIndeterminate = false
       } else if (type === 'writer') {
         const obj = {
           datasourceId: this.writerForm.datasourceId,
           tableName: this.writerForm.tableName
         }
         dsQueryApi.getColumns(obj).then(response => {
-          const data = []
-          console.log(response)
-          response.forEach(e => {
-            data.push({
-              key: e,
-              label: e,
-              disabled: false
-            })
-          })
-          console.log(data)
-          this.wColumnList = data
+          this.wColumnList = response
+          this.writerForm.columns = response
+          this.writerForm.checkAll = true
+          this.writerForm.isIndeterminate = false
         })
       }
     },
@@ -315,7 +314,8 @@ export default {
         writerTables: [this.writerForm.tableName],
         writerColumns: this.writerForm.columns,
         whereParams: this.readerForm.where,
-        querySql: this.readerForm.querySql
+        querySql: this.readerForm.querySql,
+        preSql: this.writerForm.preSql
       }
       console.info(obj)
       // 调api
