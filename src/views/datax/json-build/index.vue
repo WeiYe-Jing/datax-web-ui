@@ -11,212 +11,53 @@
       <el-button style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
 
       <div v-show="active===1" class="step1">
-        <el-form label-position="left" label-width="80px" :model="readerForm">
-          <el-form-item label="数据源">
-            <el-select
-              v-model="readerForm.id"
-              filterable
-              @change="rDsChange"
-            >
-              <el-option
-                v-for="item in rDsList"
-                :key="item.id"
-                :label="item.datasourceName"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="表">
-            <el-select
-              v-model="readerForm.tableName"
-              filterable
-              @change="rTbChange"
-            >
-              <el-option
-                v-for="item in rTbList"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="querySql" prop="querySql">
-            <el-input v-model="readerForm.querySql" placeholder="sql查询，一般用于多表关联查询时才用" />
-            <el-button @click.prevent="getColumns('reader')">解析字段</el-button>
-          </el-form-item>
-          <el-form-item label="字段">
-            <el-checkbox v-model="readerForm.checkAll" :indeterminate="readerForm.isIndeterminate" @change="rHandleCheckAllChange">全选</el-checkbox>
-            <div style="margin: 15px 0;" />
-            <el-checkbox-group v-model="readerForm.columns" @change="rHandleCheckedChange">
-              <el-checkbox v-for="c in rColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item label="where" prop="where">
-            <el-input v-model="readerForm.where" placeholder="where条件" />
-          </el-form-item>
-        </el-form>
+        <Reader ref="reader" />
       </div>
       <div v-show="active===2" class="step2">
-        <el-form label-position="left" label-width="80px" :model="readerForm">
-          <el-form-item>
-            <el-switch
-              v-model="ifStreamWriter"
-              active-text="streamwriter"
-              inactive-text="other"
-            />
-          </el-form-item>
-          <el-form-item label="数据源">
-            <el-select
-              v-model="writerForm.id"
-              :disabled="ifStreamWriter"
-              filterable
-              @change="wDsChange"
-            >
-              <el-option
-                v-for="item in rDsList"
-                :key="item.id"
-                :label="item.datasourceName"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="表">
-            <el-select
-              v-model="writerForm.tableName"
-              :disabled="ifStreamWriter"
-              filterable
-              @change="wTbChange"
-            >
-              <el-option
-                v-for="item in wTbList"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="字段">
-            <!-- <el-transfer
-              v-model="writerForm.columns"
-              :disabled="ifStreamWriter"
-              filterable
-              :data="wColumnList"
-              :titles="['可选字段', '抽取的字段']"
-            /> -->
-            <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
-            <div style="margin: 15px 0;" />
-            <el-checkbox-group v-model="writerForm.columns" @change="wHandleCheckedChange">
-              <el-checkbox v-for="c in wColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item label="preSql" prop="preSql">
-            <el-input v-model="writerForm.preSql" placeholder="preSql" />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="beforeBuildJson">构建</el-button>
-          </el-form-item>
-        </el-form>
+        <Writer ref="writer" />
       </div>
       <div v-show="active===3" class="step2">
-        33
+        <el-button type="primary" @click="buildJson">构建</el-button>
       </div>
     </div>
     <!-- <div style="margin-bottom: 100px;" /> -->
-    <json-editor v-show="active===2" ref="jsonEditor" v-model="configJson" />
+    <json-editor v-show="active===3" ref="jsonEditor" v-model="configJson" />
   </div>
 </template>
 
 <script>
-import * as dsQueryApi from '@/api/ds-query'
 import * as dataxJsonApi from '@/api/datax-json'
-import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 import JsonEditor from '@/components/JsonEditor'
+import Reader from './reader'
+import Writer from './writer'
 
 export default {
-  components: { JsonEditor },
+  components: { Reader, Writer, JsonEditor },
   data() {
     return {
       configJson: '',
-      jdbcDsQuery: {
-        current: 1,
-        size: 50
-      },
-      rDsList: [],
-      rTbList: [],
-      rColumnList: [],
-      loading: false,
-      active: 1,
-      readerForm: {
-        datasourceId: undefined,
-        tableName: '',
-        columns: [],
-        where: '',
-        querySql: '',
-        checkAll: false,
-        isIndeterminate: true
-      },
-      // 是否用streamwriter
-      ifStreamWriter: true,
-      wDsList: [],
-      wTbList: [],
-      wColumnList: [],
-      writerForm: {
-        datasourceId: undefined,
-        tableName: '',
-        columns: [],
-        checkAll: false,
-        isIndeterminate: true,
-        preSql: ''
-      }
+      active: 1
     }
   },
   created() {
-    this.getJdbcDs()
+    // this.getJdbcDs()
   },
   methods: {
-    // 获取可用数据源
-    getJdbcDs() {
-      this.loading = true
-      jdbcDsList(this.jdbcDsQuery).then(response => {
-        const { records } = response
-        this.rDsList = records
-        this.loading = false
-      })
-    },
-    // 获取表名
-    getTables(type) {
-      if (type === 'reader') {
-        const obj = {
-          datasourceId: this.readerForm.datasourceId
-        }
-        // 组装
-        dsQueryApi.getTables(obj).then(response => {
-          this.rTbList = response
-        })
-      } else if (type === 'writer') {
-        const obj = {
-          datasourceId: this.writerForm.datasourceId
-        }
-        // 组装
-        dsQueryApi.getTables(obj).then(response => {
-          this.wTbList = response
-        })
-      }
-    },
-    last() {
-      if (this.active-- < 1) this.active = 1
-    },
     next() {
       // 第一步 reader 判断是否已选字段
       if (this.active === 1) {
-        if (this.readerForm.columns.length > 0) {
-          this.active++
-        } else {
-          this.$message({
-            message: '无法进行下一步',
-            type: 'warning'
-          })
-        }
+        // this.$refs.reader.testBtn()
+        // 取子组件的数据
+        console.info(this.$refs.reader.getData())
+        this.active++
+        // if (this.readerForm.columns.length > 0) {
+        //   this.active++
+        // } else {
+        //   this.$message({
+        //     message: '无法进行下一步',
+        //     type: 'warning'
+        //   })
+        // }
       } else {
         if (this.active++ === 3) {
           // 切回第一步
@@ -224,98 +65,33 @@ export default {
         }
       }
     },
-    // reader 数据源切换
-    rDsChange(e) {
-      // 清空
-      this.readerForm.tableName = ''
-      this.readerForm.datasourceId = e
-      // 获取可用表
-      this.getTables('reader')
-    },
-    wDsChange(e) {
-      // 清空
-      this.writerForm.tableName = ''
-      this.writerForm.datasourceId = e
-      // 获取可用表
-      this.getTables('writer')
-    },
-    getTableColumns() {
-      const obj = {
-        datasourceId: this.readerForm.datasourceId,
-        tableName: this.readerForm.tableName
-      }
-      dsQueryApi.getColumns(obj).then(response => {
-        this.rColumnList = response
-        this.readerForm.columns = response
-        this.readerForm.checkAll = true
-        this.readerForm.isIndeterminate = false
-      })
-    },
-    getColumnsByQuerySql() {
-      const obj = {
-        datasourceId: this.readerForm.datasourceId,
-        querySql: this.readerForm.querySql
-      }
-      dsQueryApi.getColumnsByQuerySql(obj).then(response => {
-        this.rColumnList = response
-        this.readerForm.columns = response
-        this.readerForm.checkAll = true
-        this.readerForm.isIndeterminate = false
-      })
-    },
-    // 获取表字段
-    getColumns(type) {
-      if (type === 'reader') {
-        if (this.readerForm.querySql !== '') {
-          this.getColumnsByQuerySql()
-        } else {
-          this.getTableColumns()
-        }
-      } else if (type === 'writer') {
-        const obj = {
-          datasourceId: this.writerForm.datasourceId,
-          tableName: this.writerForm.tableName
-        }
-        dsQueryApi.getColumns(obj).then(response => {
-          this.wColumnList = response
-          this.writerForm.columns = response
-          this.writerForm.checkAll = true
-          this.writerForm.isIndeterminate = false
-        })
-      }
-    },
-    // 表切换
-    rTbChange(t) {
-      this.readerForm.tableName = t
-      this.rColumnList = []
-      this.readerForm.columns = []
-      this.getColumns('reader')
-    },
-    wTbChange(t) {
-      this.writerForm.tableName = t
-      this.wColumnList = []
-      this.writerForm.columns = []
-      this.getColumns('writer')
-    },
     beforeBuildJson() {
-      if (this.writerForm.columns.length > 0 || this.ifStreamWriter === true) {
+      const data = this.$refs.writer.getData()
+      console.log(data)
+      if (data.writerForm.columns.length > 0 || data.ifStreamWriter === true) {
         this.buildJson()
       }
     },
     // 构建json
     buildJson() {
-      console.info(this.readerForm)
+      const readerData = this.$refs.reader.getData()
+      const writeData = this.$refs.writer.getData()
+      // console.log(readerData)
+      // console.log(writeData)
+      // return
+      // if (writeData.columns.length > 0 || writeData.ifStreamWriter === true) {
+      // }
       const obj = {
-        readerDatasourceId: this.readerForm.datasourceId,
-        readerTables: [this.readerForm.tableName],
-        readerColumns: this.readerForm.columns,
-        ifStreamWriter: this.ifStreamWriter,
-        writerDatasourceId: this.writerForm.datasourceId,
-        writerTables: [this.writerForm.tableName],
-        writerColumns: this.writerForm.columns,
-        whereParams: this.readerForm.where,
-        querySql: this.readerForm.querySql,
-        preSql: this.writerForm.preSql
+        readerDatasourceId: readerData.datasourceId,
+        readerTables: [readerData.tableName],
+        readerColumns: readerData.columns,
+        ifStreamWriter: writeData.ifStreamWriter,
+        writerDatasourceId: writeData.datasourceId,
+        writerTables: [writeData.tableName],
+        writerColumns: writeData.columns,
+        whereParams: readerData.where,
+        querySql: readerData.querySql,
+        preSql: writeData.preSql
       }
       console.info(obj)
       // 调api
@@ -323,24 +99,6 @@ export default {
         console.log(response)
         this.configJson = JSON.parse(response)
       })
-    },
-    rHandleCheckAllChange(val) {
-      this.readerForm.columns = val ? this.rColumnList : []
-      this.readerForm.isIndeterminate = false
-    },
-    rHandleCheckedChange(value) {
-      const checkedCount = value.length
-      this.readerForm.checkAll = checkedCount === this.rColumnList.length
-      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rColumnList.length
-    },
-    wHandleCheckAllChange(val) {
-      this.writerForm.columns = val ? this.wColumnList : []
-      this.writerForm.isIndeterminate = false
-    },
-    wHandleCheckedChange(value) {
-      const checkedCount = value.length
-      this.writerForm.checkAll = checkedCount === this.wColumnList.length
-      this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.wColumnList.length
     }
   }
 }
