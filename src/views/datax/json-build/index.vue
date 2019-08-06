@@ -16,12 +16,12 @@
       <div v-show="active===2" class="step2">
         <Writer ref="writer" />
       </div>
-      <div v-show="active===3" class="step2">
+      <div v-show="active===3" class="step3">
         <el-button type="primary" @click="buildJson">构建</el-button>
+        <div style="margin-bottom: 20px;" />
+        <json-editor v-show="active===3" ref="jsonEditor" v-model="configJson" />
       </div>
     </div>
-    <!-- <div style="margin-bottom: 100px;" /> -->
-    <json-editor v-show="active===3" ref="jsonEditor" v-model="configJson" />
   </div>
 </template>
 
