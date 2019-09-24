@@ -144,12 +144,6 @@ export const asyncRoutes = [
         meta: { title: '同步任务', icon: 'table', affix: true }
       },
       {
-        path: 'plugin',
-        name: 'DataxPlugin',
-        component: () => import('@/views/datax/plugin/index'),
-        meta: { title: '插件查看', icon: 'table' }
-      },
-      {
         path: 'jobConfig',
         name: 'jobConfig',
         component: () => import('@/views/datax/jobConfig/index'),
