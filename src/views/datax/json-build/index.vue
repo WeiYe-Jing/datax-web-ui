@@ -18,6 +18,7 @@
       </div>
       <div v-show="active===3" class="step3">
         <el-button type="primary" @click="buildJson">构建</el-button>
+        <el-button type="info" @click="handleCopy(inputData,$event)">copy json</el-button>
         <div style="margin-bottom: 20px;" />
         <json-editor v-show="active===3" ref="jsonEditor" v-model="configJson" />
       </div>
@@ -30,6 +31,7 @@ import * as dataxJsonApi from '@/api/datax-json'
 import JsonEditor from '@/components/JsonEditor'
 import Reader from './reader'
 import Writer from './writer'
+import clip from '@/utils/clipboard'
 
 export default {
   components: { Reader, Writer, JsonEditor },
@@ -98,6 +100,13 @@ export default {
       dataxJsonApi.buildJobJson(obj).then(response => {
         console.log(response)
         this.configJson = JSON.parse(response)
+      })
+    },
+    handleCopy(text, event) {
+      clip(this.configJson, event)
+      this.$message({
+        message: 'copy success',
+        type: 'success'
       })
     }
   }
