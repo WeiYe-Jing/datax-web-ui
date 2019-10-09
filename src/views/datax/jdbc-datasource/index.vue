@@ -59,7 +59,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left">
         <el-form-item label="数据源名称" prop="datasourceName">
           <el-input v-model="temp.datasourceName" placeholder="数据源名称" />
         </el-form-item>
@@ -73,7 +73,7 @@
           <el-input v-model="temp.jdbcPassword" placeholder="密码" />
         </el-form-item>
         <el-form-item label="jdbc url" prop="jdbcUrl">
-          <el-input v-model="temp.jdbcUrl" placeholder="jdbc url" />
+          <el-input v-model="temp.jdbcUrl" :autosize="{ minRows: 3, maxRows: 6}" type="textarea" placeholder="jdbc url" />
         </el-form-item>
         <el-form-item label="jdbc驱动类" prop="jdbcDriverClass">
           <el-input v-model="temp.jdbcDriverClass" placeholder="jdbc驱动类" />
