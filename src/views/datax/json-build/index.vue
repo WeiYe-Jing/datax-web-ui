@@ -4,7 +4,8 @@
       <el-steps :active="active" finish-status="success">
         <el-step title="步骤 1" description="构建reader">1</el-step>
         <el-step title="步骤 2" description="构建writer">2</el-step>
-        <el-step title="步骤 3" description="字段映射">2</el-step>
+        <el-step title="步骤 3" description="字段映射">3</el-step>
+        <el-step title="步骤 4" description="构建">4</el-step>
       </el-steps>
 
       <!-- <el-button style="margin-top: 12px;" @click="last">上一步</el-button> -->
@@ -17,6 +18,9 @@
         <Writer ref="writer" />
       </div>
       <div v-show="active===3" class="step3">
+        <FieldMapper ref="fieldMapper" />
+      </div>
+      <div v-show="active===4" class="step4">
         <el-button type="primary" @click="buildJson">构建</el-button>
         <el-button type="info" @click="handleCopy(inputData,$event)">copy json</el-button>
         <div style="margin-bottom: 20px;" />
@@ -32,9 +36,10 @@ import JsonEditor from '@/components/JsonEditor'
 import Reader from './reader'
 import Writer from './writer'
 import clip from '@/utils/clipboard'
+import FieldMapper from './components/fieldMapper'
 
 export default {
-  components: { Reader, Writer, JsonEditor },
+  components: { Reader, Writer, JsonEditor, FieldMapper },
   data() {
     return {
       configJson: '',
@@ -61,7 +66,7 @@ export default {
         //   })
         // }
       } else {
-        if (this.active++ === 3) {
+        if (this.active++ === 4) {
           // 切回第一步
           this.active = 1
         }
