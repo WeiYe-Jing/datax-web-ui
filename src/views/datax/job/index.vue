@@ -19,6 +19,12 @@
     </div>
 
     <div class="editor-container">
+      <div style="width: 90%; margin-bottom: 12px;">
+        <el-input v-model="dynamicArgs" :autosize="{ minRows: 3, maxRows: 6}" type="textarea" placeholder="动态参数配置，如无请忽略" />
+        <el-button class="filter-item" type="default" icon="el-icon-refresh" @click="extractGetDynamicArgs">
+          解析动态参数
+        </el-button>
+      </div>
       <json-editor ref="jsonEditor" v-model="templateJson" />
     </div>
 
@@ -62,7 +68,9 @@ export default {
       // 显示日志
       logShow: false,
       // 日志显示加载中效果
-      logLoading: false
+      logLoading: false,
+      // 动态参数
+      dynamicArgs: ''
     }
   },
   created() {
@@ -86,7 +94,8 @@ export default {
     handleRunJob() {
       const obj = {
         jobConfigId: this.jobId,
-        jobJson: this.templateJson
+        jobJson: this.templateJson,
+        dynamicArgs: this.dynamicArgs
       }
       // 根据是否有 jobId 调不同的接口
       if (this.jobId === undefined) {
@@ -158,6 +167,22 @@ export default {
       this.jobId = undefined
       this.logShow = false
       this.logContent = undefined
+    },
+    // 从 json 中取出动态参数
+    extractGetDynamicArgs() {
+      // 取 ${xxx}
+      const argsf = /\$\{\w+\}/.exec(this.templateJson)
+      // 取属性名
+      const args = argsf.map(i => /\w+/.exec(i)[0])
+      // 转成 json obj
+      const argsArray = []
+      const a = {}
+      args.forEach(e => {
+        a[e] = ''
+      })
+      console.log(argsArray)
+      // todo 判断是否已有，不覆盖原值
+      this.dynamicArgs = JSON.stringify(a)
     }
   }
 }
