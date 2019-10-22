@@ -170,8 +170,10 @@ export default {
     },
     // 从 json 中取出动态参数
     extractGetDynamicArgs() {
+      // exec 只返回一个  /\$\{\w+\}/.exec(this.templateJson)
       // 取 ${xxx}
-      const argsf = /\$\{\w+\}/.exec(this.templateJson)
+      const argsf = this.templateJson.match(/\$\{\w+\}/g)
+      console.log(argsf)
       // 取属性名
       const args = argsf.map(i => /\w+/.exec(i)[0])
       // 转成 json obj
