@@ -24,7 +24,7 @@
         <el-button type="primary" @click="buildJson">构建</el-button>
         <el-button type="info" @click="handleCopy(inputData,$event)">copy json</el-button>
         <div style="margin-bottom: 20px;" />
-        <json-editor v-show="active===3" ref="jsonEditor" v-model="configJson" />
+        <json-editor v-show="active===4" ref="jsonEditor" v-model="configJson" />
       </div>
     </div>
   </div>
