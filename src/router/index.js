@@ -160,6 +160,12 @@ export const asyncRoutes = [
         name: 'jsonBuild',
         component: () => import('@/views/datax/json-build/index'),
         meta: { title: 'datax json构建', icon: 'table' }
+      },
+      {
+        path: 'GroupManagement',
+        name: 'GroupManagement',
+        component: () => import('@/views/datax/GroupManagement/index'),
+        meta: { title: '分组管理', icon: 'table' }
       }
     ]
   },
