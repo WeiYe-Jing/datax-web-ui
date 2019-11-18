@@ -1,6 +1,6 @@
 # datax-vue-admin
 
-[后端项目github地址](https://github.com/WeiYe-Jing/springboot-datax)
+[后端项目github地址](https://github.com/WeiYe-Jing/datax-web)
 
 该项目由 [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) 修改而来
 
