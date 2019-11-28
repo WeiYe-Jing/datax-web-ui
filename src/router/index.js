@@ -166,6 +166,12 @@ export const asyncRoutes = [
         name: 'GroupManagement',
         component: () => import('@/views/datax/GroupManagement/index'),
         meta: { title: '分组管理', icon: 'table' }
+      },
+      {
+        path: 'jobInfo',
+        name: 'jobInfo',
+        component: () => import('@/views/datax/jobInfo/index'),
+        meta: { title: '任务管理', icon: 'table' }
       }
     ]
   },

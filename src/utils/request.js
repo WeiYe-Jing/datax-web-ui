@@ -45,7 +45,7 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000 && res.code !== 0) {
+    if (res.code !== 20000 && res.code !== 0 && res.code !== 200) {
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -69,10 +69,12 @@ service.interceptors.response.use(
     } else {
       const { data } = response
       const { code } = data
-      // 状态码为0表示api成功
+      // 状态码为0||200表示api成功
       if (code === 0) {
         const { data: res } = data
         return res
+      } else if (code === 200) {
+        return data
       } else {
         // 返回数据
         return res
