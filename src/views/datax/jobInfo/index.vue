@@ -29,25 +29,36 @@
       <el-table-column label="任务描述" align="center" width="400">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
-      <el-table-column label="Cron" align="center" width="160">
+      <el-table-column label="Cron" align="center" width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="负责人" align="center" width="80">
+      <el-table-column label="路由策略" align="center" width="200">
+        <template slot-scope="scope">{{ scope.row.executorRouteStrategy }}</template>
+      </el-table-column>
+      <el-table-column label="负责人" align="center" width="120">
         <template slot-scope="scope">{{ scope.row.author }}</template>
       </el-table-column>
-      <el-table-column label="状态" align="center" width="80">
+      <el-table-column label="状态" align="center" width="120">
         <template slot-scope="scope">{{ scope.row.triggerStatus }}</template>
+      </el-table-column>
+      <el-table-column label="下次触发时间" align="center" width="200">
+        <template slot-scope="scope">{{ scope.row.triggerNextTime }}</template>
       </el-table-column>
       <el-table-column label="Actions" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
-          </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
-            Delete
-          </el-button>
+          <el-dropdown split-button type="primary">
+            操作
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="handleTrigger(row)">执行一次</el-dropdown-item>
+              <el-dropdown-item>查询日志</el-dropdown-item>
+              <el-dropdown-item>注册节点</el-dropdown-item>
+              <el-dropdown-item divided>启动</el-dropdown-item>
+              <el-dropdown-item>编辑</el-dropdown-item>
+              <el-dropdown-item>删除</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -251,7 +262,29 @@ export default {
           return v[j]
         }
       }))
+    },
+    handleTrigger(row) {
+      const jobDesc = row.jobDesc
+      this.$message('click on item ' + jobDesc)
+    },
+    handleCommand(command) {
+      switch (command) {
+        case 'a':
+          this.handleTrigger(command)
+      }
     }
   }
 }
 </script>
+
+<style>
+  .el-dropdown {
+    vertical-align: top;
+  }
+  .el-dropdown + .el-dropdown {
+    margin-left: 15px;
+  }
+  .el-icon-arrow-down {
+    font-size: 12px;
+  }
+</style>
