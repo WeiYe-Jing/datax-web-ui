@@ -51,12 +51,12 @@
           <el-dropdown split-button type="primary">
             操作
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="handleTrigger(row)">执行一次</el-dropdown-item>
-              <el-dropdown-item>查询日志</el-dropdown-item>
-              <el-dropdown-item>注册节点</el-dropdown-item>
-              <el-dropdown-item divided>启动</el-dropdown-item>
-              <el-dropdown-item>编辑</el-dropdown-item>
-              <el-dropdown-item>删除</el-dropdown-item>
+              <el-dropdown-item @click.native="handlerExecute(row)">执行一次</el-dropdown-item>
+              <el-dropdown-item @click.native="handlerViewLog(row)">查询日志</el-dropdown-item>
+              <el-dropdown-item @click.native="handlerViewNode(row)">注册节点</el-dropdown-item>
+              <el-dropdown-item divided @click.native="handlerStart(row)">启动</el-dropdown-item>
+              <el-dropdown-item @click.native="handlerUpdate(row)">编辑</el-dropdown-item>
+              <el-dropdown-item @click.native="handlerDelete(row)">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -64,23 +64,76 @@
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="类型" prop="pluginType">
-          <el-select v-model="temp.pluginType" class="filter-item" placeholder="插件类型">
-            <el-option v-for="item in pluginTypeOptions" :key="item.key" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="名称" prop="pluginName">
-          <el-input v-model="temp.pluginName" placeholder="插件名称" />
-        </el-form-item>
-        <el-form-item label="模板">
-          <el-input v-model="temp.templateJson" :autosize="{ minRows: 2, maxRows: 8}" type="textarea" placeholder="Please input" />
-        </el-form-item>
-        <el-form-item label="注释">
-          <el-input v-model="temp.comments" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
-        </el-form-item>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="800px">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="执行器" prop="jobGroup">
+              <el-select v-model="temp.jobGroup" placeholder="请选择执行器">
+                <el-option v-for="item in executorList" :key="item.id" :label="item.title" :value="item.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="任务描述" prop="jobGroup">
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="路由策略" prop="executorRouteStrategy">
+              <el-select v-model="temp.executorRouteStrategy" placeholder="请选择路由策略">
+                <el-option v-for="item in routeStrategies" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Cron" prop="jobCron">
+              <el-input v-model="temp.jobCron" placeholder="请输入Cron表达式" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="阻塞处理" prop="executorBlockStrategy">
+              <el-select v-model="temp.executorBlockStrategy" placeholder="请选择阻塞处理策略">
+                <el-option v-for="item in blockStrategies" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="子任务ID">
+              <el-input v-model="temp.childJobId" placeholder="请输入子任务ID,多个以逗号分隔" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="任务超时时间">
+              <el-input v-model="temp.executorTimeout" placeholder="任务超时时间，单位秒，大于零时生效" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="负责人" prop="author">
+              <el-input v-model="temp.author" placeholder="请输入负责人" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="失败重试次数">
+              <el-input v-model="temp.executorFailRetryCount" placeholder="失败重试次数，大于零时生效" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="报警邮件">
+              <el-input v-model="temp.alarmEmail" placeholder="请输入报警邮件，多个用逗号分隔" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
+      <json-editor ref="jsonEditor" v-model="temp.jobJson" />
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
@@ -107,10 +160,11 @@ import * as job from '@/api/datax-job-info'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import JsonEditor from '@/components/JsonEditor'
 
 export default {
   name: 'JobInfo',
-  components: { Pagination },
+  components: { Pagination, JsonEditor },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -146,22 +200,108 @@ export default {
         create: 'Create'
       },
       rules: {
-        pluginType: [{ required: true, message: 'type is required', trigger: 'change' }],
-        pluginName: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        jobGroup: [{ required: true, message: 'jobGroup is required', trigger: 'change' }],
+        executorRouteStrategy: [{ required: true, message: 'executorRouteStrategy is required', trigger: 'change' }],
+        executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
+        jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
+        jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
+        author: [{ required: true, message: 'author is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,
-        pluginName: '',
-        pluginType: '',
-        templateJson: '',
-        comments: ''
-      }
+        jobGroup: '',
+        jobCron: '',
+        jobDesc: '',
+        executorRouteStrategy: '',
+        executorBlockStrategy: '',
+        childJobId: '',
+        executorFailRetryCount: '',
+        alarmEmail: '',
+        executorTimeout: '',
+        author: '',
+        jobConfigId: '',
+        executorHandler: 'commandJobHandler',
+        glueType: 'BEAN',
+        jobJson: {}
+      },
+      executorList: '',
+      jobConfigList: '',
+      blockStrategies: [
+        {
+          value: 'SERIAL_EXECUTION',
+          label: '单机串行'
+        },
+        {
+          value: 'DISCARD_LATER',
+          label: '丢弃后续调度'
+        },
+        {
+          value: 'COVER_EARLY',
+          label: '覆盖之前调度'
+        }
+      ],
+      routeStrategies: [
+        {
+          value: 'FIRST',
+          label: '第一个'
+        },
+        {
+          value: 'LAST',
+          label: '最后一个'
+        },
+        {
+          value: 'ROUND',
+          label: '轮询'
+        },
+        {
+          value: 'RANDOM',
+          label: '随机'
+        },
+        {
+          value: 'CONSISTENT_HASH',
+          label: '一致性HASH'
+        },
+        {
+          value: 'LEAST_FREQUENTLY_USED',
+          label: '最不经常使用'
+        },
+        {
+          value: 'LEAST_RECENTLY_USED',
+          label: '最近最久未使用'
+        },
+        {
+          value: 'FAILOVER',
+          label: '故障转移'
+        },
+        {
+          value: 'BUSYOVER',
+          label: '忙碌转移'
+        },
+        {
+          value: 'SHARDING_BROADCAST',
+          label: '分片广播'
+        }
+      ]
     }
   },
   created() {
     this.fetchData()
+    this.getExecutor()
+    this.getConfigList()
   },
+
   methods: {
+    getExecutor() {
+      job.getExecutorList().then(response => {
+        const { content } = response
+        this.executorList = content
+      })
+    },
+    getConfigList: function() {
+      job.getJobConfigList().then(response => {
+        this.jobConfigList = response
+      })
+    },
     fetchData() {
       this.listLoading = true
       job.getList(this.listQuery).then(response => {
@@ -171,19 +311,7 @@ export default {
         this.listLoading = false
       })
     },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
-    },
     handleCreate() {
-      this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -193,7 +321,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          job.createPlugin(this.temp).then(() => {
+          job.createJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -206,8 +334,9 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handlerUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
+      this.temp.jobJson = JSON.parse(row.jobJson)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -218,7 +347,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          job.updatePlugin(tempData).then(() => {
+          job.updateJob(tempData).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -231,13 +360,8 @@ export default {
         }
       })
     },
-    handleDelete(row) {
-      console.log('删除')
-      const idList = []
-      idList.push(row.id)
-      // 拼成 idList=xx
-      // 多个比较麻烦，这里不处理
-      job.deletePlugin({ idList: row.id }).then(response => {
+    handlerDelete(row) {
+      job.removeJob(row.id).then(response => {
         this.fetchData()
         this.$notify({
           title: 'Success',
@@ -263,28 +387,58 @@ export default {
         }
       }))
     },
-    handleTrigger(row) {
+    handlerExecute(row) {
+      const param = {}
+      param.jobId = row.id
+      param.executorParam = row.executorParam
+      job.triggerJob(param).then(response => {
+        this.$notify({
+          title: 'Success',
+          message: 'Execute Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
+    // 查看日志
+    handlerViewLog(row) {
+      job.viewJobLog(row.id).then(response => {
+        // console.log(response)
+        // 判断是否是 '\n'，如果是表示显示完成，不重新加载
+        if (response.logContent === '\n') {
+          // this.jobLogQuery.fromLineNum = response.toLineNum - 20;
+          // 重新加载
+          // setTimeout(() => {
+          //   this.loadLog()
+          // }, 2000);
+        } else {
+          // 后续改进
+          // this.jobLogQuery.fromLineNum = response.toLineNum
+          this.logContent = response.logContent
+        }
+        this.logLoading = false
+      })
+    },
+    handlerViewNode(row) {
       const jobDesc = row.jobDesc
       this.$message('click on item ' + jobDesc)
     },
-    handleCommand(command) {
-      switch (command) {
-        case 'a':
-          this.handleTrigger(command)
-      }
+    handlerStart(row) {
+      job.startJob(row.id).then(response => {
+        this.$notify({
+          title: 'Success',
+          message: 'Start Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      })
     }
   }
 }
 </script>
 
 <style>
-  .el-dropdown {
-    vertical-align: top;
-  }
   .el-dropdown + .el-dropdown {
     margin-left: 15px;
-  }
-  .el-icon-arrow-down {
-    font-size: 12px;
   }
 </style>

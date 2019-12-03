@@ -4,39 +4,67 @@ import request from '@/utils/request'
 
 export function getList(params) {
   return request({
-    url: 'api/pageList',
+    url: 'api/job/pageList',
     method: 'get',
     params
   })
 }
 
-export function fetchPlugin(params) {
+export function triggerJob(data) {
   return request({
-    url: '/api/dataxPlugin/' + params,
-    method: 'get'
-  })
-}
-
-export function updatePlugin(data) {
-  return request({
-    url: '/api/dataxPlugin/',
-    method: 'put',
-    data
-  })
-}
-
-export function createPlugin(data) {
-  return request({
-    url: '/api/dataxPlugin/',
+    url: '/api/job/trigger',
     method: 'post',
     data
   })
 }
 
-export function deletePlugin(data) {
+export function startJob(id) {
   return request({
-    url: '/api/dataxPlugin/',
-    method: 'delete',
-    params: data
+    url: '/api/job/start?id=' + id,
+    method: 'post'
+  })
+}
+
+export function getExecutorList() {
+  return request({
+    url: 'api/jobgroup/list',
+    method: 'get'
+  })
+}
+
+export function getJobConfigList() {
+  return request({
+    url: '/api/jobConfig/all',
+    method: 'get'
+  })
+}
+
+export function updateJob(data) {
+  return request({
+    url: '/api/job/update',
+    method: 'post',
+    data
+  })
+}
+
+export function createJob(data) {
+  return request({
+    url: '/api/job/add/',
+    method: 'post',
+    data
+  })
+}
+
+export function removeJob(id) {
+  return request({
+    url: '/api/job/remove/' + id,
+    method: 'post'
+  })
+}
+
+export function viewJobLog(id) {
+  return request({
+    url: '/api/log/logDetailCat?id=' + id,
+    method: 'get'
   })
 }
