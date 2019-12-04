@@ -1,10 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.pluginName" placeholder="任务描述" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.pluginType" placeholder="负责人" clearable style="width: 120px" class="filter-item">
-        <el-option v-for="item in pluginTypeOptions" :key="item" :label="item" :value="item" />
-      </el-select>
+      <el-input v-model="listQuery.jobDesc" placeholder="任务描述" style="width: 200px;" class="filter-item" />
+      <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         Search
       </el-button>
@@ -184,13 +182,12 @@ export default {
       listQuery: {
         current: 0,
         size: 10,
-        jobGroup: 1,
+        jobGroup: 0,
         triggerStatus: -1,
         jobDesc: '',
         executorHandler: '',
         author: ''
       },
-      pluginTypeOptions: ['reader', 'writer'],
       dialogPluginVisible: false,
       pluginData: [],
       dialogFormVisible: false,

@@ -1,19 +1,20 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.pluginName" placeholder="插件名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.pluginType" placeholder="插件类型" clearable style="width: 120px" class="filter-item">
-        <el-option v-for="item in pluginTypeOptions" :key="item" :label="item" :value="item" />
+      <el-input v-model="listQuery.jobId" placeholder="任务ID" style="width: 200px;" class="filter-item" />
+      <el-select v-model="listQuery.jobGroup" placeholder="执行器">
+        <el-option :key="-1" :label="全部" :value="-1" />
+        <el-option v-for="item in executorList" :key="item.id" :label="item.title" :value="item.id" />
+      </el-select>
+      <el-select v-model="listQuery.logStatus" clearable placeholder="类型" style="width: 200px;">
+        <el-option v-for="item in logStatusList" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         Search
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Add
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handlerDelete">
+        Clear
       </el-button>
-      <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        reviewer
-      </el-checkbox> -->
     </div>
     <el-table
       v-loading="listLoading"
@@ -23,58 +24,84 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="序号" width="95">
-        <template slot-scope="scope">{{ scope.$index }}</template>
+      <el-table-column align="center" label="任务ID" width="80">
+        <template slot-scope="scope">{{ scope.row.id }}</template>
       </el-table-column>
-      <el-table-column label="pluginType" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.pluginType }}</template>
+      <el-table-column label="调度时间" align="center" width="200">
+        <template slot-scope="scope">{{ scope.row.triggerTime }}</template>
       </el-table-column>
-      <el-table-column label="pluginName" width="110" align="center">
+      <el-table-column label="调度结果" align="center" width="200">
+        <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.triggerCode).label }}</template>
+      </el-table-column>
+      <el-table-column label="调度备注" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.pluginName }}</span>
+          <el-popover
+            placement="bottom"
+            width="400"
+            trigger="click"
+          >
+            <h5 v-html="scope.row.triggerMsg" />
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="templateJson" width="150" align="center">
-        <template slot-scope="scope">{{ scope.row.templateJson }}</template>
+      <el-table-column label="执行时间" align="center" width="200">
+        <template slot-scope="scope">{{ scope.row.handleTime }}</template>
       </el-table-column>
-      <el-table-column label="comments" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.comments }}</template>
+      <el-table-column label="执行结果" align="center" width="200">
+        <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.handleCode).label }}</template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="执行备注" align="center" width="200">
+        <template slot-scope="scope">
+          <el-popover
+            placement="bottom"
+            width="400"
+            trigger="click"
+          >
+            <h5 v-html="scope.row.handleMsg" />
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column label="Actions" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
-          </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
-            Delete
-          </el-button>
+          <el-button type="primary" @click.native="handlerViewLog(row)">执行日志</el-button>
         </template>
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="类型" prop="pluginType">
-          <el-select v-model="temp.pluginType" class="filter-item" placeholder="插件类型">
-            <el-option v-for="item in pluginTypeOptions" :key="item.key" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="名称" prop="pluginName">
-          <el-input v-model="temp.pluginName" placeholder="插件名称" />
-        </el-form-item>
-        <el-form-item label="模板">
-          <el-input v-model="temp.templateJson" :autosize="{ minRows: 2, maxRows: 8}" type="textarea" placeholder="Please input" />
-        </el-form-item>
-        <el-form-item label="注释">
-          <el-input v-model="temp.comments" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
-        </el-form-item>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="center" label-width="100px">
+        <el-row>
+          <el-col :span="14" :offset="5">
+            <el-form-item label="执行器">
+              <el-input size="medium" value="全部" :disabled="true" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="14" :offset="5">
+            <el-form-item label="任务">
+              <el-input size="medium" value="全部" :disabled="true" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="14" :offset="5">
+            <el-form-item label="执行器">
+              <el-select v-model="temp.deleteType" placeholder="请选择执行器" style="width: 230px">
+                <el-option v-for="item in deleteTypeList" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button type="primary" @click="deleteLog">
           Confirm
         </el-button>
       </div>
@@ -92,23 +119,23 @@
 </template>
 
 <script>
-import Api from "@/api/datax-jobConfig";
+import * as log from '@/api/datax-job-log'
+import * as job from '@/api/datax-job-info'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: "DataxJobLog",
+  name: 'JobInfo',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "gray",
-        deleted: "danger"
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'gray',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     }
   },
   data() {
@@ -117,114 +144,85 @@ export default {
       listLoading: true,
       total: 0,
       listQuery: {
-        current: 1,
+        current: 0,
         size: 10,
-        pluginName: undefined
+        jobGroup: 0,
+        jobId: 0,
+        logStatus: -1,
+        filterTime: ''
       },
-      pluginTypeOptions: ['reader', 'writer'],
       dialogPluginVisible: false,
       pluginData: [],
       dialogFormVisible: false,
       dialogStatus: '',
+      executorList: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        create: 'Clear'
       },
       rules: {
-        pluginType: [{ required: true, message: 'type is required', trigger: 'change' }],
-        pluginName: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       temp: {
-        id: undefined,
-        pluginName: '',
-        pluginType: '',
-        templateJson: '',
-        comments: ''
-      }
-    };
+        deleteType: '',
+        jobGroup: 0,
+        jobId: 0
+      },
+      statusList: [
+        { value: 500, label: '失败' },
+        { value: 502, label: '失败(超时)' },
+        { value: 200, label: '成功' },
+        { value: 0, label: '无' }
+      ],
+      deleteTypeList: [
+        { value: 1, label: '清理一个月之前日志数据' },
+        { value: 2, label: '清理三个月之前日志数据' },
+        { value: 3, label: '清理六个月之前日志数据' },
+        { value: 4, label: '清理一年之前日志数据' },
+        { value: 5, label: '清理一千条以前日志数据' },
+        { value: 6, label: '清理一万条以前日志数据' },
+        { value: 7, label: '清理三万条以前日志数据' },
+        { value: 8, label: '清理十万条以前日志数据' },
+        { value: 9, label: '清理所有日志数据' }
+      ],
+      logStatusList: [
+        { value: -1, label: '全部' },
+        { value: 1, label: '成功' },
+        { value: 2, label: '失败' },
+        { value: 3, label: '进行中' }
+      ]
+    }
   },
   created() {
-    this.fetchData();
+    this.fetchData()
+    this.getExecutor()
   },
+
   methods: {
     fetchData() {
-      this.listLoading = true;
-      Api.paged(this.listQuery).then(response => {
-        const { records } = response
-        const { total } = response
-        this.total = total
-        this.list = records;
-        this.listLoading = false;
-      });
+      this.listLoading = true
+      log.getList(this.listQuery).then(response => {
+        const { content } = response
+        this.total = content.recordsTotal
+        this.list = content.data
+        this.listLoading = false
+      })
     },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
+    getExecutor() {
+      job.getExecutorList().then(response => {
+        const { content } = response
+        this.executorList = content
+      })
     },
-    handleCreate() {
-      this.resetTemp()
+    handlerDelete() {
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          Api.created(this.temp).then(() => {
-            this.fetchData()
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          Api.updated(tempData).then(() => {
-            this.fetchData()
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleDelete(row) {
-      console.log('删除')
-      const idList = []
-      idList.push(row.id)
-      // 拼成 idList=xx
-      // 多个比较麻烦，这里不处理
-      Api.deleted({ idList: row.id }).then(response => {
+    deleteLog() {
+      log.clearLog(this.temp.jobGroup, this.temp.jobId, this.temp.deleteType).then(response => {
         this.fetchData()
+        this.dialogFormVisible = false
         this.$notify({
           title: 'Success',
           message: 'Delete Successfully',
@@ -234,21 +232,25 @@ export default {
       })
       // const index = this.list.indexOf(row)
     },
-    handleFetchPv(id) {
-      Api.fetch(id).then(response => {
-        this.pluginData = response
-        this.dialogPvVisible = true
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
+    // 查看日志
+    handlerViewLog(row) {
+      log.viewJobLog(row.id).then(response => {
+        // console.log(response)
+        // 判断是否是 '\n'，如果是表示显示完成，不重新加载
+        if (response.logContent === '\n') {
+          // this.jobLogQuery.fromLineNum = response.toLineNum - 20;
+          // 重新加载
+          // setTimeout(() => {
+          //   this.loadLog()
+          // }, 2000);
         } else {
-          return v[j]
+          // 后续改进
+          // this.jobLogQuery.fromLineNum = response.toLineNum
+          this.logContent = response.logContent
         }
-      }))
+        this.logLoading = false
+      })
     }
   }
-};
+}
 </script>

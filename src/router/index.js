@@ -162,9 +162,9 @@ export const asyncRoutes = [
         meta: { title: 'datax json构建', icon: 'table' }
       },
       {
-        path: 'GroupManagement',
-        name: 'GroupManagement',
-        component: () => import('@/views/datax/GroupManagement/index'),
+        path: 'groupManagement',
+        name: 'groupManagement',
+        component: () => import('@/views/datax/groupManagement/index'),
         meta: { title: '分组管理', icon: 'table' }
       },
       {
@@ -172,6 +172,12 @@ export const asyncRoutes = [
         name: 'jobInfo',
         component: () => import('@/views/datax/jobInfo/index'),
         meta: { title: '任务管理', icon: 'table' }
+      },
+      {
+        path: 'jobLog',
+        name: 'jobLog',
+        component: () => import('@/views/datax/jobLog/index'),
+        meta: { title: '调度日志', icon: 'table' }
       }
     ]
   },
