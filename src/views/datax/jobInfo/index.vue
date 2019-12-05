@@ -180,7 +180,7 @@ export default {
       listLoading: true,
       total: 0,
       listQuery: {
-        current: 0,
+        current: 1,
         size: 10,
         jobGroup: 0,
         triggerStatus: -1,
@@ -224,60 +224,21 @@ export default {
       executorList: '',
       jobConfigList: '',
       blockStrategies: [
-        {
-          value: 'SERIAL_EXECUTION',
-          label: '单机串行'
-        },
-        {
-          value: 'DISCARD_LATER',
-          label: '丢弃后续调度'
-        },
-        {
-          value: 'COVER_EARLY',
-          label: '覆盖之前调度'
-        }
+        { value: 'SERIAL_EXECUTION', label: '单机串行' },
+        { value: 'DISCARD_LATER', label: '丢弃后续调度' },
+        { value: 'COVER_EARLY', label: '覆盖之前调度' }
       ],
       routeStrategies: [
-        {
-          value: 'FIRST',
-          label: '第一个'
-        },
-        {
-          value: 'LAST',
-          label: '最后一个'
-        },
-        {
-          value: 'ROUND',
-          label: '轮询'
-        },
-        {
-          value: 'RANDOM',
-          label: '随机'
-        },
-        {
-          value: 'CONSISTENT_HASH',
-          label: '一致性HASH'
-        },
-        {
-          value: 'LEAST_FREQUENTLY_USED',
-          label: '最不经常使用'
-        },
-        {
-          value: 'LEAST_RECENTLY_USED',
-          label: '最近最久未使用'
-        },
-        {
-          value: 'FAILOVER',
-          label: '故障转移'
-        },
-        {
-          value: 'BUSYOVER',
-          label: '忙碌转移'
-        },
-        {
-          value: 'SHARDING_BROADCAST',
-          label: '分片广播'
-        }
+        { value: 'FIRST', label: '第一个' },
+        { value: 'LAST', label: '最后一个' },
+        { value: 'ROUND', label: '轮询' },
+        { value: 'RANDOM', label: '随机' },
+        { value: 'CONSISTENT_HASH', label: '一致性HASH' },
+        { value: 'LEAST_FREQUENTLY_USED', label: '最不经常使用' },
+        { value: 'LEAST_RECENTLY_USED', label: '最近最久未使用' },
+        { value: 'FAILOVER', label: '故障转移' },
+        { value: 'BUSYOVER', label: '忙碌转移' },
+        { value: 'SHARDING_BROADCAST', label: '分片广播' }
       ]
     }
   },
@@ -399,22 +360,7 @@ export default {
     },
     // 查看日志
     handlerViewLog(row) {
-      job.viewJobLog(row.id).then(response => {
-        // console.log(response)
-        // 判断是否是 '\n'，如果是表示显示完成，不重新加载
-        if (response.logContent === '\n') {
-          // this.jobLogQuery.fromLineNum = response.toLineNum - 20;
-          // 重新加载
-          // setTimeout(() => {
-          //   this.loadLog()
-          // }, 2000);
-        } else {
-          // 后续改进
-          // this.jobLogQuery.fromLineNum = response.toLineNum
-          this.logContent = response.logContent
-        }
-        this.logLoading = false
-      })
+      this.$router.push({ path: '/datax/jobLog', query: { jobId: row.id }})
     },
     handlerViewNode(row) {
       const jobDesc = row.jobDesc

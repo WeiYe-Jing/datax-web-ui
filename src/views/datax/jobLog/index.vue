@@ -1,12 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.jobId" placeholder="任务ID" style="width: 200px;" class="filter-item" />
+      <el-input v-model="listQuery.jobId" placeholder="全部" style="width: 200px" />
       <el-select v-model="listQuery.jobGroup" placeholder="执行器">
-        <el-option :key="-1" :label="全部" :value="-1" />
         <el-option v-for="item in executorList" :key="item.id" :label="item.title" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.logStatus" clearable placeholder="类型" style="width: 200px;">
+      <el-select v-model="listQuery.logStatus" clearable placeholder="类型" style="width: 200px">
         <el-option v-for="item in logStatusList" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
@@ -65,7 +64,7 @@
       </el-table-column>
       <el-table-column label="Actions" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" @click.native="handlerViewLog(row)">执行日志</el-button>
+          <el-button type="primary" @click.native="handleViewJobLog(row)">执行日志</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -106,14 +105,15 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPluginVisible" title="Reading statistics">
-      <el-table :data="pluginData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
+    <el-dialog title="日志查看" :visible.sync="logShow">
+      <div class="log-container">
+        <pre :loading="logLoading" v-text="logContent" />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="loadLog">
+          刷新日志
+        </el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -144,10 +144,10 @@ export default {
       listLoading: true,
       total: 0,
       listQuery: {
-        current: 0,
+        current: 1,
         size: 10,
         jobGroup: 0,
-        jobId: 0,
+        jobId: '',
         logStatus: -1,
         filterTime: ''
       },
@@ -188,7 +188,20 @@ export default {
         { value: 1, label: '成功' },
         { value: 2, label: '失败' },
         { value: 3, label: '进行中' }
-      ]
+      ],
+      // 日志查询参数
+      jobLogQuery: {
+        executorAddress: '',
+        triggerTime: '',
+        id: '',
+        fromLineNum: 1
+      },
+      // 日志内容
+      logContent: undefined,
+      // 显示日志
+      logShow: false,
+      // 日志显示加载中效果
+      logLoading: false
     }
   },
   created() {
@@ -199,7 +212,15 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      log.getList(this.listQuery).then(response => {
+      const param = Object.assign({}, this.listQuery)
+      const urlJobId = this.$route.query.jobId
+      // param.jobId = urlJobId > 0 ? urlJobId : !param.jobId ? param.jobId : 0
+      if (urlJobId > 0) {
+        param.jobId = urlJobId
+      } else {
+        if (!param.jobId) param.jobId = 0
+      }
+      log.getList(param).then(response => {
         const { content } = response
         this.total = content.recordsTotal
         this.list = content.data
@@ -210,6 +231,9 @@ export default {
       job.getExecutorList().then(response => {
         const { content } = response
         this.executorList = content
+        const defaultParam = { id: 0, title: '全部' }
+        this.executorList.unshift(defaultParam)
+        this.listQuery.jobGroup = this.executorList[0].id
       })
     },
     handlerDelete() {
@@ -233,11 +257,23 @@ export default {
       // const index = this.list.indexOf(row)
     },
     // 查看日志
-    handlerViewLog(row) {
-      log.viewJobLog(row.id).then(response => {
+    handleViewJobLog(row) {
+      this.jobLogQuery.executorAddress = row.executorAddress
+      this.jobLogQuery.id = row.jobId
+      this.jobLogQuery.triggerTime = Date.parse(row.triggerTime)
+      if (this.logShow === false) {
+        this.logShow = true
+      }
+      this.loadLog()
+    },
+    // 获取日志
+    loadLog(row) {
+      this.logLoading = true
+      log.viewJobLog(this.jobLogQuery.executorAddress, this.jobLogQuery.triggerTime, this.jobLogQuery.id,
+        this.jobLogQuery.fromLineNum).then(response => {
         // console.log(response)
         // 判断是否是 '\n'，如果是表示显示完成，不重新加载
-        if (response.logContent === '\n') {
+        if (response.content.logContent === '\n') {
           // this.jobLogQuery.fromLineNum = response.toLineNum - 20;
           // 重新加载
           // setTimeout(() => {
@@ -246,7 +282,7 @@ export default {
         } else {
           // 后续改进
           // this.jobLogQuery.fromLineNum = response.toLineNum
-          this.logContent = response.logContent
+          this.logContent = response.content.logContent
         }
         this.logLoading = false
       })
@@ -254,3 +290,24 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .log-container{
+    margin-bottom: 20px;
+    background: #f5f5f5;
+    width: 100%;
+    height: 500px;
+    overflow: scroll;
+    pre {
+      display: block;
+      padding: 10px;
+      margin: 0 0 10.5px;
+      word-break: break-all;
+      word-wrap: break-word;
+      color: #334851;
+      background-color: #f5f5f5;
+      // border: 1px solid #ccd1d3;
+      border-radius: 1px;
+    }
+  }
+</style>

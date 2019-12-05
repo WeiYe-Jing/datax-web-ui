@@ -62,9 +62,9 @@ export function clearLog(jobGroup, jobId, type) {
   })
 }
 
-export function viewJobLog(id) {
+export function viewJobLog(executorAddress, triggerTime, logId, fromLineNum) {
   return request({
-    url: '/api/log/logDetailCat?id=' + id,
+    url: '/api/log/logDetailCat?executorAddress=' + executorAddress + '&triggerTime=' + triggerTime + '&logId=' + logId + '&fromLineNum=' + fromLineNum,
     method: 'get'
   })
 }
