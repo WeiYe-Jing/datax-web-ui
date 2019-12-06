@@ -27,7 +27,7 @@ export function startJob(id) {
 
 export function getExecutorList() {
   return request({
-    url: 'api/jobgroup/list',
+    url: 'api/jobGroup/list',
     method: 'get'
   })
 }

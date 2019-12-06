@@ -138,34 +138,10 @@ export const asyncRoutes = [
     meta: { title: 'datax', icon: 'example' },
     children: [
       {
-        path: 'job',
-        name: '同步任务',
-        component: () => import('@/views/datax/job/index'),
-        meta: { title: '同步任务', icon: 'table', affix: true }
-      },
-      {
-        path: 'jobConfig',
-        name: 'jobConfig',
-        component: () => import('@/views/datax/jobConfig/index'),
-        meta: { title: '作业配置', icon: 'table' }
-      },
-      {
-        path: 'jdbcDatasource',
-        name: 'jdbcDatasource',
-        component: () => import('@/views/datax/jdbc-datasource/index'),
-        meta: { title: 'jdbc数据源管理', icon: 'table' }
-      },
-      {
-        path: 'jsonBuild',
-        name: 'jsonBuild',
-        component: () => import('@/views/datax/json-build/index'),
-        meta: { title: 'datax json构建', icon: 'table' }
-      },
-      {
-        path: 'groupManagement',
-        name: 'groupManagement',
-        component: () => import('@/views/datax/groupManagement/index'),
-        meta: { title: '分组管理', icon: 'table' }
+        path: 'executorManage',
+        name: 'executorManage',
+        component: () => import('@/views/datax/executorManage/index'),
+        meta: { title: '执行器管理', icon: 'table' }
       },
       {
         path: 'jobInfo',
@@ -178,6 +154,18 @@ export const asyncRoutes = [
         name: 'jobLog',
         component: () => import('@/views/datax/jobLog/index'),
         meta: { title: '调度日志', icon: 'table' }
+      },
+      {
+        path: 'jdbcDatasource',
+        name: 'jdbcDatasource',
+        component: () => import('@/views/datax/jdbc-datasource/index'),
+        meta: { title: 'jdbc数据源管理', icon: 'table' }
+      },
+      {
+        path: 'jsonBuild',
+        name: 'jsonBuild',
+        component: () => import('@/views/datax/json-build/index'),
+        meta: { title: 'datax json构建', icon: 'table' }
       }
     ]
   },

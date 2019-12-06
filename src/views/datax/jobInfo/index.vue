@@ -141,15 +141,6 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPluginVisible" title="Reading statistics">
-      <el-table :data="pluginData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 

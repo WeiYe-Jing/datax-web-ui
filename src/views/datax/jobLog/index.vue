@@ -125,7 +125,7 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: 'JobInfo',
+  name: 'JobLog',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -214,12 +214,7 @@ export default {
       this.listLoading = true
       const param = Object.assign({}, this.listQuery)
       const urlJobId = this.$route.query.jobId
-      // param.jobId = urlJobId > 0 ? urlJobId : !param.jobId ? param.jobId : 0
-      if (urlJobId > 0) {
-        param.jobId = urlJobId
-      } else {
-        if (!param.jobId) param.jobId = 0
-      }
+      param.jobId = urlJobId > 0 ? urlJobId : !param.jobId ? 0 : param.jobId
       log.getList(param).then(response => {
         const { content } = response
         this.total = content.recordsTotal
