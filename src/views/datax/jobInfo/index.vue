@@ -27,22 +27,58 @@
       <el-table-column label="任务描述" align="center" width="400">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
-      <el-table-column label="Cron" align="center" width="200">
+      <el-table-column label="Cron" align="center" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
         </template>
       </el-table-column>
       <el-table-column label="路由策略" align="center" width="200">
-        <template slot-scope="scope">{{ scope.row.executorRouteStrategy }}</template>
+        <template slot-scope="scope"> {{ routeStrategies.find(t => t.value === scope.row.executorRouteStrategy).label }}</template>
       </el-table-column>
       <el-table-column label="负责人" align="center" width="120">
         <template slot-scope="scope">{{ scope.row.author }}</template>
       </el-table-column>
-      <el-table-column label="状态" align="center" width="120">
-        <template slot-scope="scope">{{ scope.row.triggerStatus }}</template>
+      <el-table-column label="状态" align="center" width="160">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.triggerStatus"
+            active-color="#00A854"
+            active-text="启动"
+            :active-value="1"
+            inactive-color="#F04134"
+            inactive-text="停止"
+            :inactive-value="0"
+            @change="changeSwitch(scope.row)"
+          />
+        </template>
       </el-table-column>
-      <el-table-column label="下次触发时间" align="center" width="200">
-        <template slot-scope="scope">{{ scope.row.triggerNextTime }}</template>
+      <el-table-column label="注册节点" align="center" width="150">
+        <template slot-scope="scope">
+          <el-popover
+            placement="bottom"
+            width="500"
+            @show="loadById(scope.row)"
+          >
+            <el-table :data="registerNode">
+              <el-table-column width="150" property="title" label="执行器名称" />
+              <el-table-column width="150" property="appName" label="appName" />
+              <el-table-column width="150" property="registryList" label="机器地址" />
+            </el-table>
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column label="下次触发时间" align="center" width="150">
+        <template slot-scope="scope">
+          <el-popover
+            placement="bottom"
+            width="300"
+            @show="nextTriggerTime(scope.row)"
+          >
+            <h5 v-html="triggerNextTimes" />
+            <el-button slot="reference">查看</el-button>
+          </el-popover>
+        </template>
       </el-table-column>
       <el-table-column label="Actions" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
@@ -51,9 +87,7 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item @click.native="handlerExecute(row)">执行一次</el-dropdown-item>
               <el-dropdown-item @click.native="handlerViewLog(row)">查询日志</el-dropdown-item>
-              <el-dropdown-item @click.native="handlerViewNode(row)">注册节点</el-dropdown-item>
-              <el-dropdown-item divided @click.native="handlerStart(row)">启动</el-dropdown-item>
-              <el-dropdown-item @click.native="handlerUpdate(row)">编辑</el-dropdown-item>
+              <el-dropdown-item divided @click.native="handlerUpdate(row)">编辑</el-dropdown-item>
               <el-dropdown-item @click.native="handlerDelete(row)">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -145,6 +179,7 @@
 </template>
 
 <script>
+import * as executor from '@/api/datax-executorManage'
 import * as job from '@/api/datax-job-info'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -230,7 +265,9 @@ export default {
         { value: 'FAILOVER', label: '故障转移' },
         { value: 'BUSYOVER', label: '忙碌转移' },
         { value: 'SHARDING_BROADCAST', label: '分片广播' }
-      ]
+      ],
+      triggerNextTimes: '',
+      registerNode: []
     }
   },
   created() {
@@ -359,6 +396,44 @@ export default {
     },
     handlerStart(row) {
       job.startJob(row.id).then(response => {
+        this.$notify({
+          title: 'Success',
+          message: 'Start Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
+    handlerStop(row) {
+      job.stopJob(row.id).then(response => {
+        this.$notify({
+          title: 'Success',
+          message: 'Start Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
+    changeSwitch(row) {
+      row.triggerStatus === 1 ? this.handlerStart(row) : this.handlerStop(row)
+    },
+    nextTriggerTime(row) {
+      job.nextTriggerTime(row.jobCron).then(response => {
+        const { content } = response
+        this.triggerNextTimes = content.join('<br>')
+        this.$notify({
+          title: 'Success',
+          message: 'Start Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
+    loadById(row) {
+      executor.loadById(row.jobGroup).then(response => {
+        this.registerNode = []
+        const { content } = response
+        this.registerNode.push(content)
         this.$notify({
           title: 'Success',
           message: 'Start Successfully',

@@ -25,6 +25,13 @@ export function startJob(id) {
   })
 }
 
+export function stopJob(id) {
+  return request({
+    url: '/api/job/stop?id=' + id,
+    method: 'post'
+  })
+}
+
 export function getExecutorList() {
   return request({
     url: 'api/jobGroup/list',
@@ -62,6 +69,12 @@ export function removeJob(id) {
   })
 }
 
+export function nextTriggerTime(cron) {
+  return request({
+    url: '/api/job/nextTriggerTime?cron=' + cron,
+    method: 'get'
+  })
+}
 export function viewJobLog(id) {
   return request({
     url: '/api/log/logDetailCat?id=' + id,

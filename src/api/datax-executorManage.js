@@ -25,6 +25,13 @@ export function created(data) {
   })
 }
 
+export function loadById(id) {
+  return request({
+    url: '/api/jobGroup/loadById?id=' + id,
+    method: 'post'
+  })
+}
+
 export function deleted(id) {
   return request({
     url: '/api/jobGroup/remove?id=' + id,

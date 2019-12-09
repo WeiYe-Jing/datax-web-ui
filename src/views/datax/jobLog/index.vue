@@ -214,7 +214,11 @@ export default {
       this.listLoading = true
       const param = Object.assign({}, this.listQuery)
       const urlJobId = this.$route.query.jobId
-      param.jobId = urlJobId > 0 ? urlJobId : !param.jobId ? 0 : param.jobId
+      if (urlJobId > 0 && !param.jobId) {
+        param.jobId = urlJobId
+      } else if (!urlJobId && !param.jobId) {
+        param.jobId = 0
+      }
       log.getList(param).then(response => {
         const { content } = response
         this.total = content.recordsTotal
