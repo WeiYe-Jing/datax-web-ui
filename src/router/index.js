@@ -138,9 +138,9 @@ export const asyncRoutes = [
     meta: { title: 'datax', icon: 'example' },
     children: [
       {
-        path: 'executorManage',
-        name: 'executorManage',
-        component: () => import('@/views/datax/executorManage/index'),
+        path: 'executor',
+        name: 'executor',
+        component: () => import('@/views/datax/executor/index'),
         meta: { title: '执行器管理', icon: 'table' }
       },
       {
@@ -156,6 +156,12 @@ export const asyncRoutes = [
         meta: { title: '调度日志', icon: 'table' }
       },
       {
+        path: 'plugin',
+        name: 'DataxPlugin',
+        component: () => import('@/views/datax/plugin/index'),
+        meta: { title: '插件查看', icon: 'table' }
+      },
+      {
         path: 'jdbcDatasource',
         name: 'jdbcDatasource',
         component: () => import('@/views/datax/jdbc-datasource/index'),
@@ -166,6 +172,12 @@ export const asyncRoutes = [
         name: 'jsonBuild',
         component: () => import('@/views/datax/json-build/index'),
         meta: { title: 'datax json构建', icon: 'table' }
+      },
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/datax/user/index'),
+        meta: { title: '用户管理', icon: 'table', roles: ['ROLE_ADMIN'] }
       }
     ]
   },

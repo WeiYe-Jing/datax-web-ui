@@ -39,13 +39,6 @@ export function getExecutorList() {
   })
 }
 
-export function getJobConfigList() {
-  return request({
-    url: '/api/jobConfig/all',
-    method: 'get'
-  })
-}
-
 export function updateJob(data) {
   return request({
     url: '/api/job/update',

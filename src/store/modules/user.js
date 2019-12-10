@@ -35,7 +35,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password, rememberMe: 1 }).then(response => {
         const { data } = response.content
+        const { roles } = response.content
         commit('SET_TOKEN', data)
+        localStorage.setItem('roles', JSON.stringify(roles))
         setToken(data)
         resolve()
       }).catch(error => {
@@ -48,7 +50,7 @@ const actions = {
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       const data = {}
-      data.roles = ['admin']
+      data.roles = JSON.parse(localStorage.getItem('roles'))
       commit('SET_ROLES', data.roles)
       resolve(data)
     })
