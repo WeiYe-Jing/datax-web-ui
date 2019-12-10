@@ -23,26 +23,26 @@
       <!-- <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index }}</template>
       </el-table-column> -->
-      <el-table-column label="数据源名称" width="110" align="center">
+      <el-table-column label="数据源名称" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.datasourceName }}</template>
       </el-table-column>
-      <el-table-column label="数据源分组" width="110" align="center">
+      <el-table-column label="数据源分组" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.datasourceGroup }}
         </template>
       </el-table-column>
       <el-table-column label="用户名" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.jdbcUsername }}</template>
       </el-table-column>
-      <el-table-column label="密码" width="110" align="center">
+      <el-table-column label="密码" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.jdbcPassword }}</template>
       </el-table-column>
-      <el-table-column label="jdbc url" width="110" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="jdbc url" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcUrl }}</template>
       </el-table-column>
-      <el-table-column label="jdbc驱动类" width="110" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="jdbc驱动类" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcDriverClass }}</template>
       </el-table-column>
-      <el-table-column label="comments" width="110" align="center">
+      <el-table-column label="comments" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.comments }}</template>
       </el-table-column>
       <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">

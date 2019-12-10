@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import * as executor from '@/api/datax-executorManage'
+import * as executor from '@/api/datax-executor'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
