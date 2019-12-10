@@ -1,8 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="作业名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.jobGroup" placeholder="分组" style="width: 200px;" class="filter-item" />
+      <el-input v-model="listQuery.username" placeholder="用户名" style="width: 200px;" class="filter-item" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         Search
       </el-button>
@@ -21,25 +20,27 @@
       fit
       highlight-current-row
     >
-      <!-- <el-table-column align="center" label="序号" width="95">
-        <template slot-scope="scope">{{ scope.$index }}</template>
-      </el-table-column> -->
-      <el-table-column label="作业名" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.name }}</template>
+      <el-table-column align="center" label="序号" width="95">
+        <template slot-scope="scope">{{ scope.$index+1 }}</template>
       </el-table-column>
-      <el-table-column label="分组" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.jobGroup }}</template>
+      <el-table-column label="用户名" width="200" align="center">
+        <template slot-scope="scope">{{ scope.row.username }}</template>
       </el-table-column>
-      <el-table-column label="configJson" width="110" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.configJson }}</template>
+      <el-table-column label="角色" width="200" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.role }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="权限" width="150" align="center">
+        <template slot-scope="scope">{{ scope.row.permission }}</template>
       </el-table-column>
       <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            编辑
+            Edit
           </el-button>
           <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
-            删除
+            Delete
           </el-button>
         </template>
       </el-table-column>
@@ -48,16 +49,18 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="分组" prop="jobGroup">
-          <el-input v-model="temp.jobGroup" placeholder="分组" />
+        <el-form-item label="角色" prop="role">
+          <el-select v-model="temp.role" class="filter-item" placeholder="角色类型">
+            <el-option v-for="item in roles" :key="item.key" :label="item" :value="item" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="作业名" prop="name">
-          <el-input v-model="temp.name" placeholder="作业名" />
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="temp.username" placeholder="用户名" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="temp.password" placeholder="密码" />
         </el-form-item>
       </el-form>
-
-      <json-editor ref="jsonEditor" v-model="configJson" />
-
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
@@ -71,14 +74,13 @@
 </template>
 
 <script>
-import * as Api from '@/api/datax-jobConfig'
+import * as user from '@/api/datax-user'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import JsonEditor from '@/components/JsonEditor'
 
 export default {
-  name: 'DataxJobLog',
-  components: { Pagination, JsonEditor },
+  name: 'User',
+  components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -98,10 +100,10 @@ export default {
       listQuery: {
         current: 1,
         size: 10,
-        name: undefined,
-        jobGroup: undefined
+        username: undefined
       },
-      editJsonVisible: false,
+      roles: ['ROLE_USER', 'ROLE_ADMIN'],
+      dialogPluginVisible: false,
       pluginData: [],
       dialogFormVisible: false,
       dialogStatus: '',
@@ -110,16 +112,17 @@ export default {
         create: 'Create'
       },
       rules: {
-        name: [{ required: true, message: 'name is required', trigger: 'blur' }],
-        jobGroup: [{ required: true, message: 'jobGroup is required', trigger: 'blur' }]
+        role: [{ required: true, message: 'role is required', trigger: 'change' }],
+        username: [{ required: true, message: 'username is required', trigger: 'blur' }],
+        password: [{ required: true, message: 'password is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,
-        name: undefined,
-        jobGroup: undefined,
-        configJson: undefined
-      },
-      configJson: ''
+        role: '',
+        username: '',
+        password: '',
+        permission: ''
+      }
     }
   },
   created() {
@@ -128,25 +131,14 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      Api.paged(this.listQuery).then(response => {
-        const { records } = response
-        const { total } = response
-        this.total = total
-        this.list = records
+      user.getList(this.listQuery).then(response => {
+        const { content } = response
+        this.total = content.recordsTotal
+        this.list = content.data
         this.listLoading = false
       })
     },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        name: undefined,
-        jobGroup: undefined,
-        configJson: undefined
-      }
-      this.configJson = {}
-    },
     handleCreate() {
-      this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -156,8 +148,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.configJson = this.configJson
-          Api.created(this.temp).then(() => {
+          user.createUser(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -172,7 +163,6 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.configJson = JSON.parse(row.configJson)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -183,8 +173,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.configJson = this.configJson
-          Api.updated(tempData).then(() => {
+          user.updateUser(tempData).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -198,12 +187,7 @@ export default {
       })
     },
     handleDelete(row) {
-      console.log('删除')
-      const idList = []
-      idList.push(row.id)
-      // 拼成 idList=xx
-      // 多个比较麻烦，这里不处理
-      Api.deleted({ idList: row.id }).then(response => {
+      user.deleteUser(row.id).then(response => {
         this.fetchData()
         this.$notify({
           title: 'Success',
@@ -211,13 +195,6 @@ export default {
           type: 'success',
           duration: 2000
         })
-      })
-      // const index = this.list.indexOf(row)
-    },
-    handleFetchPv(id) {
-      Api.fetch(id).then(response => {
-        this.pluginData = response
-        this.dialogPvVisible = true
       })
     }
   }
