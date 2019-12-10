@@ -24,7 +24,7 @@
       highlight-current-row
     >
       <el-table-column align="center" label="任务ID" width="80">
-        <template slot-scope="scope">{{ scope.row.id }}</template>
+        <template slot-scope="scope">{{ scope.row.jobId }}</template>
       </el-table-column>
       <el-table-column label="调度时间" align="center" width="200">
         <template slot-scope="scope">{{ scope.row.triggerTime }}</template>
@@ -258,7 +258,7 @@ export default {
     // 查看日志
     handleViewJobLog(row) {
       this.jobLogQuery.executorAddress = row.executorAddress
-      this.jobLogQuery.id = row.jobId
+      this.jobLogQuery.id = row.id
       this.jobLogQuery.triggerTime = Date.parse(row.triggerTime)
       if (this.logShow === false) {
         this.logShow = true

@@ -24,7 +24,7 @@
       highlight-current-row
     >
       <el-table-column align="center" label="序号" width="95">
-        <template slot-scope="scope">{{ scope.$index }}</template>
+        <template slot-scope="scope">{{ scope.$index+1 }}</template>
       </el-table-column>
       <el-table-column label="pluginType" width="110" align="center">
         <template slot-scope="scope">{{ scope.row.pluginType }}</template>

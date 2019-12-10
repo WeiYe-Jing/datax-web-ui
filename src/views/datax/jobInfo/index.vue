@@ -179,10 +179,9 @@
 </template>
 
 <script>
-import * as executor from '@/api/datax-executorManage'
+import * as executor from '@/api/datax-executor'
 import * as job from '@/api/datax-job-info'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import JsonEditor from '@/components/JsonEditor'
 
@@ -248,7 +247,6 @@ export default {
         jobJson: {}
       },
       executorList: '',
-      jobConfigList: '',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
         { value: 'DISCARD_LATER', label: '丢弃后续调度' },
@@ -273,7 +271,6 @@ export default {
   created() {
     this.fetchData()
     this.getExecutor()
-    this.getConfigList()
   },
 
   methods: {
@@ -281,11 +278,6 @@ export default {
       job.getExecutorList().then(response => {
         const { content } = response
         this.executorList = content
-      })
-    },
-    getConfigList: function() {
-      job.getJobConfigList().then(response => {
-        this.jobConfigList = response
       })
     },
     fetchData() {
@@ -358,21 +350,6 @@ export default {
       })
       // const index = this.list.indexOf(row)
     },
-    handleFetchPv(id) {
-      job.fetchPlugin(id).then(response => {
-        this.pluginData = response
-        this.dialogPvVisible = true
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
-    },
     handlerExecute(row) {
       const param = {}
       param.jobId = row.id
@@ -389,10 +366,6 @@ export default {
     // 查看日志
     handlerViewLog(row) {
       this.$router.push({ path: '/datax/jobLog', query: { jobId: row.id }})
-    },
-    handlerViewNode(row) {
-      const jobDesc = row.jobDesc
-      this.$message('click on item ' + jobDesc)
     },
     handlerStart(row) {
       job.startJob(row.id).then(response => {
