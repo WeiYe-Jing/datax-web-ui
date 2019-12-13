@@ -74,8 +74,6 @@ export default {
     }
   },
   created() {
-    // 获取所有模板，取200条，差不多了吧~
-    // todo 先全部加载出来, 后面改成分组
     this.getJobList()
   },
   methods: {

@@ -122,6 +122,15 @@ export default {
         username: '',
         password: '',
         permission: ''
+      },
+      resetTemp() {
+        this.temp = {
+          id: undefined,
+          role: undefined,
+          username: undefined,
+          password: undefined,
+          permission: undefined
+        }
       }
     }
   },
@@ -139,6 +148,7 @@ export default {
       })
     },
     handleCreate() {
+      this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {

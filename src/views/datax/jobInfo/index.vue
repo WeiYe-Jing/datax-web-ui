@@ -165,7 +165,7 @@
           </el-col>
         </el-row>
       </el-form>
-      <json-editor ref="jsonEditor" v-model="temp.jobJson" />
+      <json-editor ref="jsonEditor" v-model="jobJson" />
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
@@ -244,7 +244,27 @@ export default {
         jobConfigId: '',
         executorHandler: 'commandJobHandler',
         glueType: 'BEAN',
-        jobJson: {}
+        jobJson: ''
+      },
+      resetTemp() {
+        this.temp = {
+          id: undefined,
+          jobGroup: undefined,
+          jobCron: undefined,
+          jobDesc: undefined,
+          executorRouteStrategy: undefined,
+          executorBlockStrategy: undefined,
+          childJobId: undefined,
+          executorFailRetryCount: undefined,
+          alarmEmail: undefined,
+          executorTimeout: undefined,
+          author: undefined,
+          jobConfigId: undefined,
+          executorHandler: 'commandJobHandler',
+          glueType: 'BEAN',
+          jobJson: undefined
+        }
+        this.jobJson = {}
       },
       executorList: '',
       blockStrategies: [
@@ -265,7 +285,8 @@ export default {
         { value: 'SHARDING_BROADCAST', label: '分片广播' }
       ],
       triggerNextTimes: '',
-      registerNode: []
+      registerNode: [],
+      jobJson: ''
     }
   },
   created() {
@@ -290,6 +311,7 @@ export default {
       })
     },
     handleCreate() {
+      this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -299,6 +321,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.temp.jobJson = this.jobJson
           job.createJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
@@ -314,7 +337,7 @@ export default {
     },
     handlerUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.jobJson = JSON.parse(row.jobJson)
+      this.jobJson = JSON.parse(row.jobJson)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -325,6 +348,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
+          tempData.jobJson = this.jobJson
           job.updateJob(tempData).then(() => {
             this.fetchData()
             this.dialogFormVisible = false

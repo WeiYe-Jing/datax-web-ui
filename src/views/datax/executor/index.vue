@@ -44,13 +44,13 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
         <el-form-item label="AppName" prop="appName">
-          <el-input v-model="temp.appName" />
+          <el-input v-model="temp.appName" placeholder="AppName" />
         </el-form-item>
         <el-form-item label="名称" prop="title">
-          <el-input v-model="temp.title" />
+          <el-input v-model="temp.title" placeholder="请输入执行器名称" />
         </el-form-item>
         <el-form-item label="排序" prop="prop">
-          <el-input v-model="temp.order" />
+          <el-input v-model="temp.order" placeholder="执行器序号" />
         </el-form-item>
         <el-form-item label="注册方式" prop="addressType">
           <el-radio-group v-model="temp.addressType">
@@ -59,7 +59,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="机器地址" prop="addressList">
-          <el-input v-model="temp.addressList" :disabled="true" />
+          <el-input v-model="temp.addressList" :disabled="dialogStatus!=='create'" placeholder="多个以逗号分隔" />
         </el-form-item>
       </el-form>
 
@@ -148,11 +148,12 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: undefined,
-        jobGroup: undefined,
-        configJson: undefined
+        appName: undefined,
+        title: undefined,
+        order: undefined,
+        addressType: undefined,
+        addressList: undefined
       }
-      this.configJson = {}
     },
     handleCreate() {
       this.resetTemp()
