@@ -164,6 +164,13 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <!--<el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item label="任务参数">
+              <el-input v-model="temp.executorParam" placeholder="&#45;&#45;jvm=-Xms512m -Xmx512m" />
+            </el-form-item>
+          </el-col>
+        </el-row>-->
       </el-form>
       <json-editor ref="jsonEditor" v-model="jobJson" />
       <div slot="footer" class="dialog-footer">
@@ -242,9 +249,10 @@ export default {
         executorTimeout: '',
         author: '',
         jobConfigId: '',
-        executorHandler: 'commandJobHandler',
+        executorHandler: 'executorJobHandler',
         glueType: 'BEAN',
-        jobJson: ''
+        jobJson: '',
+        executorParam: ''
       },
       resetTemp() {
         this.temp = {
@@ -260,9 +268,10 @@ export default {
           executorTimeout: undefined,
           author: undefined,
           jobConfigId: undefined,
-          executorHandler: 'commandJobHandler',
+          executorHandler: 'executorJobHandler',
           glueType: 'BEAN',
-          jobJson: undefined
+          jobJson: undefined,
+          executorParam: undefined
         }
         this.jobJson = {}
       },
@@ -281,8 +290,8 @@ export default {
         { value: 'LEAST_FREQUENTLY_USED', label: '最不经常使用' },
         { value: 'LEAST_RECENTLY_USED', label: '最近最久未使用' },
         { value: 'FAILOVER', label: '故障转移' },
-        { value: 'BUSYOVER', label: '忙碌转移' },
-        { value: 'SHARDING_BROADCAST', label: '分片广播' }
+        { value: 'BUSYOVER', label: '忙碌转移' }
+        // { value: 'SHARDING_BROADCAST', label: '分片广播' }
       ],
       triggerNextTimes: '',
       registerNode: [],

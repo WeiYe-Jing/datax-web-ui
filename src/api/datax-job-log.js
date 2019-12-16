@@ -16,6 +16,14 @@ export function clearLog(jobGroup, jobId, type) {
   })
 }
 
+export function killJob(data) {
+  return request({
+    url: '/api/log/killJob',
+    method: 'post',
+    data
+  })
+}
+
 export function viewJobLog(executorAddress, triggerTime, logId, fromLineNum) {
   return request({
     url: '/api/log/logDetailCat?executorAddress=' + executorAddress + '&triggerTime=' + triggerTime + '&logId=' + logId + '&fromLineNum=' + fromLineNum,

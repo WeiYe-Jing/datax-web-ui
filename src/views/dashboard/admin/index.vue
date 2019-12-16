@@ -53,21 +53,10 @@ import LineChart from './components/LineChart'
 import * as dashborad from '@/api/dashborad'
 
 const lineChartData = {
-  newVisitis: {
-    expectedData: [],
-    actualData: []
-  },
-  messages: {
-    expectedData: [200, 192, 120, 144, 160, 130, 140],
-    actualData: [180, 160, 151, 106, 145, 150, 130]
-  },
-  purchases: {
-    expectedData: [80, 100, 121, 104, 105, 90, 100],
-    actualData: [120, 90, 100, 138, 142, 130, 130]
-  },
-  shoppings: {
-    expectedData: [130, 140, 141, 142, 145, 150, 160],
-    actualData: [120, 82, 91, 154, 162, 140, 130]
+  chartInfo: {
+    failData: [],
+    successData: [],
+    dayList: []
   }
 }
 
@@ -86,7 +75,7 @@ export default {
   },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis
+      lineChartData: lineChartData.chartInfo
     }
   },
   created() {
@@ -99,8 +88,12 @@ export default {
     chartInfo() {
       dashborad.chartInfo().then(response => {
         const { content } = response
-        this.lineChartData.newVisitis.expectedData = content.triggerDayCountSucList
-        this.lineChartData.newVisitis.actualData = content.triggerDayCountFailList
+        this.lineChartData.successData = content.triggerDayCountSucList
+        this.lineChartData.failData = content.triggerDayCountFailList
+        this.lineChartData.dayList = content.triggerDayList
+        localStorage.setItem('countSucTotal', content.triggerCountSucTotal)
+        localStorage.setItem('countRunningTotal', content.triggerCountRunningTotal)
+        localStorage.setItem('countFailTotal', content.triggerCountFailTotal)
       })
     }
   }

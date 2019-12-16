@@ -64,7 +64,8 @@
       </el-table-column>
       <el-table-column label="Actions" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" @click.native="handleViewJobLog(row)">执行日志</el-button>
+          <el-button v-show="row.executorAddress" type="primary" @click="handleViewJobLog(row)">执行日志</el-button>
+          <el-button v-show="row.handleCode===0 && row.triggerCode===200" type="primary" @click="killRunningJob(row)">终止任务</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -266,7 +267,7 @@ export default {
       this.loadLog()
     },
     // 获取日志
-    loadLog(row) {
+    loadLog() {
       this.logLoading = true
       log.viewJobLog(this.jobLogQuery.executorAddress, this.jobLogQuery.triggerTime, this.jobLogQuery.id,
         this.jobLogQuery.fromLineNum).then(response => {
@@ -284,6 +285,18 @@ export default {
           this.logContent = response.content.logContent
         }
         this.logLoading = false
+      })
+    },
+    killRunningJob(row) {
+      log.killJob(row).then(response => {
+        this.fetchData()
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'Success',
+          message: 'Kill Successfully',
+          type: 'success',
+          duration: 2000
+        })
       })
     }
   }
