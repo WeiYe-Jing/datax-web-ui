@@ -24,21 +24,21 @@
       <el-table-column align="center" label="任务ID" width="80">
         <template slot-scope="scope">{{ scope.row.id }}</template>
       </el-table-column>
-      <el-table-column label="任务描述" align="center" width="400">
+      <el-table-column label="任务描述" align="center">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
-      <el-table-column label="Cron" align="center" width="180">
+      <el-table-column label="Cron" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="路由策略" align="center" width="200">
+      <el-table-column label="路由策略" align="center">
         <template slot-scope="scope"> {{ routeStrategies.find(t => t.value === scope.row.executorRouteStrategy).label }}</template>
       </el-table-column>
-      <el-table-column label="负责人" align="center" width="120">
+      <el-table-column label="负责人" align="center">
         <template slot-scope="scope">{{ scope.row.author }}</template>
       </el-table-column>
-      <el-table-column label="状态" align="center" width="160">
+      <el-table-column label="状态" align="center">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.triggerStatus"
@@ -52,7 +52,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="注册节点" align="center" width="150">
+      <el-table-column label="注册节点" align="center">
         <template slot-scope="scope">
           <el-popover
             placement="bottom"
@@ -68,7 +68,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="下次触发时间" align="center" width="150">
+      <el-table-column label="下次触发时间" align="center">
         <template slot-scope="scope">
           <el-popover
             placement="bottom"
@@ -80,7 +80,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="Actions" align="center">
         <template slot-scope="{row}">
           <el-dropdown split-button type="primary">
             操作
@@ -96,7 +96,7 @@
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="800px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1000px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -164,13 +164,20 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <!--<el-row :gutter="20">
-          <el-col :span="24">
-            <el-form-item label="任务参数">
-              <el-input v-model="temp.executorParam" placeholder="&#45;&#45;jvm=-Xms512m -Xmx512m" />
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="动态变量">
+              <el-input v-model="temp.commandParams.replaceParam" placeholder="-Dcreatedate='%s'或者 -Did=100" />
             </el-form-item>
           </el-col>
-        </el-row>-->
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item label="JVM启动参数">
+              <el-input v-model="temp.commandParams.jvmParam" placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <json-editor ref="jsonEditor" v-model="jobJson" />
       <div slot="footer" class="dialog-footer">
@@ -252,7 +259,11 @@ export default {
         executorHandler: 'executorJobHandler',
         glueType: 'BEAN',
         jobJson: '',
-        executorParam: ''
+        executorParam: '',
+        commandParams: {
+          replaceParam: '1111',
+          jvmParam: '222'
+        }
       },
       resetTemp() {
         this.temp = {
@@ -372,27 +383,40 @@ export default {
       })
     },
     handlerDelete(row) {
-      job.removeJob(row.id).then(response => {
-        this.fetchData()
-        this.$notify({
-          title: 'Success',
-          message: 'Delete Successfully',
-          type: 'success',
-          duration: 2000
+      this.$confirm('确定删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        job.removeJob(row.id).then(response => {
+          this.fetchData()
+          this.$notify({
+            title: 'Success',
+            message: 'Delete Successfully',
+            type: 'success',
+            duration: 2000
+          })
         })
       })
+
       // const index = this.list.indexOf(row)
     },
     handlerExecute(row) {
-      const param = {}
-      param.jobId = row.id
-      param.executorParam = row.executorParam
-      job.triggerJob(param).then(response => {
-        this.$notify({
-          title: 'Success',
-          message: 'Execute Successfully',
-          type: 'success',
-          duration: 2000
+      this.$confirm('确定执行吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const param = {}
+        param.jobId = row.id
+        param.executorParam = row.executorParam
+        job.triggerJob(param).then(response => {
+          this.$notify({
+            title: 'Success',
+            message: 'Execute Successfully',
+            type: 'success',
+            duration: 2000
+          })
         })
       })
     },

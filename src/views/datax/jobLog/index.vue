@@ -26,13 +26,13 @@
       <el-table-column align="center" label="任务ID" width="80">
         <template slot-scope="scope">{{ scope.row.jobId }}</template>
       </el-table-column>
-      <el-table-column label="调度时间" align="center" width="200">
+      <el-table-column label="调度时间" align="center">
         <template slot-scope="scope">{{ scope.row.triggerTime }}</template>
       </el-table-column>
-      <el-table-column label="调度结果" align="center" width="200">
+      <el-table-column label="调度结果" align="center">
         <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.triggerCode).label }}</template>
       </el-table-column>
-      <el-table-column label="调度备注" align="center" width="200">
+      <el-table-column label="调度备注" align="center">
         <template slot-scope="scope">
           <el-popover
             placement="bottom"
@@ -44,13 +44,13 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="执行时间" align="center" width="200">
+      <el-table-column label="执行时间" align="center">
         <template slot-scope="scope">{{ scope.row.handleTime }}</template>
       </el-table-column>
-      <el-table-column label="执行结果" align="center" width="200">
+      <el-table-column label="执行结果" align="center">
         <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.handleCode).label }}</template>
       </el-table-column>
-      <el-table-column label="执行备注" align="center" width="200">
+      <el-table-column label="执行备注" align="center">
         <template slot-scope="scope">
           <el-popover
             placement="bottom"
@@ -62,7 +62,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="Actions" align="center">
         <template slot-scope="{row}">
           <el-button v-show="row.executorAddress" type="primary" @click="handleViewJobLog(row)">执行日志</el-button>
           <el-button v-show="row.handleCode===0 && row.triggerCode===200" type="primary" @click="killRunningJob(row)">终止任务</el-button>
