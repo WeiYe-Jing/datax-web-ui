@@ -97,7 +97,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1000px">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="110px">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="执行器" prop="jobGroup">
@@ -172,7 +172,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="LastTime偏移">
-              <el-input v-model="temp.timeOffset" placeholder="单位小时,例+5，-5" />
+              <el-input-number v-model="temp.timeOffset" :min="-120" :max="0" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -267,7 +267,7 @@ export default {
         executorParam: '',
         replaceParam: '',
         jvmParam: '',
-        timeOffset: ''
+        timeOffset: 0
       },
       resetTemp() {
         this.temp = {
@@ -289,9 +289,8 @@ export default {
           executorParam: undefined,
           replaceParam: undefined,
           jvmParam: undefined,
-          timeOffset: undefined
+          timeOffset: 0
         }
-        this.jobJson = {}
       },
       executorList: '',
       blockStrategies: [
@@ -363,8 +362,9 @@ export default {
       })
     },
     handlerUpdate(row) {
+      this.resetTemp()
       this.temp = Object.assign({}, row) // copy obj
-      this.jobJson = JSON.parse(row.jobJson)
+      this.jobJson = JSON.parse(this.temp.jobJson)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -374,9 +374,8 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.jobJson = this.jobJson
-          job.updateJob(tempData).then(() => {
+          this.temp.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
+          job.updateJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
