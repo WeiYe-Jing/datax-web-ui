@@ -163,7 +163,7 @@ export default {
       rules: {
       },
       temp: {
-        deleteType: '',
+        deleteType: 1,
         jobGroup: 0,
         jobId: 0
       },
