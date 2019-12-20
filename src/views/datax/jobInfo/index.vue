@@ -166,15 +166,20 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="动态变量">
-              <el-input v-model="temp.commandParams.replaceParam" placeholder="-Dcreatedate='%s'或者 -Did=100" />
+            <el-form-item label="增量时间字段">
+              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="LastTime偏移">
+              <el-input v-model="temp.timeOffset" placeholder="单位小时,例+5，-5" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="24">
             <el-form-item label="JVM启动参数">
-              <el-input v-model="temp.commandParams.jvmParam" placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError" />
+              <el-input v-model="temp.jvmParam" placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -260,10 +265,9 @@ export default {
         glueType: 'BEAN',
         jobJson: '',
         executorParam: '',
-        commandParams: {
-          replaceParam: '1111',
-          jvmParam: '222'
-        }
+        replaceParam: '',
+        jvmParam: '',
+        timeOffset: ''
       },
       resetTemp() {
         this.temp = {
@@ -282,7 +286,10 @@ export default {
           executorHandler: 'executorJobHandler',
           glueType: 'BEAN',
           jobJson: undefined,
-          executorParam: undefined
+          executorParam: undefined,
+          replaceParam: undefined,
+          jvmParam: undefined,
+          timeOffset: undefined
         }
         this.jobJson = {}
       },
