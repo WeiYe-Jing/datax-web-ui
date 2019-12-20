@@ -270,27 +270,8 @@ export default {
         timeOffset: 0
       },
       resetTemp() {
-        this.temp = {
-          id: undefined,
-          jobGroup: undefined,
-          jobCron: undefined,
-          jobDesc: undefined,
-          executorRouteStrategy: undefined,
-          executorBlockStrategy: undefined,
-          childJobId: undefined,
-          executorFailRetryCount: undefined,
-          alarmEmail: undefined,
-          executorTimeout: undefined,
-          author: undefined,
-          jobConfigId: undefined,
-          executorHandler: 'executorJobHandler',
-          glueType: 'BEAN',
-          jobJson: undefined,
-          executorParam: undefined,
-          replaceParam: undefined,
-          jvmParam: undefined,
-          timeOffset: 0
-        }
+        this.temp = this.$options.data().temp
+        this.jobJson = {}
       },
       executorList: '',
       blockStrategies: [

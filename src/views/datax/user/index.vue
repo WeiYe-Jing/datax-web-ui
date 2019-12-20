@@ -124,13 +124,7 @@ export default {
         permission: ''
       },
       resetTemp() {
-        this.temp = {
-          id: undefined,
-          role: undefined,
-          username: undefined,
-          password: undefined,
-          permission: undefined
-        }
+        this.temp = this.$options.data().temp
       }
     }
   },
