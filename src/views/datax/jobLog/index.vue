@@ -5,7 +5,7 @@
       <el-select v-model="listQuery.jobGroup" placeholder="执行器">
         <el-option v-for="item in executorList" :key="item.id" :label="item.title" :value="item.id" />
       </el-select>
-      <el-select v-model="listQuery.logStatus" clearable placeholder="类型" style="width: 200px">
+      <el-select v-model="listQuery.logStatus" placeholder="类型" style="width: 200px">
         <el-option v-for="item in logStatusList" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
@@ -62,7 +62,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center">
+      <el-table-column label="Actions" align="center" width="300">
         <template slot-scope="{row}">
           <el-button v-show="row.executorAddress" type="primary" @click="handleViewJobLog(row)">执行日志</el-button>
           <el-button v-show="row.handleCode===0 && row.triggerCode===200" type="primary" @click="killRunningJob(row)">终止任务</el-button>
