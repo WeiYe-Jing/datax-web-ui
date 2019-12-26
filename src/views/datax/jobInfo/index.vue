@@ -171,8 +171,14 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="LastTime偏移">
-              <el-input-number v-model="temp.timeOffset" :min="-120" :max="0" />
+            <el-form-item label="增量开始时间" prop="incStartTime">
+              <el-date-picker
+                v-model="temp.incStartTime"
+                type="datetime"
+                placeholder="首次增量使用"
+                format="yyyy-MM-dd HH:mm:ss"
+                default-time="00:00:00"
+              />
             </el-form-item>
           </el-col>
         </el-row>
@@ -219,6 +225,12 @@ export default {
     }
   },
   data() {
+    const validateIncStartTime = (rule, value, callback) => {
+      if (this.temp.replaceParam && !this.temp.incStartTime) {
+        callback(new Error('incStartTime is required'))
+      }
+      callback()
+    }
     return {
       list: null,
       listLoading: true,
@@ -246,7 +258,8 @@ export default {
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
-        author: [{ required: true, message: 'author is required', trigger: 'blur' }]
+        author: [{ required: true, message: 'author is required', trigger: 'blur' }],
+        incStartTime: [{ trigger: 'blur', validator: validateIncStartTime }]
       },
       temp: {
         id: undefined,
@@ -267,7 +280,7 @@ export default {
         executorParam: '',
         replaceParam: '',
         jvmParam: '',
-        timeOffset: 0
+        incStartTime: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
