@@ -12,6 +12,10 @@ export default {
   methods: {
     getData() {
       return this.$refs.writer.getData()
+    },
+    getReaderData() {
+      console.log('writer')
+      return this.$parent.getReaderData()
     }
   }
 }

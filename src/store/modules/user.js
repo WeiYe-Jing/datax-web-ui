@@ -38,6 +38,7 @@ const actions = {
         const { roles } = response.content
         commit('SET_TOKEN', data)
         localStorage.setItem('roles', JSON.stringify(roles))
+        sessionStorage.setItem('username', username.trim())
         setToken(data)
         resolve()
       }).catch(error => {
