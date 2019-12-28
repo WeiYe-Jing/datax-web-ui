@@ -150,12 +150,6 @@ export const asyncRoutes = [
         meta: { title: '任务管理', icon: 'table' }
       },
       {
-        path: 'jobTemplate',
-        name: 'jobTemplate',
-        component: () => import('@/views/datax/jobTemplate/index'),
-        meta: { title: '任务模板管理', icon: 'table' }
-      },
-      {
         path: 'jobLog',
         name: 'jobLog',
         component: () => import('@/views/datax/jobLog/index'),

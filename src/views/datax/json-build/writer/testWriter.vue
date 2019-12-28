@@ -26,7 +26,7 @@
       <el-form-item label="表">
         <el-select
           v-model="writerForm.tableName"
-          :disabled="writerForm.ifCreateTable || writerForm.ifStreamWriter"
+          :disabled="writerForm.ifStreamWriter"
           filterable
           @change="wTbChange"
         >
@@ -37,8 +37,6 @@
             :value="item"
           />
         </el-select>
-        <el-checkbox v-model="writerForm.ifCreateTable" :disabled="writerForm.ifStreamWriter" @change="createTableCheckedChange">新增</el-checkbox>
-        <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
       </el-form-item>
       <el-form-item label="字段">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
@@ -72,10 +70,8 @@ export default {
         columns: [],
         checkAll: false,
         isIndeterminate: true,
-        preSql: '',
-        ifCreateTable: false
-      },
-      readerForm: this.getReaderData()
+        preSql: ''
+      }
     }
   },
   created() {
@@ -137,18 +133,8 @@ export default {
       this.writerForm.checkAll = checkedCount === this.wColumnList.length
       this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.wColumnList.length
     },
-    createTableCheckedChange(val) {
-      this.writerForm.tableName = val ? this.readerForm.tableName : ''
-      this.wColumnList = this.readerForm.columns
-      this.writerForm.columns = this.readerForm.columns
-      this.writerForm.checkAll = true
-      this.writerForm.isIndeterminate = false
-    },
     getData() {
       return this.writerForm
-    },
-    getReaderData() {
-      return this.$parent.getReaderData()
     }
   }
 }
