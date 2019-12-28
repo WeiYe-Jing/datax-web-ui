@@ -8,7 +8,7 @@
         <el-step title="步骤 4" description="构建">4</el-step>
       </el-steps>
 
-      <el-button :disabled="active===1" style="margin-top: 12px;" @click="last">上一步</el-button>
+      <!-- <el-button style="margin-top: 12px;" @click="last">上一步</el-button> -->
       <el-button style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
 
       <div v-show="active===1" class="step1">
@@ -23,72 +23,6 @@
       <div v-show="active===4" class="step4">
         <el-button type="primary" @click="buildJson">构建</el-button>
         <el-button type="info" @click="handleCopy(inputData,$event)">copy json</el-button>
-        <el-button type="text" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "选择模板" }}</el-button>
-        <el-drawer
-          ref="jobTemplateSelectDrawer"
-          title="选择模板"
-          :visible.sync="jobTemplateSelectDrawer"
-          direction="rtl"
-          size="50%"
-        >
-          <el-table
-            v-loading="listLoading"
-            :data="list"
-            element-loading-text="Loading"
-            border
-            fit
-            highlight-current-row
-            destroy-on-close="true"
-            @current-change="handleCurrentChange"
-          >
-            <el-table-column align="center" label="任务ID" width="80">
-              <template slot-scope="scope">{{ scope.row.id }}</template>
-            </el-table-column>
-            <el-table-column label="任务描述" align="center">
-              <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
-            </el-table-column>
-            <el-table-column label="Cron" align="center">
-              <template slot-scope="scope">
-                <span>{{ scope.row.jobCron }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="路由策略" align="center">
-              <template slot-scope="scope"> {{ routeStrategies.find(t => t.value === scope.row.executorRouteStrategy).label }}</template>
-            </el-table-column>
-            <el-table-column label="负责人" align="center">
-              <template slot-scope="scope">{{ scope.row.author }}</template>
-            </el-table-column>
-            <el-table-column label="注册节点" align="center">
-              <template slot-scope="scope">
-                <el-popover
-                  placement="bottom"
-                  width="500"
-                  @show="loadById(scope.row)"
-                >
-                  <el-table :data="registerNode">
-                    <el-table-column width="150" property="title" label="执行器名称" />
-                    <el-table-column width="150" property="appName" label="appName" />
-                    <el-table-column width="150" property="registryList" label="机器地址" />
-                  </el-table>
-                  <el-button slot="reference" @click.stop>查看</el-button>
-                </el-popover>
-              </template>
-            </el-table-column>
-            <el-table-column label="下次触发时间" align="center">
-              <template slot-scope="scope">
-                <el-popover
-                  placement="bottom"
-                  width="300"
-                  @show="nextTriggerTime(scope.row)"
-                >
-                  <h5 v-html="triggerNextTimes" />
-                  <el-button slot="reference" @click.stop>查看</el-button>
-                </el-popover>
-              </template>
-            </el-table-column>
-          </el-table>
-          <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
-        </el-drawer>
         <div style="margin-bottom: 20px;" />
         <json-editor v-show="active===4" ref="jsonEditor" v-model="configJson" />
       </div>
@@ -98,10 +32,6 @@
 
 <script>
 import * as dataxJsonApi from '@/api/datax-json'
-import * as executor from '@/api/datax-executor'
-import * as jobTemplate from '@/api/datax-job-template'
-import * as job from '@/api/datax-job-info'
-import Pagination from '@/components/Pagination'
 import JsonEditor from '@/components/JsonEditor'
 import Reader from './reader'
 import Writer from './writer'
@@ -109,67 +39,11 @@ import clip from '@/utils/clipboard'
 import FieldMapper from './components/fieldMapper'
 
 export default {
-  components: { Reader, Writer, Pagination, JsonEditor, FieldMapper },
+  components: { Reader, Writer, JsonEditor, FieldMapper },
   data() {
     return {
       configJson: '',
-      active: 1,
-      jobTemplate: '',
-      jobTemplateSelectDrawer: false,
-      list: null,
-      currentRow: null,
-      listLoading: true,
-      total: 0,
-      listQuery: {
-        current: 1,
-        size: 10,
-        jobGroup: 0,
-        triggerStatus: -1,
-        jobDesc: '',
-        executorHandler: '',
-        author: ''
-      },
-      blockStrategies: [
-        { value: 'SERIAL_EXECUTION', label: '单机串行' },
-        { value: 'DISCARD_LATER', label: '丢弃后续调度' },
-        { value: 'COVER_EARLY', label: '覆盖之前调度' }
-      ],
-      routeStrategies: [
-        { value: 'FIRST', label: '第一个' },
-        { value: 'LAST', label: '最后一个' },
-        { value: 'ROUND', label: '轮询' },
-        { value: 'RANDOM', label: '随机' },
-        { value: 'CONSISTENT_HASH', label: '一致性HASH' },
-        { value: 'LEAST_FREQUENTLY_USED', label: '最不经常使用' },
-        { value: 'LEAST_RECENTLY_USED', label: '最近最久未使用' },
-        { value: 'FAILOVER', label: '故障转移' },
-        { value: 'BUSYOVER', label: '忙碌转移' }
-        // { value: 'SHARDING_BROADCAST', label: '分片广播' }
-      ],
-      triggerNextTimes: '',
-      registerNode: [],
-      jobJson: '',
-      temp: {
-        id: undefined,
-        jobGroup: '',
-        jobCron: '',
-        jobDesc: '',
-        executorRouteStrategy: '',
-        executorBlockStrategy: '',
-        childJobId: '',
-        executorFailRetryCount: '',
-        alarmEmail: '',
-        executorTimeout: '',
-        author: '',
-        jobConfigId: '',
-        executorHandler: 'executorJobHandler',
-        glueType: 'BEAN',
-        jobJson: '',
-        executorParam: '',
-        replaceParam: '',
-        jvmParam: '',
-        incStartTime: ''
-      }
+      active: 1
     }
   },
   created() {
@@ -192,27 +66,10 @@ export default {
         //   })
         // }
       } else {
-        if (this.active === 4) {
-          this.temp.jobJson = this.configJson
-          this.temp.author = sessionStorage.getItem('username')
-          job.createJob(this.temp).then(() => {
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-            // 切回第一步
-            this.active = 1
-          })
-        } else {
-          this.active++
+        if (this.active++ === 4) {
+          // 切回第一步
+          this.active = 1
         }
-      }
-    },
-    last() {
-      if (this.active > 1) {
-        this.active--
       }
     },
     beforeBuildJson() {
@@ -255,52 +112,6 @@ export default {
       this.$message({
         message: 'copy success',
         type: 'success'
-      })
-    },
-    handleJobTemplateSelectDrawer() {
-      this.jobTemplateSelectDrawer = !this.jobTemplateSelectDrawer
-      if (this.jobTemplateSelectDrawer) {
-        this.fetchData()
-        this.getExecutor()
-      }
-    },
-    getReaderData() {
-      console.info(this.$refs.reader.getData())
-      return this.$refs.reader.getData()
-    },
-    getExecutor() {
-      jobTemplate.getExecutorList().then(response => {
-        const { content } = response
-        this.executorList = content
-      })
-    },
-    fetchData() {
-      this.listLoading = true
-      jobTemplate.getList(this.listQuery).then(response => {
-        const { content } = response
-        this.total = content.recordsTotal
-        this.list = content.data
-        this.listLoading = false
-      })
-    },
-    nextTriggerTime(row) {
-      jobTemplate.nextTriggerTime(row.jobCron).then(response => {
-        const { content } = response
-        this.triggerNextTimes = content.join('<br>')
-      })
-    },
-    handleCurrentChange(val) {
-      this.temp = Object.assign({}, val)
-      this.temp.id = undefined
-      this.temp.jobDesc = this.getReaderData().tableName
-      this.$refs.jobTemplateSelectDrawer.closeDrawer()
-      this.jobTemplate = val.id + '(' + val.jobDesc + ')'
-    },
-    loadById(row) {
-      executor.loadById(row.jobGroup).then(response => {
-        this.registerNode = []
-        const { content } = response
-        this.registerNode.push(content)
       })
     }
   }
