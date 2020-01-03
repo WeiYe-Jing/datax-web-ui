@@ -194,7 +194,6 @@ export default {
       } else {
         if (this.active === 4) {
           this.temp.jobJson = this.configJson
-          this.temp.author = sessionStorage.getItem('username')
           job.createJob(this.temp).then(() => {
             this.$notify({
               title: 'Success',
