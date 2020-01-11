@@ -1,17 +1,31 @@
 <template>
   <div class="app-container">
-    <MysqlReader ref="reader" />
+    <RDBMSReader v-show="dataSource!=='hive'" ref="rdbmsreader" @selectDataSource="showDataSource" />
+    <HiveReader v-show="dataSource==='hive'" ref="hivereader" @selectDataSource="showDataSource" />
   </div>
 </template>
 
 <script>
-import MysqlReader from './reader/mysqlReader'
+import RDBMSReader from './reader/RDBMSReader'
+import HiveReader from './reader/HiveReader'
 export default {
   name: 'Reader',
-  components: { MysqlReader },
+  components: { RDBMSReader, HiveReader },
+  data() {
+    return {
+      dataSource: ''
+    }
+  },
   methods: {
     getData() {
-      return this.$refs.reader.getData()
+      if (this.dataSource === 'hive') {
+        return this.$refs.hivereader.getData()
+      } else {
+        return this.$refs.rdbmsreader.getData()
+      }
+    },
+    showDataSource(data) {
+      this.dataSource = data
     }
   }
 }

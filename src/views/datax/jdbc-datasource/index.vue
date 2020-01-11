@@ -58,28 +58,44 @@
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="800px">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
         <el-form-item label="数据源名称" prop="datasourceName">
-          <el-input v-model="temp.datasourceName" placeholder="数据源名称" />
+          <el-input v-model="temp.datasourceName" placeholder="数据源名称" style="width: 40%" />
         </el-form-item>
         <el-form-item label="数据源分组" prop="datasourceGroup">
-          <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" />
+          <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
         <el-form-item label="用户名" prop="jdbcUsername">
-          <el-input v-model="temp.jdbcUsername" placeholder="用户名" />
+          <el-input v-model="temp.jdbcUsername" placeholder="用户名" style="width: 40%" />
         </el-form-item>
-        <el-form-item label="密码" prop="jdbcPassword">
-          <el-input v-model="temp.jdbcPassword" placeholder="密码" />
+        <el-form-item v-if="visible" label="密码" prop="jdbcPassword">
+          <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
+            <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
+          </el-input>
+        </el-form-item>
+        <el-form-item v-else label="密码" prop="jdbcPassword">
+          <el-input v-model="temp.jdbcPassword" type="text" placeholder="密码" style="width: 40%">
+            <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
+          </el-input>
+        </el-form-item>
+        <el-form-item label="数据源" prop="datasoure">
+          <el-select v-model="temp.datasource" placeholder="数据源" @input="jdbcdata(temp.datasource)">
+            <el-option label="mysql" value="mysql" />
+            <el-option label="oracle" value="oracle" />
+            <el-option label="postgresql" value="postgresql" />
+            <el-option label="sqlserver" value="sqlserver" />
+            <el-option label="hive" value="hive" />
+          </el-select>
         </el-form-item>
         <el-form-item label="jdbc url" prop="jdbcUrl">
-          <el-input v-model="temp.jdbcUrl" :autosize="{ minRows: 3, maxRows: 6}" type="textarea" placeholder="jdbc url" />
+          <el-input v-model="temp.jdbcUrl" :autosize="{ minRows: 3, maxRows: 6}" type="textarea" placeholder="jdbc url" style="width: 60%" />
         </el-form-item>
         <el-form-item label="jdbc驱动类" prop="jdbcDriverClass">
-          <el-input v-model="temp.jdbcDriverClass" placeholder="jdbc驱动类" />
+          <el-input v-model="temp.jdbcDriverClass" placeholder="jdbc驱动类" style="width: 60%" />
         </el-form-item>
         <el-form-item label="注释">
-          <el-input v-model="temp.comments" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+          <el-input v-model="temp.comments" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" style="width: 60%" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -88,6 +104,9 @@
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
           Confirm
+        </el-button>
+        <el-button type="primary" @click="testDataSource()">
+          Test
         </el-button>
       </div>
     </el-dialog>
@@ -107,7 +126,7 @@
 import * as datasourceApi from '@/api/datax-jdbcDatasource'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import Pagination from '@/components/Pagination'
 
 export default {
   name: 'DataxJdbcDatasource',
@@ -157,13 +176,32 @@ export default {
         jdbcUrl: '',
         jdbcDriverClass: '',
         comments: ''
-      }
+      },
+      visible: true
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
+    jdbcdata(datasource) {
+      if (datasource === 'mysql') {
+        this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}/{database}'
+        this.temp.jdbcDriverClass = 'com.mysql.jdbc.Driver'
+      } else if (datasource === 'oracle') {
+        this.temp.jdbcUrl = 'jdbc:oracle:thin:@//{host}:{port}/{database}'
+        this.temp.jdbcDriverClass = 'oracle.jdbc.OracleDriver'
+      } else if (datasource === 'postgresql') {
+        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}/{database}'
+        this.temp.jdbcDriverClass = 'org.postgresql.Driver'
+      } else if (datasource === 'sqlserver') {
+        this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
+        this.temp.jdbcDriverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+      } else if (datasource === 'hive') {
+        this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
+        this.temp.jdbcDriverClass = 'org.apache.hive.jdbc.HiveDriver'
+      }
+    },
     fetchData() {
       this.listLoading = true
       datasourceApi.list(this.listQuery).then(response => {
@@ -206,6 +244,29 @@ export default {
               type: 'success',
               duration: 2000
             })
+          })
+        }
+      })
+    },
+    testDataSource() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          datasourceApi.test(this.temp).then(response => {
+            if (response.data === false) {
+              this.$notify({
+                title: 'Fail',
+                message: response.data.msg,
+                type: 'fail',
+                duration: 2000
+              })
+            } else {
+              this.$notify({
+                title: 'Success',
+                message: 'Tested Successfully',
+                type: 'success',
+                duration: 2000
+              })
+            }
           })
         }
       })
@@ -266,6 +327,9 @@ export default {
           return v[j]
         }
       }))
+    },
+    changePass(value) {
+      this.visible = !(value === 'show')
     }
   }
 }

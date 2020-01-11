@@ -9,7 +9,7 @@
       </el-steps>
 
       <el-button :disabled="active===1" style="margin-top: 12px;" @click="last">上一步</el-button>
-      <el-button style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
+      <el-button style="margin-top: 12px;margin-bottom: 12px;" :disabled="active===4" @click="next">下一步</el-button>
 
       <div v-show="active===1" class="step1">
         <Reader ref="reader" />
@@ -18,7 +18,7 @@
         <Writer ref="writer" />
       </div>
       <div v-show="active===3" class="step3">
-        <FieldMapper ref="fieldMapper" />
+        <Mapper ref="mapper" />
       </div>
       <div v-show="active===4" class="step4">
         <el-button type="primary" @click="buildJson">构建</el-button>
@@ -48,43 +48,13 @@
               <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
             </el-table-column>
             <el-table-column label="Cron" align="center">
-              <template slot-scope="scope">
-                <span>{{ scope.row.jobCron }}</span>
-              </template>
+              <template slot-scope="scope"><span>{{ scope.row.jobCron }}</span></template>
             </el-table-column>
             <el-table-column label="路由策略" align="center">
               <template slot-scope="scope"> {{ routeStrategies.find(t => t.value === scope.row.executorRouteStrategy).label }}</template>
             </el-table-column>
             <el-table-column label="负责人" align="center">
               <template slot-scope="scope">{{ scope.row.author }}</template>
-            </el-table-column>
-            <el-table-column label="注册节点" align="center">
-              <template slot-scope="scope">
-                <el-popover
-                  placement="bottom"
-                  width="500"
-                  @show="loadById(scope.row)"
-                >
-                  <el-table :data="registerNode">
-                    <el-table-column width="150" property="title" label="执行器名称" />
-                    <el-table-column width="150" property="appName" label="appName" />
-                    <el-table-column width="150" property="registryList" label="机器地址" />
-                  </el-table>
-                  <el-button slot="reference" @click.stop>查看</el-button>
-                </el-popover>
-              </template>
-            </el-table-column>
-            <el-table-column label="下次触发时间" align="center">
-              <template slot-scope="scope">
-                <el-popover
-                  placement="bottom"
-                  width="300"
-                  @show="nextTriggerTime(scope.row)"
-                >
-                  <h5 v-html="triggerNextTimes" />
-                  <el-button slot="reference" @click.stop>查看</el-button>
-                </el-popover>
-              </template>
             </el-table-column>
           </el-table>
           <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
@@ -98,7 +68,6 @@
 
 <script>
 import * as dataxJsonApi from '@/api/datax-json'
-import * as executor from '@/api/datax-executor'
 import * as jobTemplate from '@/api/datax-job-template'
 import * as job from '@/api/datax-job-info'
 import Pagination from '@/components/Pagination'
@@ -106,10 +75,10 @@ import JsonEditor from '@/components/JsonEditor'
 import Reader from './reader'
 import Writer from './writer'
 import clip from '@/utils/clipboard'
-import FieldMapper from './components/fieldMapper'
+import Mapper from './mapper'
 
 export default {
-  components: { Reader, Writer, Pagination, JsonEditor, FieldMapper },
+  components: { Reader, Writer, Pagination, JsonEditor, Mapper },
   data() {
     return {
       configJson: '',
@@ -177,21 +146,21 @@ export default {
   },
   methods: {
     next() {
+      const fromColumnList = this.$refs.reader.getData().columns
+      const toColumnsList = this.$refs.writer.getData().columns
+      // const fromTableName = this.$refs.reader.getData().tableName
       // 第一步 reader 判断是否已选字段
       if (this.active === 1) {
-        // this.$refs.reader.testBtn()
+        // 实现第一步骤读取的表和字段直接带到第二步骤
+        // this.$refs.writer.sendTableNameAndColumns(fromTableName, fromColumnList)
         // 取子组件的数据
-        console.info(this.$refs.reader.getData())
+        // console.info(this.$refs.reader.getData())
         this.active++
-        // if (this.readerForm.columns.length > 0) {
-        //   this.active++
-        // } else {
-        //   this.$message({
-        //     message: '无法进行下一步',
-        //     type: 'warning'
-        //   })
-        // }
       } else {
+        // 将第一步和第二步得到的字段名字发送到第三步
+        if (this.active === 2) {
+          this.$refs.mapper.sendColumns(fromColumnList, toColumnsList)
+        }
         if (this.active === 4) {
           this.temp.jobJson = this.configJson
           job.createJob(this.temp).then(() => {
@@ -225,28 +194,46 @@ export default {
     buildJson() {
       const readerData = this.$refs.reader.getData()
       const writeData = this.$refs.writer.getData()
-      // console.log(readerData)
-      // console.log(writeData)
-      // return
-      // if (writeData.columns.length > 0 || writeData.ifStreamWriter === true) {
-      // }
+      const tableName = this.$refs.writer.getTableName()
+      const hiveReader = {
+        readerPath: readerData.path,
+        readerDefaultFS: readerData.defaultFS,
+        readerFileType: readerData.fileType,
+        readerFieldDelimiter: readerData.fieldDelimiter
+      }
+      const hiveWriter = {
+        writerDefaultFS: writeData.defaultFS,
+        writerFileType: writeData.fileType,
+        writerPath: writeData.path,
+        writerFileName: writeData.fileName,
+        writeMode: writeData.writeMode,
+        writeFieldDelimiter: writeData.fieldDelimiter
+      }
+      const rdbmsReader = {
+        readerSplitPk: readerData.splitPk,
+        whereParams: readerData.where,
+        querySql: readerData.querySql
+      }
+      const rdbmsWriter = {
+        preSql: writeData.preSql
+      }
       const obj = {
         readerDatasourceId: readerData.datasourceId,
         readerTables: [readerData.tableName],
         readerColumns: readerData.columns,
         ifStreamWriter: writeData.ifStreamWriter,
         writerDatasourceId: writeData.datasourceId,
-        writerTables: [writeData.tableName],
+        writerTables: [tableName],
         writerColumns: writeData.columns,
-        whereParams: readerData.where,
-        querySql: readerData.querySql,
-        preSql: writeData.preSql
+        hiveReader: hiveReader,
+        hiveWriter: hiveWriter,
+        rdbmsReader: rdbmsReader,
+        rdbmsWriter: rdbmsWriter
       }
-      console.info(obj)
       // 调api
       dataxJsonApi.buildJobJson(obj).then(response => {
-        console.log(response)
         this.configJson = JSON.parse(response)
+        console.info(this.configJson)
       })
     },
     handleCopy(text, event) {
@@ -282,25 +269,12 @@ export default {
         this.listLoading = false
       })
     },
-    nextTriggerTime(row) {
-      jobTemplate.nextTriggerTime(row.jobCron).then(response => {
-        const { content } = response
-        this.triggerNextTimes = content.join('<br>')
-      })
-    },
     handleCurrentChange(val) {
       this.temp = Object.assign({}, val)
       this.temp.id = undefined
       this.temp.jobDesc = this.getReaderData().tableName
       this.$refs.jobTemplateSelectDrawer.closeDrawer()
       this.jobTemplate = val.id + '(' + val.jobDesc + ')'
-    },
-    loadById(row) {
-      executor.loadById(row.jobGroup).then(response => {
-        this.registerNode = []
-        const { content } = response
-        this.registerNode.push(content)
-      })
     }
   }
 }
