@@ -9,7 +9,7 @@
       </el-steps>
 
       <el-button :disabled="active===1" style="margin-top: 12px;" @click="last">上一步</el-button>
-      <el-button style="margin-top: 12px;margin-bottom: 12px;" :disabled="active===4" @click="next">下一步</el-button>
+      <el-button style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
 
       <div v-show="active===1" class="step1">
         <Reader ref="reader" />
@@ -23,7 +23,7 @@
       <div v-show="active===4" class="step4">
         <el-button type="primary" @click="buildJson">构建</el-button>
         <el-button type="info" @click="handleCopy(inputData,$event)">copy json</el-button>
-        <el-button type="text" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "选择模板" }}</el-button>
+        <el-button type="text" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "选择模板(操作步骤：构建->选择模板->下一步)" }}</el-button>
         <el-drawer
           ref="jobTemplateSelectDrawer"
           title="选择模板"

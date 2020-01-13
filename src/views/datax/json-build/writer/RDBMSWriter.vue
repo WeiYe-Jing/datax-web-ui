@@ -15,7 +15,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="表" prop="fromTableName">
+      <el-form-item label="表" prop="tableName">
         <el-select
           v-model="fromTableName"
           :disabled="writerForm.ifCreateTable"
@@ -72,7 +72,7 @@ export default {
       readerForm: this.getReaderData(),
       rules: {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
-        fromTableName: [{ required: true, message: 'this is required', trigger: 'change' }]
+        tableName: [{ required: true, message: 'this is required', trigger: 'change' }]
       }
     }
   },
