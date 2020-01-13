@@ -64,6 +64,12 @@ export default {
       const checkedCount = value.length
       this.readerForm.checkAll = checkedCount === this.toColumnsList.length
       this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.toColumnsList.length
+    },
+    getLColumns() {
+      return this.readerForm.lcolumns
+    },
+    getRColumns() {
+      return this.readerForm.rcolumns
     }
   }
 }

@@ -183,17 +183,13 @@ export default {
         this.active--
       }
     },
-    beforeBuildJson() {
-      const data = this.$refs.writer.getData()
-      if (data.writerForm.columns.length > 0 || data.ifStreamWriter === true) {
-        this.buildJson()
-      }
-    },
     // 构建json
     buildJson() {
       const readerData = this.$refs.reader.getData()
       const writeData = this.$refs.writer.getData()
       const tableName = this.$refs.writer.getTableName()
+      const readerColumns = this.$refs.mapper.getLColumns()
+      const writerColumns = this.$refs.mapper.getRColumns()
       const hiveReader = {
         readerPath: readerData.path,
         readerDefaultFS: readerData.defaultFS,
@@ -219,11 +215,10 @@ export default {
       const obj = {
         readerDatasourceId: readerData.datasourceId,
         readerTables: [readerData.tableName],
-        readerColumns: readerData.columns,
-        ifStreamWriter: writeData.ifStreamWriter,
+        readerColumns: readerColumns,
         writerDatasourceId: writeData.datasourceId,
         writerTables: [tableName],
-        writerColumns: writeData.columns,
+        writerColumns: writerColumns,
         hiveReader: hiveReader,
         hiveWriter: hiveWriter,
         rdbmsReader: rdbmsReader,

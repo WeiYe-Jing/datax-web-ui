@@ -12,6 +12,12 @@ export default {
     sendColumns(fromColumnsList, toColumnsList) {
       this.$refs.mapper.fromColumnsList = fromColumnsList
       this.$refs.mapper.toColumnsList = toColumnsList
+    },
+    getLColumns() {
+      return this.$refs.mapper.getLColumns()
+    },
+    getRColumns() {
+      return this.$refs.mapper.getRColumns()
     }
   }
 }
