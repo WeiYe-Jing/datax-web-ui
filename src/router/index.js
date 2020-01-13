@@ -155,12 +155,12 @@ export const asyncRoutes = [
         component: () => import('@/views/datax/jobLog/index'),
         meta: { title: '调度日志', icon: 'table' }
       },
-      {
-        path: 'plugin',
-        name: 'DataxPlugin',
-        component: () => import('@/views/datax/plugin/index'),
-        meta: { title: '插件查看', icon: 'table' }
-      },
+      // {
+      //   path: 'plugin',
+      //   name: 'DataxPlugin',
+      //   component: () => import('@/views/datax/plugin/index'),
+      //   meta: { title: '插件查看', icon: 'table' }
+      // },
       {
         path: 'jdbcDatasource',
         name: 'jdbcDatasource',

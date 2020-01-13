@@ -40,3 +40,11 @@ export function deleted(data) {
     params: data
   })
 }
+
+export function test(data) {
+  return request({
+    url: '/api/jobJdbcDatasource/test',
+    method: 'post',
+    data
+  })
+}

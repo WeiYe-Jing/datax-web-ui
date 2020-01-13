@@ -271,7 +271,6 @@ export default {
       this.logLoading = true
       log.viewJobLog(this.jobLogQuery.executorAddress, this.jobLogQuery.triggerTime, this.jobLogQuery.id,
         this.jobLogQuery.fromLineNum).then(response => {
-        // console.log(response)
         // 判断是否是 '\n'，如果是表示显示完成，不重新加载
         if (response.content.logContent === '\n') {
           // this.jobLogQuery.fromLineNum = response.toLineNum - 20;
@@ -280,8 +279,6 @@ export default {
           //   this.loadLog()
           // }, 2000);
         } else {
-          // 后续改进
-          // this.jobLogQuery.fromLineNum = response.toLineNum
           this.logContent = response.content.logContent
         }
         this.logLoading = false

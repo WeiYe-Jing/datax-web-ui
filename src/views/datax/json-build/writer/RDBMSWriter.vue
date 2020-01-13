@@ -1,17 +1,9 @@
 <template>
   <div>
-    <el-form label-position="left" label-width="80px" :model="writerForm">
-      <el-form-item>
-        <el-switch
-          v-model="writerForm.ifStreamWriter"
-          active-text="streamwriter"
-          inactive-text="other"
-        />
-      </el-form-item>
-      <el-form-item label="数据源">
+    <el-form label-position="left" label-width="80px" :model="writerForm" :rules="rules">
+      <el-form-item label="数据源" prop="datasourceId">
         <el-select
-          v-model="writerForm.id"
-          :disabled="writerForm.ifStreamWriter"
+          v-model="writerForm.datasourceId"
           filterable
           @change="wDsChange"
         >
@@ -23,10 +15,10 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="表">
+      <el-form-item label="表" prop="tableName">
         <el-select
-          v-model="writerForm.tableName"
-          :disabled="writerForm.ifStreamWriter"
+          v-model="fromTableName"
+          :disabled="writerForm.ifCreateTable"
           filterable
           @change="wTbChange"
         >
@@ -37,16 +29,20 @@
             :value="item"
           />
         </el-select>
+        <!--<el-input v-model="fromTableName" style="width: 195px" filterable  @change="wTbChange"></el-input>-->
+        <!--<el-checkbox v-model="writerForm.ifCreateTable" @change="createTableCheckedChange">新增</el-checkbox>-->
+        <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
       </el-form-item>
+      <div style="margin: 5px 0;" />
       <el-form-item label="字段">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
         <div style="margin: 15px 0;" />
         <el-checkbox-group v-model="writerForm.columns" @change="wHandleCheckedChange">
-          <el-checkbox v-for="c in wColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
+          <el-checkbox v-for="c in fromColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="preSql" prop="preSql">
-        <el-input v-model="writerForm.preSql" placeholder="preSql" />
+      <el-form-item label="preSql">
+        <el-input v-model="writerForm.preSql" placeholder="preSql" type="textarea" style="width: 42%" />
       </el-form-item>
     </el-form>
   </div>
@@ -56,21 +52,27 @@
 import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 export default {
-  name: 'MysqlWriter',
+  name: 'RDBMSWriter',
   data() {
     return {
       wDsList: [],
+      fromTableName: '',
+      fromColumnList: [],
       wTbList: [],
-      wColumnList: [],
+      dataSource: '',
       writerForm: {
-        // 是否用streamwriter
-        ifStreamWriter: true,
         datasourceId: undefined,
         tableName: '',
         columns: [],
         checkAll: false,
         isIndeterminate: true,
-        preSql: ''
+        preSql: '',
+        ifCreateTable: false
+      },
+      readerForm: this.getReaderData(),
+      rules: {
+        datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
+        tableName: [{ required: true, message: 'this is required', trigger: 'change' }]
       }
     }
   },
@@ -101,6 +103,12 @@ export default {
       // 清空
       this.writerForm.tableName = ''
       this.writerForm.datasourceId = e
+      this.wDsList.find((item) => {
+        if (item.id === e) {
+          this.dataSource = item.datasource
+        }
+      })
+      this.$emit('selectDataSource', this.dataSource)
       // 获取可用表
       this.getTables()
     },
@@ -111,7 +119,7 @@ export default {
         tableName: this.writerForm.tableName
       }
       dsQueryApi.getColumns(obj).then(response => {
-        this.wColumnList = response
+        this.fromColumnList = response
         this.writerForm.columns = response
         this.writerForm.checkAll = true
         this.writerForm.isIndeterminate = false
@@ -120,21 +128,34 @@ export default {
     // 表切换
     wTbChange(t) {
       this.writerForm.tableName = t
-      this.wColumnList = []
+      this.fromColumnList = []
       this.writerForm.columns = []
       this.getColumns('writer')
     },
     wHandleCheckAllChange(val) {
-      this.writerForm.columns = val ? this.wColumnList : []
+      this.writerForm.columns = val ? this.fromColumnList : []
       this.writerForm.isIndeterminate = false
     },
     wHandleCheckedChange(value) {
       const checkedCount = value.length
-      this.writerForm.checkAll = checkedCount === this.wColumnList.length
-      this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.wColumnList.length
+      this.writerForm.checkAll = checkedCount === this.fromColumnList.length
+      this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.fromColumnList.length
+    },
+    createTableCheckedChange(val) {
+      this.writerForm.tableName = val ? this.readerForm.tableName : ''
+      this.fromColumnList = this.readerForm.columns
+      this.writerForm.columns = this.readerForm.columns
+      this.writerForm.checkAll = true
+      this.writerForm.isIndeterminate = false
     },
     getData() {
       return this.writerForm
+    },
+    getReaderData() {
+      return this.$parent.getReaderData()
+    },
+    getTableName() {
+      return this.fromTableName
     }
   }
 }
