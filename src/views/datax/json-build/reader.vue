@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <RDBMSReader v-show="dataSource!=='hive'" ref="rdbmsreader" @selectDataSource="showDataSource" />
-    <HiveReader v-show="dataSource==='hive'" ref="hivereader" @selectDataSource="showDataSource" />
+    <RDBMSReader v-if="dataSource!=='hive'" ref="rdbmsreader" @selectDataSource="showDataSource" />
+    <HiveReader v-if="dataSource==='hive'" ref="hivereader" @selectDataSource="showDataSource" />
   </div>
 </template>
 

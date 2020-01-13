@@ -185,7 +185,6 @@ export default {
     },
     beforeBuildJson() {
       const data = this.$refs.writer.getData()
-      console.log(data)
       if (data.writerForm.columns.length > 0 || data.ifStreamWriter === true) {
         this.buildJson()
       }
@@ -233,7 +232,6 @@ export default {
       // 调api
       dataxJsonApi.buildJobJson(obj).then(response => {
         this.configJson = JSON.parse(response)
-        console.info(this.configJson)
       })
     },
     handleCopy(text, event) {
@@ -251,7 +249,6 @@ export default {
       }
     },
     getReaderData() {
-      console.info(this.$refs.reader.getData())
       return this.$refs.reader.getData()
     },
     getExecutor() {

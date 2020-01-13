@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <RDBMSWriter v-show="dataSource!=='hive'" ref="rdbmswriter" @selectDataSource="showDataSource" />
-    <HiveWriter v-show="dataSource==='hive'" ref="hivewriter" @selectDataSource="showDataSource" />
+    <RDBMSWriter v-if="dataSource!=='hive'" ref="rdbmswriter" @selectDataSource="showDataSource" />
+    <HiveWriter v-if="dataSource==='hive'" ref="hivewriter" @selectDataSource="showDataSource" />
   </div>
 </template>
 
