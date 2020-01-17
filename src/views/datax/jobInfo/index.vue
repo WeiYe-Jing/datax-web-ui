@@ -3,6 +3,9 @@
     <div class="filter-container">
       <el-input v-model="listQuery.jobDesc" placeholder="任务描述" style="width: 200px;" class="filter-item" />
       <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
+      <el-select v-model="listQuery.glueType" placeholder="任务类型" style="width: 200px" class="filter-item">
+        <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         Search
       </el-button>
@@ -26,6 +29,9 @@
       </el-table-column>
       <el-table-column label="任务描述" align="center">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
+      </el-table-column>
+      <el-table-column label="任务类型" align="center">
+        <template slot-scope="scope">{{ glueTypes.find(t=>t.value===scope.row.glueType).label }}</template>
       </el-table-column>
       <el-table-column label="Cron" align="center">
         <template slot-scope="scope">
@@ -107,7 +113,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="任务描述" prop="jobGroup">
+            <el-form-item label="任务描述" prop="jobDesc">
               <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
             </el-form-item>
           </el-col>
@@ -142,8 +148,10 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="任务超时时间">
-              <el-input v-model="temp.executorTimeout" placeholder="任务超时时间，单位秒，大于零时生效" />
+            <el-form-item label="任务类型" prop="glueType">
+              <el-select v-model="temp.glueType" placeholder="任务脚本类型">
+                <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -155,7 +163,7 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="失败重试次数">
-              <el-input v-model="temp.executorFailRetryCount" placeholder="失败重试次数，大于零时生效" />
+              <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -164,12 +172,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="增量时间字段">
-              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
-            </el-form-item>
-          </el-col>
+        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
@@ -178,11 +181,34 @@
                 placeholder="首次增量使用"
                 format="yyyy-MM-dd HH:mm:ss"
                 default-time="00:00:00"
+                style="width: 56%"
               />
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="增量时间字段">
+              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+            </el-form-item>
+          </el-col>
         </el-row>
-        <el-row :gutter="20">
+        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="分区时间字段">
+              <el-input v-model="partitionField" placeholder="请输入分区时间字段" style="width: 56%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item v-show="partitionField" label="分区时间">
+              <el-select v-model="timeFormatType" placeholder="分区时间格式">
+                <el-option v-for="item in timeFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-show="partitionField" :span="5">
+            <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
+          </el-col>
+        </el-row>
+        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
           <el-col :span="24">
             <el-form-item label="JVM启动参数">
               <el-input v-model="temp.jvmParam" placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError" />
@@ -190,7 +216,10 @@
           </el-col>
         </el-row>
       </el-form>
-      <json-editor ref="jsonEditor" v-model="jobJson" />
+      <json-editor v-if="temp.glueType==='BEAN'" ref="jsonEditor" v-model="jobJson" />
+      <shell-editor v-if="temp.glueType==='GLUE_SHELL'" ref="shellEditor" v-model="glueSource" />
+      <python-editor v-if="temp.glueType==='GLUE_PYTHON'" ref="pythonEditor" v-model="glueSource" />
+      <powershell-editor v-if="temp.glueType==='GLUE_POWERSHELL'" ref="powershellEditor" v-model="glueSource" />
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
@@ -209,10 +238,13 @@ import * as job from '@/api/datax-job-info'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import JsonEditor from '@/components/JsonEditor'
+import ShellEditor from '@/components/ShellEditor'
+import PythonEditor from '@/components/PythonEditor'
+import PowershellEditor from '@/components/PowershellEditor'
 
 export default {
   name: 'JobInfo',
-  components: { Pagination, JsonEditor },
+  components: { Pagination, JsonEditor, ShellEditor, PythonEditor, PowershellEditor },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -241,7 +273,7 @@ export default {
         jobGroup: 0,
         triggerStatus: -1,
         jobDesc: '',
-        executorHandler: '',
+        glueType: '',
         author: ''
       },
       dialogPluginVisible: false,
@@ -256,6 +288,7 @@ export default {
         jobGroup: [{ required: true, message: 'jobGroup is required', trigger: 'change' }],
         executorRouteStrategy: [{ required: true, message: 'executorRouteStrategy is required', trigger: 'change' }],
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
+        glueType: [{ required: true, message: 'jobType is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
         author: [{ required: true, message: 'author is required', trigger: 'blur' }],
@@ -274,17 +307,23 @@ export default {
         executorTimeout: '',
         author: '',
         jobConfigId: '',
-        executorHandler: 'executorJobHandler',
-        glueType: 'BEAN',
+        executorHandler: '',
+        glueType: '',
+        glueSource: '',
         jobJson: '',
         executorParam: '',
         replaceParam: '',
         jvmParam: '',
-        incStartTime: ''
+        incStartTime: '',
+        partitionInfo: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
-        this.jobJson = {}
+        this.jobJson = ''
+        this.glueSource = ''
+        this.timeOffset = 0
+        this.timeFormatType = 'yyyy-MM-dd'
+        this.partitionField = ''
       },
       executorList: '',
       blockStrategies: [
@@ -304,9 +343,24 @@ export default {
         { value: 'BUSYOVER', label: '忙碌转移' }
         // { value: 'SHARDING_BROADCAST', label: '分片广播' }
       ],
+      glueTypes: [
+        { value: 'BEAN', label: 'DataX任务' },
+        { value: 'GLUE_SHELL', label: 'Shell任务' },
+        { value: 'GLUE_PYTHON', label: 'Python任务' },
+        { value: 'GLUE_POWERSHELL', label: 'PowerShell任务' }
+      ],
       triggerNextTimes: '',
       registerNode: [],
-      jobJson: ''
+      jobJson: '',
+      glueSource: '',
+      timeOffset: 0,
+      timeFormatType: 'yyyy-MM-dd',
+      partitionField: '',
+      timeFormatTypes: [
+        { value: 'yyyy-MM-dd', label: 'yyyy-MM-dd' },
+        { value: 'yyyyMMdd', label: 'yyyyMMdd' },
+        { value: 'yyyy/MM/dd', label: 'yyyy/MM/dd' }
+      ]
     }
   },
   created() {
@@ -342,6 +396,9 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.jobJson = this.jobJson
+          this.temp.glueSource = this.glueSource
+          this.temp.executorHandler = this.temp.glueType === 'BEAN' ? 'executorJobHandler' : ''
+          if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.createJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
@@ -358,7 +415,14 @@ export default {
     handlerUpdate(row) {
       this.resetTemp()
       this.temp = Object.assign({}, row) // copy obj
-      this.jobJson = JSON.parse(this.temp.jobJson)
+      if (this.temp.jobJson) this.jobJson = JSON.parse(this.temp.jobJson)
+      this.glueSource = this.temp.glueSource
+      if (this.temp.partitionInfo) {
+        const partition = this.temp.partitionInfo.split(',')
+        this.partitionField = partition[0]
+        this.timeOffset = partition[1]
+        this.timeFormatType = partition[2]
+      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -368,7 +432,10 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.temp.executorHandler = this.temp.glueType === 'BEAN' ? 'executorJobHandler' : ''
           this.temp.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
+          this.temp.glueSource = this.glueSource
+          if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.updateJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false

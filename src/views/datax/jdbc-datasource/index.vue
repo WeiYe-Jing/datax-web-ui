@@ -23,6 +23,9 @@
       <!-- <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index }}</template>
       </el-table-column> -->
+      <el-table-column label="数据源" width="200" align="center">
+        <template slot-scope="scope">{{ scope.row.datasource }}</template>
+      </el-table-column>
       <el-table-column label="数据源名称" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.datasourceName }}</template>
       </el-table-column>
@@ -32,9 +35,6 @@
       </el-table-column>
       <el-table-column label="用户名" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.jdbcUsername }}</template>
-      </el-table-column>
-      <el-table-column label="密码" width="200" align="center">
-        <template slot-scope="scope">{{ scope.row.jdbcPassword }}</template>
       </el-table-column>
       <el-table-column label="jdbc url" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcUrl }}</template>
@@ -79,13 +79,9 @@
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
         </el-form-item>
-        <el-form-item label="数据源" prop="datasoure">
-          <el-select v-model="temp.datasource" placeholder="数据源" @input="jdbcdata(temp.datasource)">
-            <el-option label="mysql" value="mysql" />
-            <el-option label="oracle" value="oracle" />
-            <el-option label="postgresql" value="postgresql" />
-            <el-option label="sqlserver" value="sqlserver" />
-            <el-option label="hive" value="hive" />
+        <el-form-item label="数据源" prop="datasource">
+          <el-select v-model="temp.datasource" placeholder="数据源" style="width: 200px" @change="selectDataSource(temp.datasource)">
+            <el-option v-for="item in dataSources" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="jdbc url" prop="jdbcUrl">
@@ -165,7 +161,8 @@ export default {
         jdbcUsername: [{ required: true, message: 'this is required', trigger: 'blur' }],
         jdbcPassword: [{ required: true, message: 'this is required', trigger: 'blur' }],
         jdbcUrl: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        jdbcDriverClass: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        jdbcDriverClass: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        datasource: [{ required: true, message: 'this is required', trigger: 'change' }]
       },
       temp: {
         id: undefined,
@@ -175,16 +172,24 @@ export default {
         jdbcPassword: '',
         jdbcUrl: '',
         jdbcDriverClass: '',
-        comments: ''
+        comments: '',
+        datasource: ''
       },
-      visible: true
+      visible: true,
+      dataSources: [
+        { value: 'mysql', label: 'mysql' },
+        { value: 'oracle', label: 'oracle' },
+        { value: 'postgresql', label: 'postgresql' },
+        { value: 'sqlserver', label: 'sqlserver' },
+        { value: 'hive', label: 'hive' }
+      ]
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
-    jdbcdata(datasource) {
+    selectDataSource(datasource) {
       if (datasource === 'mysql') {
         this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'com.mysql.jdbc.Driver'

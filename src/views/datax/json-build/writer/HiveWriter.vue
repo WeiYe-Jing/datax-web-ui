@@ -60,7 +60,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="fieldDelimiter" prop="fieldDelimiter">
-        <el-input v-model="writerForm.fieldDelimiter" placeholder="写入时的字段分隔符,与创建的Hive表的字段分隔符一致" style="width: 42%" />
+        <el-input v-model="writerForm.fieldDelimiter" placeholder="与创建表的分隔符一致" style="width: 13%" />
       </el-form-item>
       <el-form-item label="字段">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>

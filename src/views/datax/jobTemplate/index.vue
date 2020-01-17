@@ -91,7 +91,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="任务描述" prop="jobGroup">
+            <el-form-item label="任务描述" prop="jobDesc">
               <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
             </el-form-item>
           </el-col>
@@ -126,8 +126,10 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="任务超时时间">
-              <el-input v-model="temp.executorTimeout" placeholder="任务超时时间，单位秒，大于零时生效" />
+            <el-form-item label="任务类型" prop="glueType">
+              <el-select v-model="temp.glueType" placeholder="任务脚本类型">
+                <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -139,7 +141,7 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="失败重试次数">
-              <el-input v-model="temp.executorFailRetryCount" placeholder="失败重试次数，大于零时生效" />
+              <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -150,11 +152,6 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="增量时间字段">
-              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
                 v-model="temp.incStartTime"
@@ -162,8 +159,31 @@
                 placeholder="首次增量使用"
                 format="yyyy-MM-dd HH:mm:ss"
                 default-time="00:00:00"
+                style="width: 56%"
               />
             </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="增量时间字段">
+              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="分区时间字段">
+              <el-input v-model="partitionField" placeholder="请输入分区时间字段" style="width: 56%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item v-show="partitionField" label="分区时间">
+              <el-select v-model="timeFormatType" placeholder="分区时间格式">
+                <el-option v-for="item in timeFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-show="partitionField" :span="5">
+            <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
           </el-col>
         </el-row>
         <el-row :gutter="20">
@@ -174,7 +194,6 @@
           </el-col>
         </el-row>
       </el-form>
-      <json-editor ref="jsonEditor" v-model="jobJson" />
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
@@ -192,11 +211,10 @@ import * as executor from '@/api/datax-executor'
 import * as job from '@/api/datax-job-template'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import JsonEditor from '@/components/JsonEditor'
 
 export default {
   name: 'JobTemplate',
-  components: { Pagination, JsonEditor },
+  components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -260,16 +278,17 @@ export default {
         jobConfigId: '',
         executorHandler: 'executorJobHandler',
         glueType: 'BEAN',
-        jobJson: '',
         executorParam: '',
         replaceParam: '',
         jvmParam: '',
-        timeOffset: 0,
-        incStartTime: ''
+        incStartTime: '',
+        partitionInfo: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
-        this.jobJson = {}
+        this.timeOffset = 0
+        this.timeFormatType = 'yyyy-MM-dd'
+        this.partitionField = ''
       },
       executorList: '',
       blockStrategies: [
@@ -289,9 +308,19 @@ export default {
         { value: 'BUSYOVER', label: '忙碌转移' }
         // { value: 'SHARDING_BROADCAST', label: '分片广播' }
       ],
+      glueTypes: [
+        { value: 'BEAN', label: 'DataX任务' }
+      ],
       triggerNextTimes: '',
       registerNode: [],
-      jobJson: ''
+      timeOffset: 0,
+      timeFormatType: 'yyyy-MM-dd',
+      partitionField: '',
+      timeFormatTypes: [
+        { value: 'yyyy-MM-dd', label: 'yyyy-MM-dd' },
+        { value: 'yyyyMMdd', label: 'yyyyMMdd' },
+        { value: 'yyyy/MM/dd', label: 'yyyy/MM/dd' }
+      ]
     }
   },
   created() {
@@ -326,7 +355,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.jobJson = this.jobJson
+          if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.createJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
@@ -343,9 +372,14 @@ export default {
     handlerUpdate(row) {
       this.resetTemp()
       this.temp = Object.assign({}, row) // copy obj
-      this.jobJson = JSON.parse(this.temp.jobJson)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      if (this.temp.partitionInfo) {
+        const partition = this.temp.partitionInfo.split(',')
+        this.partitionField = partition[0]
+        this.timeOffset = partition[1]
+        this.timeFormatType = partition[2]
+      }
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -353,7 +387,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
+          if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.updateJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false

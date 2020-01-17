@@ -21,7 +21,7 @@
         <el-button @click.prevent="getColumns('reader')">解析字段</el-button>
       </el-form-item>
       <el-form-item label="splitPk">
-        <el-input v-model="readerForm.splitPk" placeholder="切分主键" style="width: 20%" />
+        <el-input v-model="readerForm.splitPk" placeholder="切分主键" style="width: 13%" />
       </el-form-item>
       <el-form-item label="字段">
         <el-checkbox

@@ -150,12 +150,6 @@ export const asyncRoutes = [
         meta: { title: '任务管理', icon: 'table' }
       },
       {
-        path: 'jobTemplate',
-        name: 'jobTemplate',
-        component: () => import('@/views/datax/jobTemplate/index'),
-        meta: { title: '任务模板管理', icon: 'table' }
-      },
-      {
         path: 'jobLog',
         name: 'jobLog',
         component: () => import('@/views/datax/jobLog/index'),
@@ -168,16 +162,22 @@ export const asyncRoutes = [
       //   meta: { title: '插件查看', icon: 'table' }
       // },
       {
-        path: 'jdbcDatasource',
-        name: 'jdbcDatasource',
-        component: () => import('@/views/datax/jdbc-datasource/index'),
-        meta: { title: 'jdbc数据源管理', icon: 'table' }
+        path: 'jobTemplate',
+        name: 'jobTemplate',
+        component: () => import('@/views/datax/jobTemplate/index'),
+        meta: { title: 'datax 任务模板', icon: 'table' }
       },
       {
         path: 'jsonBuild',
         name: 'jsonBuild',
         component: () => import('@/views/datax/json-build/index'),
         meta: { title: 'datax json构建', icon: 'table' }
+      },
+      {
+        path: 'jdbcDatasource',
+        name: 'jdbcDatasource',
+        component: () => import('@/views/datax/jdbc-datasource/index'),
+        meta: { title: 'json构建数据源', icon: 'table' }
       },
       {
         path: 'user',
