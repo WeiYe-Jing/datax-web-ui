@@ -86,6 +86,9 @@
           </el-popover>
         </template>
       </el-table-column>
+      <el-table-column label="最近一次执行状态" align="center">
+        <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.lastHandleCode).label }}</template>
+      </el-table-column>
       <el-table-column label="Actions" align="center">
         <template slot-scope="{row}">
           <el-dropdown split-button type="primary">
@@ -360,6 +363,12 @@ export default {
         { value: 'yyyy-MM-dd', label: 'yyyy-MM-dd' },
         { value: 'yyyyMMdd', label: 'yyyyMMdd' },
         { value: 'yyyy/MM/dd', label: 'yyyy/MM/dd' }
+      ],
+      statusList: [
+        { value: 500, label: '失败' },
+        { value: 502, label: '失败(超时)' },
+        { value: 200, label: '成功' },
+        { value: 0, label: '无' }
       ]
     }
   },
