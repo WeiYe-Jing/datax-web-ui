@@ -18,11 +18,19 @@ export default {
   props: ['value'],
   data() {
     return {
-      PythonEditor: false
+      pythonEditor: false
+    }
+  },
+  watch: {
+    value(value) {
+      const editorValue = this.pythonEditor.getValue()
+      if (value !== editorValue) {
+        this.pythonEditor.setValue(this.value)
+      }
     }
   },
   mounted() {
-    this.PythonEditor = CodeMirror.fromTextArea(this.$refs.textarea, {
+    this.pythonEditor = CodeMirror.fromTextArea(this.$refs.textarea, {
       lineNumbers: true,
       mode: 'text/x-python',
       gutters: ['CodeMirror-lint-markers'],
@@ -30,15 +38,15 @@ export default {
       lint: true
     })
 
-    this.PythonEditor.setValue(this.value)
-    this.PythonEditor.on('change', cm => {
+    this.pythonEditor.setValue(this.value)
+    this.pythonEditor.on('change', cm => {
       this.$emit('changed', cm.getValue())
       this.$emit('input', cm.getValue())
     })
   },
   methods: {
     getValue() {
-      return this.PythonEditor.getValue()
+      return this.pythonEditor.getValue()
     }
   }
 }

@@ -18,11 +18,19 @@ export default {
   props: ['value'],
   data() {
     return {
-      ShellEditor: false
+      shellEditor: false
+    }
+  },
+  watch: {
+    value(value) {
+      const editorValue = this.shellEditor.getValue()
+      if (value !== editorValue) {
+        this.shellEditor.setValue(this.value)
+      }
     }
   },
   mounted() {
-    this.ShellEditor = CodeMirror.fromTextArea(this.$refs.textarea, {
+    this.shellEditor = CodeMirror.fromTextArea(this.$refs.textarea, {
       lineNumbers: true,
       mode: 'text/x-sh',
       gutters: ['CodeMirror-lint-markers'],
@@ -30,15 +38,15 @@ export default {
       lint: true
     })
 
-    this.ShellEditor.setValue(this.value)
-    this.ShellEditor.on('change', cm => {
+    this.shellEditor.setValue(this.value)
+    this.shellEditor.on('change', cm => {
       this.$emit('changed', cm.getValue())
       this.$emit('input', cm.getValue())
     })
   },
   methods: {
     getValue() {
-      return this.ShellEditor.getValue()
+      return this.shellEditor.getValue()
     }
   }
 }
