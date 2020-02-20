@@ -18,11 +18,19 @@ export default {
   props: ['value'],
   data() {
     return {
-      PowershellEditor: false
+      powershellEditor: false
+    }
+  },
+  watch: {
+    value(value) {
+      const editorValue = this.powershellEditor.getValue()
+      if (value !== editorValue) {
+        this.powershellEditor.setValue(this.value)
+      }
     }
   },
   mounted() {
-    this.PowershellEditor = CodeMirror.fromTextArea(this.$refs.textarea, {
+    this.powershellEditor = CodeMirror.fromTextArea(this.$refs.textarea, {
       lineNumbers: true,
       mode: 'powershell',
       gutters: ['CodeMirror-lint-markers'],
@@ -30,15 +38,15 @@ export default {
       lint: true
     })
 
-    this.PowershellEditor.setValue(this.value)
-    this.PowershellEditor.on('change', cm => {
+    this.powershellEditor.setValue(this.value)
+    this.powershellEditor.on('change', cm => {
       this.$emit('changed', cm.getValue())
       this.$emit('input', cm.getValue())
     })
   },
   methods: {
     getValue() {
-      return this.PowershellEditor.getValue()
+      return this.powershellEditor.getValue()
     }
   }
 }
