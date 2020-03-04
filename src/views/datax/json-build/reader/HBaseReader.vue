@@ -16,19 +16,24 @@
           <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
-      <el-form-item label="path" prop="path">
-        <el-input v-model="readerForm.path" :autosize="{ minRows: 2, maxRows: 20}" type="textarea" placeholder="要读取的文件路径，如果要读取多个文件，可以使用正则表达式'*'" style="width: 42%" />
-      </el-form-item>
-      <el-form-item label="defaultFS" prop="defaultFS">
-        <el-input v-model="readerForm.defaultFS" placeholder="Hadoop hdfs文件系统namenode节点地址" style="width: 42%" />
-      </el-form-item>
-      <el-form-item label="fileType" prop="fileType">
-        <el-select v-model="readerForm.fileType" placeholder="文件的类型">
-          <el-option v-for="item in fileTypes" :key="item.value" :label="item.label" :value="item.value" />
+      <el-form-item label="mode" prop="mode">
+        <el-select v-model="readerForm.mode" placeholder="读取hbase的模式">
+          <el-option v-for="item in modeTypes" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
-      <el-form-item label="fieldDelimiter" prop="fieldDelimiter">
-        <el-input v-model="readerForm.fieldDelimiter" placeholder="读取的字段分隔符" style="width: 42%" />
+      <el-form-item label="maxVersion">
+        <el-input v-model="readerForm.maxVersion" placeholder="多版本模式下读取的版本数,取值只能为－1或者大于1的数字" style="width: 50%" />
+      </el-form-item>
+      <el-form-item label="range">
+        <el-input v-model="readerForm.range.startRowkey" placeholder="startRowkey指定开始rowkey" style="width: 50%" />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="readerForm.range.endRowkey" placeholder="endRowkey指定结束rowkey" style="width: 50%" />
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="readerForm.range.isBinaryRowkey" placeholder="转换方式">
+          <el-option v-for="item in binaryRowkeyTypes" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
       </el-form-item>
       <el-form-item label="字段">
         <el-checkbox
@@ -50,7 +55,7 @@ import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 
 export default {
-  name: 'HiveReader',
+  name: 'HBaseReader',
   data() {
     return {
       jdbcDsQuery: {
@@ -72,25 +77,27 @@ export default {
         columns: [],
         checkAll: false,
         isIndeterminate: true,
-        path: '',
-        defaultFS: '',
-        fileType: '',
-        fieldDelimiter: ''
+        mode: '',
+        maxVersion: '',
+        range: {
+          startRowkey: '',
+          endRowkey: '',
+          isBinaryRowkey: ''
+        }
       },
+      modeTypes: [
+        { value: 'normal', label: 'normal' },
+        { value: 'multiVersionFixedColumn', label: 'multiVersionFixedColumn' }
+      ],
+      binaryRowkeyTypes: [
+        { value: 'true', label: '调用Bytes.toBytesBinary(rowkey)' },
+        { value: 'false', label: '调用Bytes.toBytes(rowkey)' }
+      ],
       rules: {
-        path: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        defaultFS: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fileType: [{ required: true, message: 'this is required', trigger: 'change' }],
+        mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
         tableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
-      },
-      fileTypes: [
-        { value: 'text', label: 'text' },
-        { value: 'orc', label: 'orc' },
-        { value: 'rc', label: 'rc' },
-        { value: 'seq', label: 'seq' },
-        { value: 'csv', label: 'csv' }
-      ]
+      }
     }
   },
   created() {

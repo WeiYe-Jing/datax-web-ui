@@ -1,11 +1,24 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.datasourceName" clearable placeholder="数据源名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input
+        v-model="listQuery.datasourceName"
+        clearable
+        placeholder="数据源名称"
+        style="width: 200px;"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         Search
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px;"
+        type="primary"
+        icon="el-icon-edit"
+        @click="handleCreate"
+      >
         Add
       </el-button>
       <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
@@ -34,13 +47,16 @@
         </template>
       </el-table-column>
       <el-table-column label="用户名" width="150" align="center">
-        <template slot-scope="scope">{{ scope.row.jdbcUsername }}</template>
+        <template slot-scope="scope">{{ scope.row.jdbcUsername ? scope.row.jdbcUsername:'-' }}</template>
       </el-table-column>
       <el-table-column label="jdbc url" width="200" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.jdbcUrl }}</template>
+        <template slot-scope="scope">{{ scope.row.jdbcUrl ? scope.row.jdbcUrl:'-' }}</template>
       </el-table-column>
       <el-table-column label="jdbc驱动类" width="200" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.jdbcDriverClass }}</template>
+        <template slot-scope="scope">{{ scope.row.jdbcDriverClass ? scope.row.jdbcDriverClass:'-' }}</template>
+      </el-table-column>
+      <el-table-column label="ZK地址" width="200" align="center" :show-overflow-tooltip="true">
+        <template slot-scope="scope">{{ scope.row.zkAdress ? scope.row.zkAdress:'-' }}</template>
       </el-table-column>
       <el-table-column label="comments" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.comments }}</template>
@@ -56,42 +72,68 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="listQuery.current"
+      :limit.sync="listQuery.size"
+      @pagination="fetchData"
+    />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="800px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
+        <el-form-item label="数据源" prop="datasource">
+          <el-select
+            v-model="temp.datasource"
+            placeholder="数据源"
+            style="width: 200px"
+            @change="selectDataSource(temp.datasource)"
+          >
+            <el-option v-for="item in dataSources" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="数据源名称" prop="datasourceName">
           <el-input v-model="temp.datasourceName" placeholder="数据源名称" style="width: 40%" />
         </el-form-item>
         <el-form-item label="数据源分组" prop="datasourceGroup">
           <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
-        <el-form-item label="用户名" prop="jdbcUsername">
+        <el-form-item v-if="isNeedToFill" label="用户名" prop="jdbcUsername">
           <el-input v-model="temp.jdbcUsername" placeholder="用户名" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="visible" label="密码" prop="jdbcPassword">
+        <el-form-item v-if="visible" v-show="isNeedToFill" label="密码" prop="jdbcPassword">
           <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
           </el-input>
         </el-form-item>
-        <el-form-item v-else label="密码" prop="jdbcPassword">
+        <el-form-item v-show="isNeedToFill" v-else label="密码" prop="jdbcPassword">
           <el-input v-model="temp.jdbcPassword" type="text" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
         </el-form-item>
-        <el-form-item label="数据源" prop="datasource">
-          <el-select v-model="temp.datasource" placeholder="数据源" style="width: 200px" @change="selectDataSource(temp.datasource)">
-            <el-option v-for="item in dataSources" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
+        <el-form-item v-if="isNeedToFill" label="jdbc url" prop="jdbcUrl">
+          <el-input
+            v-model="temp.jdbcUrl"
+            :autosize="{ minRows: 3, maxRows: 6}"
+            type="textarea"
+            placeholder="jdbc url"
+            style="width: 60%"
+          />
         </el-form-item>
-        <el-form-item label="jdbc url" prop="jdbcUrl">
-          <el-input v-model="temp.jdbcUrl" :autosize="{ minRows: 3, maxRows: 6}" type="textarea" placeholder="jdbc url" style="width: 60%" />
-        </el-form-item>
-        <el-form-item label="jdbc驱动类" prop="jdbcDriverClass">
+        <el-form-item v-if="isNeedToFill" label="jdbc驱动类" prop="jdbcDriverClass">
           <el-input v-model="temp.jdbcDriverClass" placeholder="jdbc驱动类" style="width: 60%" />
         </el-form-item>
+        <el-form-item v-if="!isNeedToFill" label="ZK地址" prop="zkAdress">
+          <el-input v-model="temp.zkAdress" placeholder="127.0.0.1:2181" style="width: 60%" />
+        </el-form-item>
         <el-form-item label="注释">
-          <el-input v-model="temp.comments" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" style="width: 60%" />
+          <el-input
+            v-model="temp.comments"
+            :autosize="{ minRows: 2, maxRows: 4}"
+            type="textarea"
+            placeholder="Please input"
+            style="width: 60%"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -162,7 +204,8 @@ export default {
         jdbcPassword: [{ required: true, message: 'this is required', trigger: 'blur' }],
         jdbcUrl: [{ required: true, message: 'this is required', trigger: 'blur' }],
         jdbcDriverClass: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        datasource: [{ required: true, message: 'this is required', trigger: 'change' }]
+        datasource: [{ required: true, message: 'this is required', trigger: 'change' }],
+        zkAdress: [{ required: true, message: 'this is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,
@@ -173,7 +216,8 @@ export default {
         jdbcUrl: '',
         jdbcDriverClass: '',
         comments: '',
-        datasource: ''
+        datasource: '',
+        zkAdress: ''
       },
       visible: true,
       dataSources: [
@@ -181,8 +225,10 @@ export default {
         { value: 'oracle', label: 'oracle' },
         { value: 'postgresql', label: 'postgresql' },
         { value: 'sqlserver', label: 'sqlserver' },
-        { value: 'hive', label: 'hive' }
-      ]
+        { value: 'hive', label: 'hive' },
+        { value: 'hbase', label: 'hbase' }
+      ],
+      isNeedToFill: true
     }
   },
   created() {
@@ -206,6 +252,7 @@ export default {
         this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.apache.hive.jdbc.HiveDriver'
       }
+      this.isNeedToFill = datasource !== 'hbase'
     },
     fetchData() {
       this.listLoading = true
@@ -280,6 +327,7 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      this.isNeedToFill = row.datasource !== 'hbase'
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })

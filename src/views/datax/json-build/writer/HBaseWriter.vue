@@ -40,27 +40,28 @@
           </el-form-item>
         </el-col>-->
       </el-row>
-      <el-form-item label="path" prop="path">
-        <el-input v-model="writerForm.path" :autosize="{ minRows: 2, maxRows: 20}" type="textarea" placeholder="为与hive表关联，请填写hive表在hdfs上的存储路径" style="width: 42%" />
+      <el-form-item label="mode" prop="mode">
+        <el-input v-model="writerForm.mode" disabled style="width: 42%" />
       </el-form-item>
-      <el-form-item label="defaultFS" prop="defaultFS">
-        <el-input v-model="writerForm.defaultFS" placeholder="Hadoop hdfs文件系统namenode节点地址" style="width: 42%" />
+      <el-form-item label="rowkeyColumn">
+        <el-input v-model="writerForm.rowkeyColumn.index" placeholder="index指定该列对应reader端column的索引" style="width: 42%" />
       </el-form-item>
-      <el-form-item label="fileName" prop="fileName">
-        <el-input v-model="writerForm.fileName" placeholder="HdfsWriter写入时的文件名" style="width: 42%" />
+      <el-form-item>
+        <el-input v-model="writerForm.rowkeyColumn.type" placeholder="type指定写入数据类型" style="width: 42%" />
       </el-form-item>
-      <el-form-item label="fileType" prop="fileType">
-        <el-select v-model="writerForm.fileType" placeholder="文件的类型">
-          <el-option v-for="item in fileTypes" :key="item.value" :label="item.label" :value="item.value" />
+      <el-form-item>
+        <el-input v-model="writerForm.rowkeyColumn.value" placeholder="value配置常量，常作为多个字段的拼接符" style="width: 42%" />
+      </el-form-item>
+      <el-form-item label="versionColumn">
+        <el-input v-model="writerForm.versionColumn.index" placeholder="index指定对应reader端column的索引" style="width: 42%" />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="writerForm.versionColumn.value" placeholder="value指定时间的值,long值" style="width: 42%" />
+      </el-form-item>
+      <el-form-item label="nullMode">
+        <el-select v-model="writerForm.nullMode" placeholder="null值转换方式">
+          <el-option v-for="item in nullModeTypes" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
-      </el-form-item>
-      <el-form-item label="writeMode" prop="writeMode">
-        <el-select v-model="writerForm.writeMode" placeholder="文件的类型">
-          <el-option v-for="item in writeModes" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="fieldDelimiter" prop="fieldDelimiter">
-        <el-input v-model="writerForm.fieldDelimiter" placeholder="与创建表的分隔符一致" style="width: 13%" />
       </el-form-item>
       <el-form-item label="字段">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
@@ -77,7 +78,7 @@
 import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 export default {
-  name: 'HiveWriter',
+  name: 'HBaseWriter',
   data() {
     return {
       wDsList: [],
@@ -92,32 +93,28 @@ export default {
         checkAll: false,
         isIndeterminate: true,
         ifCreateTable: false,
-        defaultFS: '',
-        fileType: '',
-        path: '',
-        fileName: '',
-        writeMode: '',
-        fieldDelimiter: ''
+        mode: 'normal',
+        rowkeyColumn: {
+          index: '',
+          type: '',
+          value: ''
+        },
+        versionColumn: {
+          index: '',
+          value: ''
+        },
+        nullMode: ''
       },
+      nullModeTypes: [
+        { value: 'skip', label: '不向hbase写这列' },
+        { value: 'empty', label: '写入new byte [0]' }
+      ],
       rules: {
-        path: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        defaultFS: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fileName: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fileType: [{ required: true, message: 'this is required', trigger: 'change' }],
-        writeMode: [{ required: true, message: 'this is required', trigger: 'change' }],
-        fieldDelimiter: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
         fromTableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
       },
-      readerForm: this.getReaderData(),
-      fileTypes: [
-        { value: 'text', label: 'text' },
-        { value: 'orc', label: 'orc' }
-      ],
-      writeModes: [
-        { value: 'append', label: 'append 写入前不做任何处理' },
-        { value: 'nonConflict', label: 'nonConflict 目录下有fileName前缀的文件，直接报错' }
-      ]
+      readerForm: this.getReaderData()
     }
   },
   created() {
