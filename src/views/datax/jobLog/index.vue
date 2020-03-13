@@ -106,7 +106,7 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog title="日志查看" :visible.sync="logShow">
+    <el-dialog title="日志查看" :visible.sync="logShow" width="78%">
       <div class="log-container">
         <pre :loading="logLoading" v-text="logContent" />
       </div>
