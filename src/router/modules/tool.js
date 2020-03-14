@@ -11,7 +11,7 @@ const toolRouter = {
   name: '工具',
   meta: {
     title: '工具',
-    icon: 'example'
+    icon: 'json'
   },
   children: [
     {

@@ -80,7 +80,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/admin/index'),
         name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+        meta: { title: '运行报表', icon: 'dashboard', affix: true }
       }
     ]
   }
@@ -135,25 +135,25 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/datax/job',
     name: 'Example',
-    meta: { title: 'datax', icon: 'example' },
+    meta: { title: 'datax', icon: 'work' },
     children: [
       {
         path: 'executor',
         name: 'executor',
         component: () => import('@/views/datax/executor/index'),
-        meta: { title: '执行器管理', icon: 'table' }
+        meta: { title: '执行器管理', icon: 'exe-cfg' }
       },
       {
         path: 'jobInfo',
         name: 'jobInfo',
         component: () => import('@/views/datax/jobInfo/index'),
-        meta: { title: '任务管理', icon: 'table' }
+        meta: { title: '任务管理', icon: 'task-cfg' }
       },
       {
         path: 'jobLog',
         name: 'jobLog',
         component: () => import('@/views/datax/jobLog/index'),
-        meta: { title: '调度日志', icon: 'table' }
+        meta: { title: '调度日志', icon: 'log' }
       },
       // {
       //   path: 'plugin',
@@ -165,25 +165,25 @@ export const asyncRoutes = [
         path: 'jobTemplate',
         name: 'jobTemplate',
         component: () => import('@/views/datax/jobTemplate/index'),
-        meta: { title: 'datax 任务模板', icon: 'table' }
+        meta: { title: 'datax 任务模板', icon: 'task-tmp' }
       },
       {
         path: 'jsonBuild',
         name: 'jsonBuild',
         component: () => import('@/views/datax/json-build/index'),
-        meta: { title: 'datax json构建', icon: 'table' }
+        meta: { title: 'datax json构建', icon: 'guide' }
       },
       {
         path: 'jdbcDatasource',
         name: 'jdbcDatasource',
         component: () => import('@/views/datax/jdbc-datasource/index'),
-        meta: { title: 'json构建数据源', icon: 'table' }
+        meta: { title: 'json构建数据源', icon: 'cfg-datasouce' }
       },
       {
         path: 'user',
         name: 'user',
         component: () => import('@/views/datax/user/index'),
-        meta: { title: '用户管理', icon: 'table', roles: ['ROLE_ADMIN'] }
+        meta: { title: '用户管理', icon: 'user-cfg', roles: ['ROLE_ADMIN'] }
       }
     ]
   },

@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'Vue Element Admin',
+  title: 'Datax Web',
 
   /**
    * @type {boolean} true | false
