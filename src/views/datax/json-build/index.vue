@@ -187,7 +187,6 @@ export default {
     buildJson() {
       const readerData = this.$refs.reader.getData()
       const writeData = this.$refs.writer.getData()
-      const tableName = this.$refs.writer.getTableName()
       const readerColumns = this.$refs.mapper.getLColumns()
       const writerColumns = this.$refs.mapper.getRColumns()
       const hiveReader = {
@@ -204,6 +203,17 @@ export default {
         writeMode: writeData.writeMode,
         writeFieldDelimiter: writeData.fieldDelimiter
       }
+      const hbaseReader = {
+        readerMode: readerData.mode,
+        readerMaxVersion: readerData.maxVersion,
+        readerRange: readerData.range
+      }
+      const hbaseWriter = {
+        writerMode: writeData.mode,
+        writerRowkeyColumn: writeData.rowkeyColumn,
+        writerVersionColumn: writeData.versionColumn,
+        writeNullMode: writeData.nullMode
+      }
       const rdbmsReader = {
         readerSplitPk: readerData.splitPk,
         whereParams: readerData.where,
@@ -217,12 +227,14 @@ export default {
         readerTables: [readerData.tableName],
         readerColumns: readerColumns,
         writerDatasourceId: writeData.datasourceId,
-        writerTables: [tableName],
+        writerTables: [writeData.tableName],
         writerColumns: writerColumns,
         hiveReader: hiveReader,
         hiveWriter: hiveWriter,
         rdbmsReader: rdbmsReader,
-        rdbmsWriter: rdbmsWriter
+        rdbmsWriter: rdbmsWriter,
+        hbaseReader: hbaseReader,
+        hbaseWriter: hbaseWriter
       }
       // 调api
       dataxJsonApi.buildJobJson(obj).then(response => {
