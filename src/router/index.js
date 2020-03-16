@@ -131,29 +131,24 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/data/log',
+    hidden: true,
+    component: () => import('@/views/datax/jobLog/log'),
+    meta: { title: '任务日志', icon: 'work' }
+  },
+  {
     path: '/datax',
     component: Layout,
     redirect: '/datax/job',
     name: 'Example',
-    meta: { title: 'datax', icon: 'work' },
+    meta: { title: '任务管理', icon: 'work' },
     children: [
-      {
-        path: 'executor',
-        name: 'executor',
-        component: () => import('@/views/datax/executor/index'),
-        meta: { title: '执行器管理', icon: 'exe-cfg' }
-      },
+
       {
         path: 'jobInfo',
         name: 'jobInfo',
         component: () => import('@/views/datax/jobInfo/index'),
         meta: { title: '任务管理', icon: 'task-cfg' }
-      },
-      {
-        path: 'jobLog',
-        name: 'jobLog',
-        component: () => import('@/views/datax/jobLog/index'),
-        meta: { title: '调度日志', icon: 'log' }
       },
       // {
       //   path: 'plugin',
@@ -171,14 +166,53 @@ export const asyncRoutes = [
         path: 'jsonBuild',
         name: 'jsonBuild',
         component: () => import('@/views/datax/json-build/index'),
-        meta: { title: 'datax json构建', icon: 'guide' }
+        meta: { title: '任务构建', icon: 'guide' }
       },
       {
         path: 'jdbcDatasource',
         name: 'jdbcDatasource',
         component: () => import('@/views/datax/jdbc-datasource/index'),
-        meta: { title: 'json构建数据源', icon: 'cfg-datasouce' }
-      },
+        meta: { title: '数据源管理', icon: 'cfg-datasouce' }
+      }
+    ]
+  },
+  {
+    path: '/datax',
+    component: Layout,
+    redirect: '/datax/job',
+    name: 'Example',
+    meta: { title: '日志管理', icon: 'work' },
+    children: [
+      {
+        path: 'jobLog',
+        name: 'jobLog',
+        component: () => import('@/views/datax/jobLog/index'),
+        meta: { title: '日志管理', icon: 'log' }
+      }
+    ]
+  },
+  {
+    path: '/datax',
+    component: Layout,
+    redirect: '/datax/job',
+    name: 'Example',
+    meta: { title: '执行器管理', icon: 'work' },
+    children: [
+      {
+        path: 'executor',
+        name: 'executor',
+        component: () => import('@/views/datax/executor/index'),
+        meta: { title: '执行器管理', icon: 'exe-cfg' }
+      }
+    ]
+  },
+  {
+    path: '/datax',
+    component: Layout,
+    redirect: '/datax/job',
+    name: 'Example',
+    meta: { title: '用户管理', icon: 'work' },
+    children: [
       {
         path: 'user',
         name: 'user',
