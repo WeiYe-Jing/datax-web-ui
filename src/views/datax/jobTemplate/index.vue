@@ -4,10 +4,10 @@
       <el-input v-model="listQuery.jobDesc" placeholder="任务描述" style="width: 200px;" class="filter-item" />
       <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
-        Search
+        搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Add
+        添加
       </el-button>
       <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
         reviewer
@@ -66,7 +66,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center">
+      <el-table-column label="操作" align="center">
         <template slot-scope="{row}">
           <el-dropdown split-button type="primary">
             操作
@@ -171,8 +171,8 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="分区时间字段">
-              <el-input v-model="partitionField" placeholder="请输入分区时间字段" style="width: 56%" />
+            <el-form-item label="分区字段">
+              <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
             </el-form-item>
           </el-col>
           <el-col :span="7">
@@ -196,10 +196,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          确认
         </el-button>
       </div>
     </el-dialog>
