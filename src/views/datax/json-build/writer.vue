@@ -3,6 +3,8 @@
     <RDBMSWriter v-if="dataSource!=='hive' && dataSource!=='hbase'" ref="rdbmswriter" @selectDataSource="showDataSource" />
     <HiveWriter v-if="dataSource==='hive'" ref="hivewriter" @selectDataSource="showDataSource" />
     <HBaseWriter v-if="dataSource==='hbase'" ref="hbasewriter" @selectDataSource="showDataSource" />
+    <MongoDBWriter v-if="dataSource==='mongodb'" ref="mongodbwriter" @selectDataSource="showDataSource" />
+
   </div>
 </template>
 
@@ -10,9 +12,10 @@
 import RDBMSWriter from './writer/RDBMSWriter'
 import HiveWriter from './writer/HiveWriter'
 import HBaseWriter from './writer/HBaseWriter'
+import MongoDBWriter from './writer/MongoDBWriter'
 export default {
   name: 'Writer',
-  components: { RDBMSWriter, HiveWriter, HBaseWriter },
+  components: { RDBMSWriter, HiveWriter, HBaseWriter, MongoDBWriter },
   data() {
     return {
       dataSource: ''
@@ -24,6 +27,8 @@ export default {
         return this.$refs.hivewriter.getData()
       } else if (this.dataSource === 'hbase') {
         return this.$refs.hbasewriter.getData()
+      } else if (this.dataSource === 'mongodb') {
+        return this.$refs.mongodbwriter.getData()
       } else {
         return this.$refs.rdbmswriter.getData()
       }
@@ -32,7 +37,9 @@ export default {
       if (this.dataSource === 'hive') {
         return this.$refs.hivewriter.getTableName()
       } else if (this.dataSource === 'hbase') {
-        return this.$refs.HBaseReader.getData()
+        return this.$refs.hbasewriter.getData()
+      } else if (this.dataSource === 'mongodb') {
+        return this.$refs.mongodbwriter.getData()
       } else {
         return this.$refs.rdbmswriter.getTableName()
       }
