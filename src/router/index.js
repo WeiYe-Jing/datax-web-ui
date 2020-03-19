@@ -132,6 +132,7 @@ export const asyncRoutes = [
   },
   {
     path: '/data/log',
+    hidden: true,
     component: () => import('@/views/datax/jobLog/log'),
     meta: { title: '任务日志', icon: 'work' }
   },
