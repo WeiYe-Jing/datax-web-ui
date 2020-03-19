@@ -9,10 +9,16 @@
         <el-option v-for="item in logStatusList" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
-        Search
+        搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handlerDelete">
-        Clear
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px;"
+        type="primary"
+        icon="el-icon-edit"
+        @click="handlerDelete"
+      >
+        清除
       </el-button>
     </div>
     <el-table
@@ -30,7 +36,7 @@
         <template slot-scope="scope">{{ scope.row.triggerTime }}</template>
       </el-table-column>
       <el-table-column label="调度结果" align="center">
-        <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.triggerCode).label }}</template>
+        <template slot-scope="scope"> <span :style="`color:${scope.row.triggerCode==500?'red':''}`">{{ statusList.find(t => t.value === scope.row.triggerCode).label }}</span></template>
       </el-table-column>
       <el-table-column label="调度备注" align="center">
         <template slot-scope="scope">
@@ -48,7 +54,7 @@
         <template slot-scope="scope">{{ scope.row.handleTime }}</template>
       </el-table-column>
       <el-table-column label="执行结果" align="center">
-        <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.handleCode).label }}</template>
+        <template slot-scope="scope"> <span :style="`color:${scope.row.handleCode==500?'red':''}`">{{ statusList.find(t => t.value === scope.row.handleCode).label }}</span></template>
       </el-table-column>
       <el-table-column label="执行备注" align="center">
         <template slot-scope="scope">
@@ -62,14 +68,22 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="300">
+      <el-table-column label="操作" align="center" width="300">
         <template slot-scope="{row}">
-          <el-button v-show="row.executorAddress" type="primary" @click="handleViewJobLog(row)">执行日志</el-button>
-          <el-button v-show="row.handleCode===0 && row.triggerCode===200" type="primary" @click="killRunningJob(row)">终止任务</el-button>
+          <el-button v-show="row.executorAddress" type="primary" @click="handleViewJobLog(row)">日志查看</el-button>
+          <el-button v-show="row.handleCode===0 && row.triggerCode===200" type="primary" @click="killRunningJob(row)">
+            终止任务
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="listQuery.current"
+      :limit.sync="listQuery.size"
+      @pagination="fetchData"
+    />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="600px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="center" label-width="100px">
@@ -99,10 +113,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="deleteLog">
-          Confirm
+          确定
         </el-button>
       </div>
     </el-dialog>
@@ -111,6 +125,9 @@
         <pre :loading="logLoading" v-text="logContent" />
       </div>
       <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          关闭
+        </el-button>
         <el-button type="primary" @click="loadLog">
           刷新日志
         </el-button>
@@ -160,8 +177,7 @@ export default {
       textMap: {
         create: 'Clear'
       },
-      rules: {
-      },
+      rules: {},
       temp: {
         deleteType: 1,
         jobGroup: 0,
@@ -258,13 +274,16 @@ export default {
     },
     // 查看日志
     handleViewJobLog(row) {
+      // const str = location.href.split('#')[0]
+      // window.open(`${str}#/ router的name `)
       this.jobLogQuery.executorAddress = row.executorAddress
       this.jobLogQuery.id = row.id
       this.jobLogQuery.triggerTime = Date.parse(row.triggerTime)
-      if (this.logShow === false) {
-        this.logShow = true
-      }
-      this.loadLog()
+      // if (this.logShow === false) {
+      //   this.logShow = true
+      // }
+      window.open(`#/data/log?executorAddress=${this.jobLogQuery.executorAddress}&triggerTime=${this.jobLogQuery.triggerTime}&id=${this.jobLogQuery.id}&fromLineNum=${this.jobLogQuery.fromLineNum}`)
+      // this.loadLog()
     },
     // 获取日志
     loadLog() {
@@ -301,12 +320,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .log-container{
+  .log-container {
     margin-bottom: 20px;
     background: #f5f5f5;
     width: 100%;
     height: 500px;
     overflow: scroll;
+
     pre {
       display: block;
       padding: 10px;

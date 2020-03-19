@@ -22,7 +22,7 @@
       </div>
       <div v-show="active===4" class="step4">
         <el-button type="primary" @click="buildJson">构建</el-button>
-        <el-button type="info" @click="handleCopy(inputData,$event)">copy json</el-button>
+        <el-button type="info" @click="handleCopy(inputData,$event)">复制 json</el-button>
         <el-button type="text" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "选择模板(操作步骤：构建->选择模板->下一步)" }}</el-button>
         <el-drawer
           ref="jobTemplateSelectDrawer"
