@@ -180,6 +180,12 @@ export const asyncRoutes = [
         meta: { title: 'json构建数据源', icon: 'table' }
       },
       {
+        path: 'registry',
+        name: 'registry',
+        component: () => import('@/views/datax/registry/index'),
+        meta: { title: '资源监控', icon: 'table' }
+      },
+      {
         path: 'user',
         name: 'user',
         component: () => import('@/views/datax/user/index'),
