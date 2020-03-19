@@ -30,7 +30,7 @@
         <template slot-scope="scope">{{ scope.row.memoryUsage }}%</template>
       </el-table-column>
       <el-table-column label="平均负载" align="center">
-        <template slot-scope="scope">{{ scope.row.loadAverage }}</template>
+        <template slot-scope="scope">{{ scope.row.loadAverage>=0?scope.row.loadAverage:0 }}</template>
       </el-table-column>
       <el-table-column label="更新时间" align="center">
         <template slot-scope="scope">{{ scope.row.updateTime }}</template>

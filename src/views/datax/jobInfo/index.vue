@@ -86,6 +86,9 @@
           </el-popover>
         </template>
       </el-table-column>
+      <el-table-column label="最近一次执行状态" align="center">
+        <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.lastHandleCode).label }}</template>
+      </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row}">
           <el-dropdown split-button type="primary">
