@@ -76,12 +76,12 @@ export default {
         upsertInfo: {
           isUpsert: '',
           upsertKey: ''
-        },
-        upsertType: [
-          { value: true, label: '针对相同的upsertKey做更新' },
-          { value: false, label: '不做更新' }
-        ]
+        }
       },
+      upsertType: [
+        { value: true, label: '针对相同的upsertKey做更新' },
+        { value: false, label: '不做更新' }
+      ],
       rules: {
         mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
