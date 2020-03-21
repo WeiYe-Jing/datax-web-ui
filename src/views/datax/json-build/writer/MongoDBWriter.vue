@@ -36,10 +36,12 @@
         </el-col>
       </el-row>
       <el-form-item label="更新信息">
-        <el-input v-model="writerForm.upsertInfo.isUpsert" placeholder="index指定对应reader端column的索引" style="width: 42%" />
+        <el-select v-model="writerForm.upsertInfo.isUpsert" placeholder="是否更新">
+          <el-option v-for="item in upsertType" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
       </el-form-item>
       <el-form-item>
-        <el-input v-model="writerForm.upsertInfo.upsertKey" placeholder="value指定时间的值,long值" style="width: 42%" />
+        <el-input v-model="writerForm.upsertInfo.upsertKey" placeholder="更新的业务主键" style="width: 42%" />
       </el-form-item>
       <el-form-item label="字段">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
@@ -67,13 +69,18 @@ export default {
       writerForm: {
         datasourceId: undefined,
         columns: [],
+        tableName: '',
         checkAll: false,
         isIndeterminate: true,
         ifCreateTable: false,
         upsertInfo: {
           isUpsert: '',
           upsertKey: ''
-        }
+        },
+        upsertType: [
+          { value: true, label: '针对相同的upsertKey做更新' },
+          { value: false, label: '不做更新' }
+        ]
       },
       rules: {
         mode: [{ required: true, message: 'this is required', trigger: 'blur' }],

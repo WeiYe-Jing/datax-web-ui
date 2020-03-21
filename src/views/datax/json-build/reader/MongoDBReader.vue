@@ -11,8 +11,8 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="文档" prop="collectionName">
-        <el-select v-model="readerForm.collectionName" filterable @change="rTbChange">
+      <el-form-item label="文档" prop="tableName">
+        <el-select v-model="readerForm.tableName" filterable @change="rTbChange">
           <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
@@ -54,7 +54,7 @@ export default {
       dataSource: '',
       readerForm: {
         datasourceId: undefined,
-        collectionName: '',
+        tableName: '',
         columns: [],
         checkAll: false,
         isIndeterminate: true
@@ -62,7 +62,7 @@ export default {
       rules: {
         mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        collectionName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        tableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
       }
     }
   },

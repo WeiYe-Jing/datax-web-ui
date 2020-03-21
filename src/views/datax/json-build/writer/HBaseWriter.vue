@@ -93,10 +93,17 @@ export default {
         checkAll: false,
         isIndeterminate: true,
         ifCreateTable: false,
-        upsertInfo: {
-          isUpsert: '',
-          upsertKey: ''
-        }
+        mode: 'normal',
+        rowkeyColumn: {
+          index: '',
+          type: '',
+          value: ''
+        },
+        versionColumn: {
+          index: '',
+          value: ''
+        },
+        nullMode: ''
       },
       nullModeTypes: [
         { value: 'skip', label: '不向hbase写这列' },
