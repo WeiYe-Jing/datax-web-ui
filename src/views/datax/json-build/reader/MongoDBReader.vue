@@ -11,28 +11,9 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="表" prop="tableName">
-        <el-select v-model="readerForm.tableName" filterable @change="rTbChange">
+      <el-form-item label="文档" prop="collectionName">
+        <el-select v-model="readerForm.collectionName" filterable @change="rTbChange">
           <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="mode" prop="mode">
-        <el-select v-model="readerForm.mode" placeholder="读取hbase的模式">
-          <el-option v-for="item in modeTypes" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="maxVersion">
-        <el-input v-model="readerForm.maxVersion" placeholder="多版本模式下读取的版本数,取值只能为－1或者大于1的数字" style="width: 50%" />
-      </el-form-item>
-      <el-form-item label="range">
-        <el-input v-model="readerForm.range.startRowkey" placeholder="startRowkey指定开始rowkey" style="width: 50%" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="readerForm.range.endRowkey" placeholder="endRowkey指定结束rowkey" style="width: 50%" />
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="readerForm.range.isBinaryRowkey" placeholder="转换方式">
-          <el-option v-for="item in binaryRowkeyTypes" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
       <el-form-item label="字段">
@@ -74,23 +55,14 @@ export default {
       readerForm: {
         datasourceId: undefined,
         collectionName: '',
-        dbName: '',
         columns: [],
         checkAll: false,
         isIndeterminate: true
       },
-      modeTypes: [
-        { value: 'normal', label: 'normal' },
-        { value: 'multiVersionFixedColumn', label: 'multiVersionFixedColumn' }
-      ],
-      binaryRowkeyTypes: [
-        { value: 'true', label: '调用Bytes.toBytesBinary(rowkey)' },
-        { value: 'false', label: '调用Bytes.toBytes(rowkey)' }
-      ],
       rules: {
         mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        tableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        collectionName: [{ required: true, message: 'this is required', trigger: 'blur' }]
       }
     }
   },

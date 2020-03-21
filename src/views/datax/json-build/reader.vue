@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <RDBMSReader v-if="dataSource!=='hive' && dataSource!=='hbase'" ref="rdbmsreader" @selectDataSource="showDataSource" />
+    <RDBMSReader v-if="dataSource!=='hive' && dataSource!=='hbase' && dataSource!=='mongodb'" ref="rdbmsreader" @selectDataSource="showDataSource" />
     <HiveReader v-if="dataSource==='hive'" ref="hivereader" @selectDataSource="showDataSource" />
     <HBaseReader v-if="dataSource==='hbase'" ref="hbasereader" @selectDataSource="showDataSource" />
     <MongoDBReader v-if="dataSource==='mongodb'" ref="mongodbreader" @selectDataSource="showDataSource" />

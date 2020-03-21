@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <RDBMSWriter v-if="dataSource!=='hive' && dataSource!=='hbase'" ref="rdbmswriter" @selectDataSource="showDataSource" />
+    <RDBMSWriter v-if="dataSource!=='hive' && dataSource!=='hbase' && dataSource!=='mongodb'" ref="rdbmswriter" @selectDataSource="showDataSource" />
     <HiveWriter v-if="dataSource==='hive'" ref="hivewriter" @selectDataSource="showDataSource" />
     <HBaseWriter v-if="dataSource==='hbase'" ref="hbasewriter" @selectDataSource="showDataSource" />
     <MongoDBWriter v-if="dataSource==='mongodb'" ref="mongodbwriter" @selectDataSource="showDataSource" />

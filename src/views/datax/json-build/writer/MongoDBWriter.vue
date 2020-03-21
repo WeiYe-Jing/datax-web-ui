@@ -34,34 +34,12 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <!--<el-col :span="6">
-          <el-form-item>
-            <el-button type="primary" :disabled="!this.fromTableName" @click="createTable()">一键生成目标表</el-button>
-          </el-form-item>
-        </el-col>-->
       </el-row>
-      <el-form-item label="mode" prop="mode">
-        <el-input v-model="writerForm.mode" disabled style="width: 42%" />
-      </el-form-item>
-      <el-form-item label="rowkeyColumn">
-        <el-input v-model="writerForm.rowkeyColumn.index" placeholder="index指定该列对应reader端column的索引" style="width: 42%" />
+      <el-form-item label="更新信息">
+        <el-input v-model="writerForm.upsertInfo.isUpsert" placeholder="index指定对应reader端column的索引" style="width: 42%" />
       </el-form-item>
       <el-form-item>
-        <el-input v-model="writerForm.rowkeyColumn.type" placeholder="type指定写入数据类型" style="width: 42%" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="writerForm.rowkeyColumn.value" placeholder="value配置常量，常作为多个字段的拼接符" style="width: 42%" />
-      </el-form-item>
-      <el-form-item label="versionColumn">
-        <el-input v-model="writerForm.versionColumn.index" placeholder="index指定对应reader端column的索引" style="width: 42%" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="writerForm.versionColumn.value" placeholder="value指定时间的值,long值" style="width: 42%" />
-      </el-form-item>
-      <el-form-item label="nullMode">
-        <el-select v-model="writerForm.nullMode" placeholder="null值转换方式">
-          <el-option v-for="item in nullModeTypes" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
+        <el-input v-model="writerForm.upsertInfo.upsertKey" placeholder="value指定时间的值,long值" style="width: 42%" />
       </el-form-item>
       <el-form-item label="字段">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
@@ -88,7 +66,6 @@ export default {
       dataSource: '',
       writerForm: {
         datasourceId: undefined,
-        collectionName: '',
         columns: [],
         checkAll: false,
         isIndeterminate: true,
