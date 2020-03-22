@@ -214,6 +214,10 @@ export default {
         writerVersionColumn: writeData.versionColumn,
         writeNullMode: writeData.nullMode
       }
+      const mongoDBReader = {}
+      const mongoDBWriter = {
+        upsertInfo: writeData.upsertInfo
+      }
       const rdbmsReader = {
         readerSplitPk: readerData.splitPk,
         whereParams: readerData.where,
@@ -234,7 +238,9 @@ export default {
         rdbmsReader: rdbmsReader,
         rdbmsWriter: rdbmsWriter,
         hbaseReader: hbaseReader,
-        hbaseWriter: hbaseWriter
+        hbaseWriter: hbaseWriter,
+        mongoDBReader: mongoDBReader,
+        mongoDBWriter: mongoDBWriter
       }
       // 调api
       dataxJsonApi.buildJobJson(obj).then(response => {
