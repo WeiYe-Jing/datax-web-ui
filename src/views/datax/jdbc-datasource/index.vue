@@ -246,6 +246,7 @@ export default {
         this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.apache.hive.jdbc.HiveDriver'
       }
+      this.isNeedToFill = datasource !== 'hbase'
     },
     fetchData() {
       this.listLoading = true
