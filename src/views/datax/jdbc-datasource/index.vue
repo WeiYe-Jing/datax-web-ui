@@ -92,25 +92,34 @@
         <el-form-item label="数据源分组" prop="datasourceGroup">
           <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="jdbc || mongoDB" label="用户名" prop="jdbcUsername">
+        <el-form-item v-if="jdbc || mongodb" label="用户名" prop="jdbcUsername">
           <el-input v-model="temp.jdbcUsername" placeholder="用户名" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="visible" v-show="jdbc || mongoDB" label="密码" prop="jdbcPassword">
+        <el-form-item v-if="visible" v-show="jdbc || mongodb" label="密码" prop="jdbcPassword">
           <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
           </el-input>
         </el-form-item>
-        <el-form-item v-show="jdbc || mongoDB" v-else label="密码" prop="jdbcPassword">
+        <el-form-item v-show="jdbc || mongodb" v-else label="密码" prop="jdbcPassword">
           <el-input v-model="temp.jdbcPassword" type="text" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
         </el-form-item>
-        <el-form-item v-if="jdbc || mongoDB" label="jdbc url" prop="jdbcUrl">
+        <el-form-item v-if="jdbc" label="jdbc url" prop="jdbcUrl">
           <el-input
             v-model="temp.jdbcUrl"
             :autosize="{ minRows: 3, maxRows: 6}"
             type="textarea"
             placeholder="jdbc url"
+            style="width: 60%"
+          />
+        </el-form-item>
+        <el-form-item v-if="mongodb" label="地址" prop="jdbcUrl">
+          <el-input
+            v-model="temp.jdbcUrl"
+            :autosize="{ minRows: 3, maxRows: 6}"
+            type="textarea"
+            placeholder="127.0.0.1:27017"
             style="width: 60%"
           />
         </el-form-item>
@@ -120,7 +129,7 @@
         <el-form-item v-if="hbase" label="ZK地址" prop="zkAdress">
           <el-input v-model="temp.zkAdress" placeholder="127.0.0.1:2181" style="width: 60%" />
         </el-form-item>
-        <el-form-item v-if="mongoDB" label="数据库名称" prop="zkAdress">
+        <el-form-item v-if="mongodb" label="数据库名称" prop="databaseName">
           <el-input v-model="temp.databaseName" placeholder="数据库名称" style="width: 60%" />
         </el-form-item>
         <el-form-item label="注释">
@@ -202,7 +211,8 @@ export default {
         jdbcUrl: [{ required: true, message: 'this is required', trigger: 'blur' }],
         jdbcDriverClass: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasource: [{ required: true, message: 'this is required', trigger: 'change' }],
-        zkAdress: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        zkAdress: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        databaseName: [{ required: true, message: 'this is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,
@@ -229,7 +239,7 @@ export default {
       ],
       jdbc: true,
       hbase: false,
-      mongoDB: false
+      mongodb: false
     }
   },
   created() {
@@ -252,12 +262,19 @@ export default {
       } else if (datasource === 'hive') {
         this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.apache.hive.jdbc.HiveDriver'
-      } else if (datasource === 'hbase') {
-        this.jdbc = this.mongoDB = false
+        this.hbase = this.mongodb = false
+        this.jdbc = true
+      }
+      if (datasource === 'hbase') {
+        this.jdbc = this.mongodb = false
         this.hbase = true
-      } else if (datasource === 'mongoDB') {
+      } else if (datasource === 'mongodb') {
         this.jdbc = this.hbase = false
-        this.mongoDB = true
+        this.mongodb = true
+        this.temp.jdbcUrl = '{host}:{port}'
+      } else {
+        this.hbase = this.mongodb = false
+        this.jdbc = true
       }
     },
     fetchData() {
