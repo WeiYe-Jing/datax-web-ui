@@ -40,17 +40,20 @@
         <template slot-scope="scope">{{ scope.row.datasourceGroup }}
         </template>
       </el-table-column>
-      <el-table-column label="用户名" width="150" align="center">
+      <!--<el-table-column label="用户名" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.jdbcUsername ? scope.row.jdbcUsername:'-' }}</template>
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column label="jdbc url" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcUrl ? scope.row.jdbcUrl:'-' }}</template>
       </el-table-column>
-      <el-table-column label="jdbc驱动类" width="200" align="center" :show-overflow-tooltip="true">
+      <!-- <el-table-column label="jdbc驱动类" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcDriverClass ? scope.row.jdbcDriverClass:'-' }}</template>
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column label="ZK地址" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.zkAdress ? scope.row.zkAdress:'-' }}</template>
+      </el-table-column>
+      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">
+        <template slot-scope="scope">{{ scope.row.databaseName ? scope.row.databaseName:'-' }}</template>
       </el-table-column>
       <el-table-column label="注释" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.comments }}</template>
