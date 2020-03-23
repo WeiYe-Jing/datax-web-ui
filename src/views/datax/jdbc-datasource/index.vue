@@ -265,17 +265,7 @@ export default {
         this.hbase = this.mongodb = false
         this.jdbc = true
       }
-      if (datasource === 'hbase') {
-        this.jdbc = this.mongodb = false
-        this.hbase = true
-      } else if (datasource === 'mongodb') {
-        this.jdbc = this.hbase = false
-        this.mongodb = true
-        this.temp.jdbcUrl = '{host}:{port}'
-      } else {
-        this.hbase = this.mongodb = false
-        this.jdbc = true
-      }
+      this.getShowStrategy(datasource)
     },
     fetchData() {
       this.listLoading = true
@@ -347,6 +337,7 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.getShowStrategy(row.datasource)
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -370,6 +361,19 @@ export default {
           })
         }
       })
+    },
+    getShowStrategy(datasource) {
+      if (datasource === 'hbase') {
+        this.jdbc = this.mongodb = false
+        this.hbase = true
+      } else if (datasource === 'mongodb') {
+        this.jdbc = this.hbase = false
+        this.mongodb = true
+        this.temp.jdbcUrl = '{host}:{port}'
+      } else {
+        this.hbase = this.mongodb = false
+        this.jdbc = true
+      }
     },
     handleDelete(row) {
       console.log('删除')

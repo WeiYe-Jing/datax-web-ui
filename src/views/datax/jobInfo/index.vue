@@ -505,7 +505,7 @@ export default {
     },
     // 查看日志
     handlerViewLog(row) {
-      this.$router.push({ path: '/datax/jobLog', query: { jobId: row.id }})
+      this.$router.push({ path: '/datax/log/jobLog', query: { jobId: row.id }})
     },
     handlerStart(row) {
       job.startJob(row.id).then(response => {
