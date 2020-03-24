@@ -207,10 +207,19 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: 'user',
-    name: 'user',
-    component: () => import('@/views/datax/user/index'),
-    meta: { title: '用户管理', icon: 'table', roles: ['ROLE_ADMIN'] }
+    path: '/datax/user',
+    component: Layout,
+    redirect: '/datax/user',
+    name: 'Example',
+    meta: { title: '用户管理', icon: 'work' },
+    children: [
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/datax/user/index'),
+        meta: { title: '用户管理', icon: 'table', roles: ['ROLE_ADMIN'] }
+      }
+    ]
   },
   {
     path: '/datax/registry',
