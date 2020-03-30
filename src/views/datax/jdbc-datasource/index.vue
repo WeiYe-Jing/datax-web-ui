@@ -238,7 +238,8 @@ export default {
         { value: 'sqlserver', label: 'sqlserver' },
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
-        { value: 'mongodb', label: 'mongodb' }
+        { value: 'mongodb', label: 'mongodb' },
+        { value: 'clickhouse', label: 'clickhouse' }
       ],
       jdbc: true,
       hbase: false,
@@ -262,6 +263,9 @@ export default {
       } else if (datasource === 'sqlserver') {
         this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
         this.temp.jdbcDriverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+      } else if (datasource === 'clickhouse') {
+        this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}/{database}'
+        this.temp.jdbcDriverClass = 'ru.yandex.clickhouse.ClickHouseDriver'
       } else if (datasource === 'hive') {
         this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.apache.hive.jdbc.HiveDriver'
