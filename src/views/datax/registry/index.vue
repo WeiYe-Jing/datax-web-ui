@@ -10,7 +10,7 @@
       <p><span class="fl">执行器：{{ item.registryKey }}</span><span class="fl">&nbsp;&nbsp;注册地址：{{ item.registryValue }}</span><span class="fr">更新时间：{{ item.updateTime }}</span></p>
       <div :class="item.id + ' fl'" style="width: 30%;height: 300px" />
       <div :class="item.id + ' fl'" style="width: 30%;height: 300px" />
-      <div :class="item.id + ' fl' + ' loadAverage'" style="width: 30%;height: 300px">
+      <div :class="item.id + ' fl' + ' loadAverage'" style="width: 30%;height: 300px ">
         <p class="title">平均负载</p>
         <p class="number">{{ item.loadAverage >= 0 ? item.loadAverage : 0 }}</p>
       </div>
