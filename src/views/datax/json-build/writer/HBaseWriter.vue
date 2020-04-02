@@ -76,6 +76,9 @@ export default {
           if (typeof obj !== 'object' || !obj) {
             callback(new Error('JSON格式错误'))
           }
+          if (!(obj instanceof Array)) {
+            callback(new Error('JSON必须为数组'))
+          }
         } catch (e) {
           callback(new Error('JSON格式错误'))
         }
