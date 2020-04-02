@@ -95,15 +95,15 @@
         <el-form-item label="数据源分组" prop="datasourceGroup">
           <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="jdbc || mongodb" label="用户名">
+        <el-form-item v-if="jdbc" label="用户名">
           <el-input v-model="temp.jdbcUsername" placeholder="用户名" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="visible" v-show="jdbc || mongodb" label="密码">
+        <el-form-item v-if="visible" v-show="jdbc" label="密码">
           <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
           </el-input>
         </el-form-item>
-        <el-form-item v-show="jdbc || mongodb" v-else label="密码">
+        <el-form-item v-show="jdbc" v-else label="密码">
           <el-input v-model="temp.jdbcPassword" type="text" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
@@ -372,7 +372,7 @@ export default {
       } else if (datasource === 'mongodb') {
         this.jdbc = this.hbase = false
         this.mongodb = true
-        this.temp.jdbcUrl = '{host}:{port}'
+        this.temp.jdbcUrl = 'mongodb://[username:password@]host1[:port1][,...hostN[:portN]]][/[database][?options]]'
       } else {
         this.hbase = this.mongodb = false
         this.jdbc = true
