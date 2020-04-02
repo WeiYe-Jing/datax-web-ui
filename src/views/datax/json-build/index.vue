@@ -79,6 +79,7 @@ import clip from '@/utils/clipboard'
 import Mapper from './mapper'
 
 export default {
+  name: 'JsonBuild',
   components: { Reader, Writer, Pagination, JsonEditor, Mapper },
   data() {
     return {

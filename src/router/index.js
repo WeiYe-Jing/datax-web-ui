@@ -164,9 +164,9 @@ export const asyncRoutes = [
       },
       {
         path: 'jsonBuild',
-        name: 'jsonBuild',
+        name: 'JsonBuild',
         component: () => import('@/views/datax/json-build/index'),
-        meta: { title: '任务构建', icon: 'guide' }
+        meta: { title: '任务构建', icon: 'guide', noCache: false }
       },
       {
         path: 'jdbcDatasource',
