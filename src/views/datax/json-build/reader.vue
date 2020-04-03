@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
-    <RDBMSReader v-if="dataSource!=='hive' && dataSource!=='hbase' && dataSource!=='mongodb'" ref="rdbmsreader" @selectDataSource="showDataSource" />
-    <HiveReader v-if="dataSource==='hive'" ref="hivereader" @selectDataSource="showDataSource" />
-    <HBaseReader v-if="dataSource==='hbase'" ref="hbasereader" @selectDataSource="showDataSource" />
-    <MongoDBReader v-if="dataSource==='mongodb'" ref="mongodbreader" @selectDataSource="showDataSource" />
+    <RDBMSReader v-show="dataSource!=='hive' && dataSource!=='hbase' && dataSource!=='mongodb'" ref="rdbmsreader" @selectDataSource="showDataSource" />
+    <HiveReader v-show="dataSource==='hive'" ref="hivereader" @selectDataSource="showDataSource" />
+    <HBaseReader v-show="dataSource==='hbase'" ref="hbasereader" @selectDataSource="showDataSource" />
+    <MongoDBReader v-show="dataSource==='mongodb'" ref="mongodbreader" @selectDataSource="showDataSource" />
   </div>
 </template>
 
@@ -34,6 +34,7 @@ export default {
     },
     showDataSource(data) {
       this.dataSource = data
+      this.getData()
     }
   }
 }
