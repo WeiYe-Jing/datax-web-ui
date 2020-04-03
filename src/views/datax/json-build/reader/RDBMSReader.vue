@@ -44,6 +44,7 @@
 <script>
 import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
+import Bus from '../bus'
 
 export default {
   name: 'RDBMSReader',
@@ -113,6 +114,7 @@ export default {
           this.dataSource = item.datasource
         }
       })
+      Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
       // 获取可用表
       this.getTables('reader')
@@ -168,6 +170,9 @@ export default {
       this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rColumnList.length
     },
     getData() {
+      if (Bus.dataSourceId) {
+        this.readerForm.datasourceId = Bus.dataSourceId
+      }
       return this.readerForm
     }
   }
