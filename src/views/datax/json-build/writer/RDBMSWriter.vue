@@ -42,7 +42,10 @@
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="preSql">
-        <el-input v-model="writerForm.preSql" placeholder="preSql" type="textarea" style="width: 42%" />
+        <el-input v-model="writerForm.preSql" placeholder="多个用;分隔" type="textarea" style="width: 42%" />
+      </el-form-item>
+      <el-form-item label="postSql">
+        <el-input v-model="writerForm.postSql" placeholder="多个用;分隔" type="textarea" style="width: 42%" />
       </el-form-item>
     </el-form>
   </div>
@@ -68,6 +71,7 @@ export default {
         checkAll: false,
         isIndeterminate: true,
         preSql: '',
+        postSql: '',
         ifCreateTable: false
       },
       readerForm: this.getReaderData(),

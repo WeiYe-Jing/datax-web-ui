@@ -226,7 +226,8 @@ export default {
         querySql: readerData.querySql
       }
       const rdbmsWriter = {
-        preSql: writeData.preSql
+        preSql: writeData.preSql,
+        postSql: writeData.postSql
       }
       const obj = {
         readerDatasourceId: readerData.datasourceId,
