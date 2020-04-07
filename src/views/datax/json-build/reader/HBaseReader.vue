@@ -193,6 +193,11 @@ export default {
       }
       return this.readerForm
     }
+  },
+  watch: {
+    'readerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('reader')
+    }
   }
 }
 </script>
