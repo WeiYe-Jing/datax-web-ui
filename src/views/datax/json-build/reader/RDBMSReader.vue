@@ -44,7 +44,7 @@
 <script>
 import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
-import Bus from '../bus'
+import Bus from '../busReader'
 
 export default {
   name: 'RDBMSReader',
@@ -77,6 +77,11 @@ export default {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
         tableName: [{ required: true, message: 'this is required', trigger: 'change' }]
       }
+    }
+  },
+  watch: {
+    'readerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('reader')
     }
   },
   created() {
@@ -174,11 +179,6 @@ export default {
         this.readerForm.datasourceId = Bus.dataSourceId
       }
       return this.readerForm
-    }
-  },
-  watch: {
-    'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
     }
   }
 }

@@ -176,7 +176,7 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'DataxJdbcDatasource',
+  name: 'JdbcDatasource',
   components: { Pagination },
   directives: { waves },
   filters: {

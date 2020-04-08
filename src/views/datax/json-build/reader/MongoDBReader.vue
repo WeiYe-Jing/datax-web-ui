@@ -34,7 +34,7 @@
 <script>
 import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
-import Bus from '../bus'
+import Bus from '../busReader'
 
 export default {
   name: 'MongoDBReader',
@@ -65,6 +65,11 @@ export default {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
         tableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
       }
+    }
+  },
+  watch: {
+    'readerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('reader')
     }
   },
   created() {
@@ -158,11 +163,6 @@ export default {
         this.readerForm.datasourceId = Bus.dataSourceId
       }
       return this.readerForm
-    }
-  },
-  watch: {
-    'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
     }
   }
 }

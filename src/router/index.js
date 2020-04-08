@@ -140,13 +140,13 @@ export const asyncRoutes = [
     path: '/datax/job',
     component: Layout,
     redirect: '/datax/job',
-    name: 'Example',
+    name: 'job',
     meta: { title: '任务管理', icon: 'work' },
     children: [
 
       {
         path: 'jobInfo',
-        name: 'jobInfo',
+        name: 'JobInfo',
         component: () => import('@/views/datax/jobInfo/index'),
         meta: { title: '任务管理', icon: 'task-cfg' }
       },
@@ -158,7 +158,7 @@ export const asyncRoutes = [
       // },
       {
         path: 'jobTemplate',
-        name: 'jobTemplate',
+        name: 'JobTemplate',
         component: () => import('@/views/datax/jobTemplate/index'),
         meta: { title: 'datax 任务模板', icon: 'task-tmp' }
       },
@@ -170,7 +170,7 @@ export const asyncRoutes = [
       },
       {
         path: 'jdbcDatasource',
-        name: 'jdbcDatasource',
+        name: 'JdbcDatasource',
         component: () => import('@/views/datax/jdbc-datasource/index'),
         meta: { title: '数据源管理', icon: 'cfg-datasouce' }
       }
@@ -180,12 +180,12 @@ export const asyncRoutes = [
     path: '/datax/log',
     component: Layout,
     redirect: '/datax/jobLog',
-    name: 'Example',
+    name: 'log',
     meta: { title: '日志管理', icon: 'work' },
     children: [
       {
         path: 'jobLog',
-        name: 'jobLog',
+        name: 'JobLog',
         component: () => import('@/views/datax/jobLog/index'),
         meta: { title: '日志管理', icon: 'log' }
       }
@@ -195,12 +195,12 @@ export const asyncRoutes = [
     path: '/datax/executor',
     component: Layout,
     redirect: '/datax/executor',
-    name: 'Example',
+    name: 'executor',
     meta: { title: '执行器管理', icon: 'work' },
     children: [
       {
         path: 'executor',
-        name: 'executor',
+        name: 'Executor',
         component: () => import('@/views/datax/executor/index'),
         meta: { title: '执行器管理', icon: 'exe-cfg' }
       }
@@ -210,12 +210,12 @@ export const asyncRoutes = [
     path: '/datax/user',
     component: Layout,
     redirect: '/datax/user',
-    name: 'Example',
+    name: 'user',
     meta: { title: '用户管理', icon: 'work' },
     children: [
       {
         path: 'user',
-        name: 'user',
+        name: 'User',
         component: () => import('@/views/datax/user/index'),
         meta: { title: '用户管理', icon: 'table', roles: ['ROLE_ADMIN'] }
       }
@@ -225,12 +225,12 @@ export const asyncRoutes = [
     path: '/datax/registry',
     component: Layout,
     redirect: '/datax/registry',
-    name: 'Example',
+    name: 'registry',
     meta: { title: '资源监控', icon: 'work' },
     children: [
       {
         path: 'registry',
-        name: 'registry',
+        name: 'Registry',
         component: () => import('@/views/datax/registry/index'),
         meta: { title: '资源监控', icon: 'battery-line' }
       }

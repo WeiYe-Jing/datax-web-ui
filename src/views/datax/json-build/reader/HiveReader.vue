@@ -48,7 +48,7 @@
 <script>
 import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
-import Bus from '../bus'
+import Bus from '../busReader'
 
 export default {
   name: 'HiveReader',
@@ -92,6 +92,11 @@ export default {
         { value: 'seq', label: 'seq' },
         { value: 'csv', label: 'csv' }
       ]
+    }
+  },
+  watch: {
+    'readerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('reader')
     }
   },
   created() {
@@ -185,11 +190,6 @@ export default {
         this.readerForm.datasourceId = Bus.dataSourceId
       }
       return this.readerForm
-    }
-  },
-  watch: {
-    'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
     }
   }
 }

@@ -32,10 +32,13 @@
       <el-table-column align="center" label="任务ID" width="80">
         <template slot-scope="scope">{{ scope.row.jobId }}</template>
       </el-table-column>
+      <el-table-column align="center" label="任务描述">
+        <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
+      </el-table-column>
       <el-table-column label="调度时间" align="center">
         <template slot-scope="scope">{{ scope.row.triggerTime }}</template>
       </el-table-column>
-      <el-table-column label="调度结果" align="center">
+      <el-table-column label="调度结果" align="center" width="100">
         <template slot-scope="scope"> <span :style="`color:${scope.row.triggerCode==500?'red':''}`">{{ statusList.find(t => t.value === scope.row.triggerCode).label }}</span></template>
       </el-table-column>
       <el-table-column label="调度备注" align="center">
