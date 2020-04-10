@@ -6,7 +6,7 @@
         Search
       </el-button>
     </div>
-    <div v-for="item in list" class="container">
+    <div v-for="item in list" :key="item.id" class="container">
       <p><span class="fl">执行器：{{ item.registryKey }}</span><span class="fl">&nbsp;&nbsp;注册地址：{{ item.registryValue }}</span><span class="fr">更新时间：{{ item.updateTime }}</span></p>
       <div :class="item.id + ' fl'" style="width: 30%;height: 300px" />
       <div :class="item.id + ' fl'" style="width: 30%;height: 300px" />
@@ -15,48 +15,15 @@
         <p class="number">{{ item.loadAverage >= 0 ? item.loadAverage : 0 }}</p>
       </div>
     </div>
-    <!--<el-table-->
-    <!--v-loading="listLoading"-->
-    <!--:data="list"-->
-    <!--element-loading-text="Loading"-->
-    <!--border-->
-    <!--fit-->
-    <!--highlight-current-row-->
-    <!--&gt;-->
-    <!--<el-table-column align="center" label="序号" width="95">-->
-    <!--<template slot-scope="scope">{{ scope.$index+1 }}</template>-->
-    <!--</el-table-column>-->
-    <!--<el-table-column label="执行器" align="center">-->
-    <!--<template slot-scope="scope">{{ scope.row.registryKey }}</template>-->
-    <!--</el-table-column>-->
-    <!--<el-table-column label="注册地址" align="center">-->
-    <!--<template slot-scope="scope">{{ scope.row.registryValue }}</template>-->
-    <!--</el-table-column>-->
-    <!--<el-table-column label="CPU使用率" align="center">-->
-    <!--<template slot-scope="scope">{{ scope.row.cpuUsage }}%</template>-->
-    <!--</el-table-column>-->
-    <!--<el-table-column label="内存使用率" align="center">-->
-    <!--<template slot-scope="scope">{{ scope.row.memoryUsage }}%</template>-->
-    <!--</el-table-column>-->
-    <!--<el-table-column label="平均负载" align="center">-->
-    <!--<template slot-scope="scope">{{ scope.row.loadAverage>=0?scope.row.loadAverage:0 }}</template>-->
-    <!--</el-table-column>-->
-    <!--<el-table-column label="更新时间" align="center">-->
-    <!--<template slot-scope="scope">{{ scope.row.updateTime }}</template>-->
-    <!--</el-table-column>-->
-    <!--</el-table>-->
-    <!--<pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />-->
   </div>
 </template>
 
 <script>
 import { getList } from '@/api/datax-registry'
 import waves from '@/directive/waves' // waves directive
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
   name: 'Registry',
-  components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -124,7 +91,7 @@ export default {
           show: false
         },
         series: [{
-          name: '速度',
+          name: 'cpu使用率',
           type: 'gauge',
           max: 100,
           radius: '70%', // 半径
@@ -160,7 +127,7 @@ export default {
           show: false
         },
         series: [{
-          name: '速度',
+          name: '内存使用率',
           type: 'gauge',
           max: 100,
           radius: '70%', // 半径
