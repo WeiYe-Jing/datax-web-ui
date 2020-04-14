@@ -195,7 +195,8 @@ export default {
         readerPath: readerData.path,
         readerDefaultFS: readerData.defaultFS,
         readerFileType: readerData.fileType,
-        readerFieldDelimiter: readerData.fieldDelimiter
+        readerFieldDelimiter: readerData.fieldDelimiter,
+        readerSkipHeader: readerData.skipHeader
       }
       const hiveWriter = {
         writerDefaultFS: writeData.defaultFS,

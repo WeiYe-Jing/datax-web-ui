@@ -30,6 +30,11 @@
       <el-form-item label="fieldDelimiter" prop="fieldDelimiter">
         <el-input v-model="readerForm.fieldDelimiter" placeholder="读取的字段分隔符" style="width: 42%" />
       </el-form-item>
+      <el-form-item label="skipHeader">
+        <el-select v-model="readerForm.skipHeader" placeholder="是否跳过表头">
+          <el-option v-for="item in skipHeaderTypes" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="字段">
         <el-checkbox
           v-model="readerForm.checkAll"
@@ -76,7 +81,8 @@ export default {
         path: '',
         defaultFS: '',
         fileType: '',
-        fieldDelimiter: ''
+        fieldDelimiter: '',
+        skipHeader: ''
       },
       rules: {
         path: [{ required: true, message: 'this is required', trigger: 'blur' }],
@@ -91,6 +97,10 @@ export default {
         { value: 'rc', label: 'rc' },
         { value: 'seq', label: 'seq' },
         { value: 'csv', label: 'csv' }
+      ],
+      skipHeaderTypes: [
+        { value: 'true', label: '读取跳过表头' },
+        { value: 'false', label: '读取包含表头' }
       ]
     }
   },
