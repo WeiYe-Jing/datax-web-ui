@@ -29,9 +29,9 @@
             :value="item"
           />
         </el-select>
-        <!--<el-input v-model="fromTableName" style="width: 195px" filterable  @change="wTbChange"></el-input>-->
-        <!--<el-checkbox v-model="writerForm.ifCreateTable" @change="createTableCheckedChange">新增</el-checkbox>-->
         <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
+        <el-input v-model="createTableName" style="width: 195px" />
+        <el-button type="primary" @click="createTable">新增</el-button>
       </el-form-item>
       <div style="margin: 5px 0;" />
       <el-form-item label="字段">
@@ -59,11 +59,16 @@ export default {
   name: 'RDBMSWriter',
   data() {
     return {
+      jdbcDsQuery: {
+        current: 1,
+        size: 200
+      },
       wDsList: [],
       fromTableName: '',
       fromColumnList: [],
       wTbList: [],
       dataSource: '',
+      createTableName: '',
       writerForm: {
         datasourceId: undefined,
         tableName: '',
@@ -152,13 +157,6 @@ export default {
       this.writerForm.checkAll = checkedCount === this.fromColumnList.length
       this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.fromColumnList.length
     },
-    createTableCheckedChange(val) {
-      this.writerForm.tableName = val ? this.readerForm.tableName : ''
-      this.fromColumnList = this.readerForm.columns
-      this.writerForm.columns = this.readerForm.columns
-      this.writerForm.checkAll = true
-      this.writerForm.isIndeterminate = false
-    },
     getData() {
       if (Bus.dataSourceId) {
         this.writerForm.datasourceId = Bus.dataSourceId
@@ -170,6 +168,20 @@ export default {
     },
     getTableName() {
       return this.fromTableName
+    },
+    createTable() {
+      const obj = {
+        datasourceId: this.writerForm.datasourceId,
+        tableName: this.createTableName
+      }
+      dsQueryApi.createTable(obj).then(response => {
+        this.$notify({
+          title: 'Success',
+          message: 'Create Table Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      }).catch(() => console.log('promise catch err'))
     }
   }
 }

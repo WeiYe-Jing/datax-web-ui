@@ -29,12 +29,12 @@ export function getColumnsByQuerySql(params) {
   })
 }
 
-// 根据datasourceID、tablename、columns（数组）拼接的json传给后台三个条件创建表【目标端】
-export function createTable(query) {
+// 根据datasourceID、tablename创建表【目标端】
+export function createTable(params) {
   return request({
     url: '/api/jdbcDatasourceQuery/createTable',
     method: 'post',
-    data: query
+    params
   })
 }
 // 判断字段是否存在，存在，即更新值，否则添加字段

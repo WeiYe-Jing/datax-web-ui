@@ -62,6 +62,10 @@ export default {
   name: 'MongoDBWriter',
   data() {
     return {
+      jdbcDsQuery: {
+        current: 1,
+        size: 200
+      },
       wDsList: [],
       fromTableName: '',
       fromColumnList: [],
@@ -180,24 +184,6 @@ export default {
     },
     getTableName() {
       return this.fromTableName
-    },
-    createTable() {
-      const tableName = this.fromTableName
-      const datasourceId = this.writerForm.datasourceId
-      const columns = this.fromColumnList
-      const jsonString = {}
-      jsonString['datasourceId'] = datasourceId
-      jsonString['tableName'] = tableName
-      jsonString['columns'] = columns
-      console.info(jsonString)
-      dsQueryApi.createTable(jsonString).then(response => {
-        this.$notify({
-          title: 'Success',
-          message: 'Create Table Successfully',
-          type: 'success',
-          duration: 2000
-        })
-      }).catch(() => console.log('promise catch err'))
     }
   }
 }
