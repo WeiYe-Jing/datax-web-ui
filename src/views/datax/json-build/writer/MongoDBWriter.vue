@@ -61,6 +61,10 @@ export default {
   name: 'MongoDBWriter',
   data() {
     return {
+      jdbcDsQuery: {
+        current: 1,
+        size: 200
+      },
       wDsList: [],
       fromTableName: '',
       fromColumnList: [],

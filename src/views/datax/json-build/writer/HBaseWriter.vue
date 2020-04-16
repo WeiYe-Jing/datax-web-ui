@@ -81,6 +81,10 @@ export default {
   name: 'HBaseWriter',
   data() {
     return {
+      jdbcDsQuery: {
+        current: 1,
+        size: 200
+      },
       wDsList: [],
       fromTableName: '',
       fromColumnList: [],

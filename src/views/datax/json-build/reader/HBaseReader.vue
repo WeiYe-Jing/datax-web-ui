@@ -60,7 +60,7 @@ export default {
     return {
       jdbcDsQuery: {
         current: 1,
-        size: 50
+        size: 200
       },
       rDsList: [],
       rTbList: [],
