@@ -1,7 +1,7 @@
 <template>
   <div ref="rightPanel" :class="{show:show}" class="rightPanel-container">
     <div class="rightPanel-background" />
-    <div class="rightPanel">
+    <div class="rightPanel" style="display: none">
       <div class="handle-button" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
         <i :class="show?'el-icon-close':'el-icon-setting'" />
       </div>

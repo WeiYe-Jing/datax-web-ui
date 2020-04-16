@@ -13,22 +13,22 @@
       fit
       highlight-current-row
     >
-      <el-table-column label="排序" width="110" align="center">
+      <el-table-column label="排序" width="50" align="center">
         <template slot-scope="scope">{{ scope.row.order }}</template>
       </el-table-column>
-      <el-table-column label="AppName" width="200" align="center">
-        <template slot-scope="scope">{{ scope.row.appName }}</template>
-      </el-table-column>
-      <el-table-column label="名称" width="300" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="名称" width="120" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.title }}</template>
+      </el-table-column>
+      <el-table-column label="分组标识" width="200" align="center">
+        <template slot-scope="scope">{{ scope.row.appName }}</template>
       </el-table-column>
       <el-table-column label="注册方式" width="110" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope"> {{ addressTypes.find(t => t.value === scope.row.addressType).label }}</template>
       </el-table-column>
-      <el-table-column label="OnLine 机器地址" width="200" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="在线机器" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.addressList }}</template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
