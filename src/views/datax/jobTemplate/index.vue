@@ -36,7 +36,7 @@
         <template slot-scope="scope"> {{ routeStrategies.find(t => t.value === scope.row.executorRouteStrategy).label }}</template>
       </el-table-column>
       <el-table-column label="负责人" align="center">
-        <template slot-scope="scope">{{ scope.row.author }}</template>
+        <template slot-scope="scope">{{ scope.row.authorName }}</template>
       </el-table-column>
       <el-table-column label="注册节点" align="center">
         <template slot-scope="scope">
@@ -68,13 +68,12 @@
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row}">
-          <el-dropdown split-button type="primary">
-            操作
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item divided @click.native="handlerUpdate(row)">编辑</el-dropdown-item>
-              <el-dropdown-item @click.native="handlerDelete(row)">删除</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+          <el-button type="primary" size="mini" @click="handlerUpdate(row)">
+            编辑
+          </el-button>
+          <el-button size="mini" type="danger" @click="handlerDelete(row)">
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -119,8 +118,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="子任务ID">
-              <el-input v-model="temp.childJobId" placeholder="请输入子任务ID,多个以逗号分隔" />
+            <el-form-item label="负责人" prop="author">
+              <el-select v-model="temp.author" multiple placeholder="请输入负责人" value-key="id">
+                <el-option v-for="item in authorList" :key="item.id" :label="item.nickname" :value="item" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -132,9 +133,20 @@
               </el-select>
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="负责人" prop="author">
-              <el-input v-model="temp.author" placeholder="请输入负责人" />
+            <el-form-item label="父任务ID">
+              <el-select v-model="temp.parentJobId" multiple placeholder="父任务ID" value-key="id">
+                <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="子任务ID">
+              <el-select v-model="temp.childJobId" multiple placeholder="子任务ID" value-key="id">
+                <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -144,20 +156,27 @@
               <el-input-number v-model="temp.executorTimeout" :min="0" :max="20" />
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="失败重试次数">
               <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="报警邮件">
-              <el-input v-model="temp.alarmEmail" placeholder="请输入报警邮件，多个用逗号分隔" />
+        </el-row>
+        <el-row :gutter="20">
+          <el-col>
+            <el-form-item label="增量时间字段">
+              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="20">
+        <el-row v-show="this.temp.replaceParam" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="增量时间格式" prop="replaceParamType">
+              <el-select v-model="temp.replaceParamType" placeholder="增量时间格式">
+                <el-option v-for="item in replaceFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
@@ -166,13 +185,8 @@
                 placeholder="首次增量使用"
                 format="yyyy-MM-dd HH:mm:ss"
                 default-time="00:00:00"
-                style="width: 56%"
+                style="width: 60%"
               />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="增量时间字段">
-              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -278,10 +292,12 @@ export default {
         executorRouteStrategy: '',
         executorBlockStrategy: '',
         childJobId: '',
+        parentJobId: '',
         executorFailRetryCount: '',
         alarmEmail: '',
         executorTimeout: '',
         author: '',
+        authorName: '',
         jobConfigId: '',
         executorHandler: 'executorJobHandler',
         glueType: 'BEAN',
@@ -298,6 +314,8 @@ export default {
         this.partitionField = ''
       },
       executorList: '',
+      authorList: '',
+      JobIdList: '',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
         { value: 'DISCARD_LATER', label: '丢弃后续调度' },
@@ -314,6 +332,12 @@ export default {
         { value: 'FAILOVER', label: '故障转移' },
         { value: 'BUSYOVER', label: '忙碌转移' }
         // { value: 'SHARDING_BROADCAST', label: '分片广播' }
+      ],
+      replaceFormatTypes: [
+        { value: 'yyyy/MM/dd', label: '日期' },
+        { value: 'HH:mm:ss', label: '时间' },
+        { value: 'yyyy/MM/dd HH:mm:ss', label: '日期+时间' },
+        { value: 'UnitTime', label: '时间戳' }
       ],
       glueTypes: [
         { value: 'BEAN', label: 'DataX任务' }
@@ -333,6 +357,8 @@ export default {
   created() {
     this.fetchData()
     this.getExecutor()
+    this.getUsers()
+    this.getJobIdList()
   },
 
   methods: {
@@ -340,6 +366,18 @@ export default {
       job.getExecutorList().then(response => {
         const { content } = response
         this.executorList = content
+      })
+    },
+    getUsers() {
+      job.getUsersList().then(response => {
+        const { content } = response
+        this.authorList = content
+      })
+    },
+    getJobIdList() {
+      job.getJobIdList().then(response => {
+        const { content } = response
+        this.JobIdList = content
       })
     },
     fetchData() {
@@ -362,6 +400,29 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          if (this.temp.author) {
+            const auth = []
+            for (const i in this.temp.author) {
+              auth.push(this.temp.author[i].id)
+            }
+            this.temp.author = auth.toString()
+          }
+
+          if (this.temp.childJobId) {
+            const auth = []
+            for (const i in this.temp.childJobId) {
+              auth.push(this.temp.childJobId[i].id)
+            }
+            this.temp.childJobId = auth.toString()
+          }
+
+          if (this.temp.parentJobId) {
+            const auth = []
+            for (const i in this.temp.parentJobId) {
+              auth.push(this.temp.parentJobId[i].id)
+            }
+            this.temp.parentJobId = auth.toString()
+          }
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.createJob(this.temp).then(() => {
             this.fetchData()
@@ -381,6 +442,61 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      const arrIntSet = []
+      const arrchildSet = []
+      const arrparentSet = []
+      const arrJobIdList = []
+      if (this.JobIdList) {
+        for (const n in this.JobIdList) {
+          if (this.JobIdList[n].id !== this.temp.id) {
+            arrJobIdList.push(this.JobIdList[n])
+          }
+        }
+        this.JobIdList = arrJobIdList
+      }
+
+      if (this.temp.author) {
+        // eslint-disable-next-line no-unused-vars
+        const arrString = this.temp.author.split(',')
+        for (const i in arrString) {
+          for (const n in this.authorList) {
+            // eslint-disable-next-line eqeqeq
+            if (this.authorList[n].id == arrString[i]) {
+              arrIntSet.push(this.authorList[n])
+            }
+          }
+        }
+        this.temp.author = arrIntSet
+      }
+
+      if (this.temp.childJobId) {
+        // eslint-disable-next-line no-unused-vars
+        const arrString = this.temp.childJobId.split(',')
+        for (const i in arrString) {
+          for (const n in this.JobIdList) {
+            // eslint-disable-next-line eqeqeq
+            if (this.JobIdList[n].id == arrString[i]) {
+              arrchildSet.push(this.JobIdList[n])
+            }
+          }
+        }
+        this.temp.childJobId = arrchildSet
+      }
+
+      if (this.temp.parentJobId) {
+        // eslint-disable-next-line no-unused-vars
+        const arrString = this.temp.parentJobId.split(',')
+        for (const i in arrString) {
+          for (const n in this.JobIdList) {
+            // eslint-disable-next-line eqeqeq
+            if (this.JobIdList[n].id == arrString[i]) {
+              arrparentSet.push(this.JobIdList[n])
+            }
+          }
+        }
+        this.temp.parentJobId = arrparentSet
+      }
+
       if (this.temp.partitionInfo) {
         const partition = this.temp.partitionInfo.split(',')
         this.partitionField = partition[0]
@@ -394,6 +510,30 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          if (this.temp.author) {
+            const auth = []
+            for (const i in this.temp.author) {
+              auth.push(this.temp.author[i].id)
+            }
+            this.temp.author = auth.toString()
+          }
+
+          if (this.temp.childJobId) {
+            const auth = []
+            for (const i in this.temp.childJobId) {
+              auth.push(this.temp.childJobId[i].id)
+            }
+            this.temp.childJobId = auth.toString()
+          }
+
+          if (this.temp.parentJobId) {
+            const auth = []
+            for (const i in this.temp.parentJobId) {
+              auth.push(this.temp.parentJobId[i].id)
+            }
+            this.temp.parentJobId = auth.toString()
+          }
+
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.updateJob(this.temp).then(() => {
             this.fetchData()
@@ -431,12 +571,6 @@ export default {
       job.nextTriggerTime(row.jobCron).then(response => {
         const { content } = response
         this.triggerNextTimes = content.join('<br>')
-        this.$notify({
-          title: 'Success',
-          message: 'Start Successfully',
-          type: 'success',
-          duration: 2000
-        })
       })
     },
     loadById(row) {
@@ -444,12 +578,6 @@ export default {
         this.registerNode = []
         const { content } = response
         this.registerNode.push(content)
-        this.$notify({
-          title: 'Success',
-          message: 'Start Successfully',
-          type: 'success',
-          duration: 2000
-        })
       })
     }
   }

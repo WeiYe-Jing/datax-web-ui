@@ -16,11 +16,11 @@
           <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
-      <el-form-item label="querySql">
+      <el-form-item label="SQL语句">
         <el-input v-model="readerForm.querySql" :autosize="{ minRows: 3, maxRows: 20}" type="textarea" placeholder="sql查询，一般用于多表关联查询时才用" style="width: 42%" />
         <el-button @click.prevent="getColumns('reader')">解析字段</el-button>
       </el-form-item>
-      <el-form-item label="splitPk">
+      <el-form-item label="切分">
         <el-input v-model="readerForm.splitPk" placeholder="切分主键" style="width: 13%" />
       </el-form-item>
       <el-form-item label="字段">

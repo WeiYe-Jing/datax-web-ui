@@ -8,9 +8,6 @@
         <el-step title="步骤 4" description="构建">4</el-step>
       </el-steps>
 
-      <el-button :disabled="active===1" style="margin-top: 12px;" @click="last">上一步</el-button>
-      <el-button style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
-
       <div v-show="active===1" class="step1">
         <Reader ref="reader" />
       </div>
@@ -21,9 +18,9 @@
         <Mapper ref="mapper" />
       </div>
       <div v-show="active===4" class="step4">
-        <el-button type="primary" @click="buildJson">构建</el-button>
-        <el-button type="info" @click="handleCopy(inputData,$event)">复制 json</el-button>
-        <el-button type="primary" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "选择模板" }}</el-button>
+        <el-button type="danger" @click="buildJson">1、构建</el-button>
+        <el-button type="danger" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "2、选择模板" }}</el-button>
+        <el-button type="info" @click="handleCopy(inputData,$event)">复制json</el-button>
         (步骤：构建->选择模板->下一步)
         <el-drawer
           ref="jobTemplateSelectDrawer"
@@ -63,6 +60,9 @@
         <div style="margin-bottom: 20px;" />
         <json-editor v-show="active===4" ref="jsonEditor" v-model="configJson" />
       </div>
+
+      <el-button :disabled="active===1" style="margin-top: 12px;" @click="last">上一步</el-button>
+      <el-button type="primary" style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
     </div>
   </div>
 </template>

@@ -43,22 +43,22 @@
       <!--<el-table-column label="用户名" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.jdbcUsername ? scope.row.jdbcUsername:'-' }}</template>
       </el-table-column>-->
-      <el-table-column label="jdbc url" width="200" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="jdbc连接串" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcUrl ? scope.row.jdbcUrl:'-' }}</template>
       </el-table-column>
       <!-- <el-table-column label="jdbc驱动类" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcDriverClass ? scope.row.jdbcDriverClass:'-' }}</template>
       </el-table-column>-->
-      <el-table-column label="ZK地址" width="200" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.zkAdress ? scope.row.zkAdress:'-' }}</template>
-      </el-table-column>
-      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.databaseName ? scope.row.databaseName:'-' }}</template>
-      </el-table-column>
-      <el-table-column label="注释" width="150" align="center">
+      <!--      <el-table-column label="ZK地址" width="200" align="center" :show-overflow-tooltip="true">-->
+      <!--        <template slot-scope="scope">{{ scope.row.zkAdress ? scope.row.zkAdress:'-' }}</template>-->
+      <!--      </el-table-column>-->
+      <!--      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">-->
+      <!--        <template slot-scope="scope">{{ scope.row.databaseName ? scope.row.databaseName:'-' }}</template>-->
+      <!--      </el-table-column>-->
+      <el-table-column label="备注" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.comments }}</template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
