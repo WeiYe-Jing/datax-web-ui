@@ -27,6 +27,9 @@
       <el-table-column label="任务描述" align="center">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
+      <el-table-column label="所属项目" align="center">
+        <template slot-scope="scope">{{ scope.row.jobProject }}</template>
+      </el-table-column>
       <el-table-column label="Cron" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
@@ -83,26 +86,25 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="110px">
         <el-row :gutter="20">
           <el-col :span="12">
+            <el-form-item label="任务描述" prop="jobDesc">
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属项目" prop="jobProject">
+              <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
             <el-form-item label="执行器" prop="jobGroup">
               <el-select v-model="temp.jobGroup" placeholder="请选择执行器">
                 <el-option v-for="item in executorList" :key="item.id" :label="item.title" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="任务描述" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="路由策略" prop="executorRouteStrategy">
-              <el-select v-model="temp.executorRouteStrategy" placeholder="请选择路由策略">
-                <el-option v-for="item in routeStrategies" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </el-form-item>
-          </el-col>
+
           <el-col :span="12">
             <el-form-item label="Cron" prop="jobCron">
               <el-input v-model="temp.jobCron" placeholder="请输入Cron表达式" />
@@ -118,9 +120,9 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="负责人" prop="author">
-              <el-select v-model="temp.author" multiple placeholder="请输入负责人" value-key="id">
-                <el-option v-for="item in authorList" :key="item.id" :label="item.nickname" :value="item" />
+            <el-form-item label="路由策略" prop="executorRouteStrategy">
+              <el-select v-model="temp.executorRouteStrategy" placeholder="请选择路由策略">
+                <el-option v-for="item in routeStrategies" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -130,6 +132,13 @@
             <el-form-item label="任务类型" prop="glueType">
               <el-select v-model="temp.glueType" placeholder="任务脚本类型">
                 <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="负责人" prop="author">
+              <el-select v-model="temp.author" multiple placeholder="请输入负责人" value-key="id">
+                <el-option v-for="item in authorList" :key="item.id" :label="item.nickname" :value="item" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -280,6 +289,7 @@ export default {
         executorRouteStrategy: [{ required: true, message: 'executorRouteStrategy is required', trigger: 'change' }],
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
+        jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
         author: [{ required: true, message: 'author is required', trigger: 'blur' }],
         incStartTime: [{ trigger: 'blur', validator: validateIncStartTime }]
@@ -289,8 +299,8 @@ export default {
         jobGroup: '',
         jobCron: '',
         jobDesc: '',
-        executorRouteStrategy: '',
-        executorBlockStrategy: '',
+        executorRouteStrategy: 'RANDOM',
+        executorBlockStrategy: 'DISCARD_LATER',
         childJobId: '',
         parentJobId: '',
         executorFailRetryCount: '',
@@ -393,6 +403,7 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+      this.temp.jobGroup = this.executorList[0]["id"]
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })

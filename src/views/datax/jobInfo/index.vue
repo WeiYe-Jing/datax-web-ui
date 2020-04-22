@@ -2,7 +2,13 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.jobDesc" placeholder="任务名称" style="width: 200px;" class="filter-item" />
-      <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
+      <el-select v-model="jobProjects" multiple placeholder="所属项目" class="filter-item">
+        <el-option v-for="item in jobProjectList" :key="item.jobProject" :label="item.jobProject" :value="item.jobProject" />
+      </el-select>
+
+      <el-select v-model="authors" multiple placeholder="负责人" class="filter-item">
+        <el-option v-for="item in authorList" :key="item.id" :label="item.nickname" :value="item.id" />
+      </el-select>
       <el-select v-model="listQuery.glueType" placeholder="任务类型" style="width: 200px" class="filter-item">
         <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
@@ -30,7 +36,10 @@
       <el-table-column label="任务名称" align="center" width="200">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
-      <el-table-column label="Cron" align="center" width="100">
+      <el-table-column label="所属项目" align="center" width="120">
+        <template slot-scope="scope">{{ scope.row.jobProject }}</template>
+      </el-table-column>
+      <el-table-column label="Cron" align="center" width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
         </template>
@@ -104,23 +113,21 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="110px">
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="执行器" prop="jobGroup">
-              <el-select v-model="temp.jobGroup" placeholder="请选择执行器">
-                <el-option v-for="item in executorList" :key="item.id" :label="item.title" :value="item.id" />
-              </el-select>
+            <el-form-item label="任务名称" prop="jobDesc">
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="任务名称" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
+            <el-form-item label="所属项目" prop="jobProject">
+              <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="路由策略" prop="executorRouteStrategy">
-              <el-select v-model="temp.executorRouteStrategy" placeholder="请选择路由策略">
-                <el-option v-for="item in routeStrategies" :key="item.value" :label="item.label" :value="item.value" />
+            <el-form-item label="执行器" prop="jobGroup">
+              <el-select v-model="temp.jobGroup" placeholder="请选择执行器">
+                <el-option v-for="item in executorList" :key="item.id" :label="item.title" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -140,18 +147,26 @@
           </el-col>
 
           <el-col :span="12">
-            <el-form-item label="负责人" prop="author">
-              <el-select v-model="temp.author" multiple placeholder="请输入负责人" value-key="id">
-                <el-option v-for="item in authorList" :key="item.id" :label="item.nickname" :value="item" />
+            <el-form-item label="路由策略" prop="executorRouteStrategy">
+              <el-select v-model="temp.executorRouteStrategy" placeholder="请选择路由策略">
+                <el-option v-for="item in routeStrategies" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-col>
+
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="任务类型" prop="glueType">
               <el-select v-model="temp.glueType" placeholder="任务脚本类型">
                 <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="负责人" prop="author">
+              <el-select v-model="temp.author" multiple placeholder="请输入负责人" value-key="id">
+                <el-option v-for="item in authorList" :key="item.id" :label="item.nickname" :value="item" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -285,6 +300,8 @@ export default {
       callback()
     }
     return {
+      jobProjects:'',
+      authors:'',
       list: null,
       listLoading: true,
       total: 0,
@@ -292,6 +309,7 @@ export default {
         current: 1,
         size: 10,
         jobGroup: 0,
+        jobProject: '',
         triggerStatus: -1,
         jobDesc: '',
         glueType: '',
@@ -311,6 +329,7 @@ export default {
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
         glueType: [{ required: true, message: 'jobType is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
+        jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
         author: [{ required: true, message: 'author is required', trigger: 'blur' }],
         incStartTime: [{ trigger: 'blur', validator: validateIncStartTime }]
@@ -351,6 +370,7 @@ export default {
       executorList: '',
       authorList: '',
       JobIdList: '',
+      jobProjectList:'',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
         { value: 'DISCARD_LATER', label: '丢弃后续调度' },
@@ -405,6 +425,7 @@ export default {
     this.getExecutor()
     this.getUsers()
     this.getJobIdList()
+    this.getJobProject()
   },
 
   methods: {
@@ -420,6 +441,13 @@ export default {
         this.authorList = content
       })
     },
+    getJobProject(){
+      job.getJobProjectList().then(response=>{
+        const { content } = response
+        this.jobProjectList= content
+        console.log(content)
+      })
+    },
     getJobIdList() {
       job.getJobIdList().then(response => {
         const { content } = response
@@ -428,6 +456,14 @@ export default {
     },
     fetchData() {
       this.listLoading = true
+      if (this.authors) {
+        this.listQuery.author = this.authors.toString()
+      }
+
+      if (this.jobProjects) {
+        this.listQuery.jobProject = this.jobProjects.toString()
+      }
+
       job.getList(this.listQuery).then(response => {
         const { content } = response
         this.total = content.recordsTotal

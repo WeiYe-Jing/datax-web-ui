@@ -1,11 +1,12 @@
 <template>
   <div>
-    <el-form label-position="left" label-width="80px" :model="writerForm" :rules="rules">
-      <el-form-item label="数据源" prop="datasourceId">
+    <el-form label-position="right" label-width="150px" :model="writerForm" :rules="rules">
+      <el-form-item label="数据库源：" prop="datasourceId">
         <el-select
           v-model="writerForm.datasourceId"
           filterable
           @change="wDsChange"
+          style="width: 300px;"
         >
           <el-option
             v-for="item in wDsList"
@@ -15,12 +16,13 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="表" prop="tableName">
+      <el-form-item label="数据库表名：" prop="tableName">
         <el-select
           v-model="fromTableName"
           :disabled="writerForm.ifCreateTable"
           filterable
           @change="wTbChange"
+          style="width: 300px"
         >
           <el-option
             v-for="item in wTbList"
@@ -34,15 +36,15 @@
         <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
       </el-form-item>
       <div style="margin: 5px 0;" />
-      <el-form-item label="字段">
+      <el-form-item label="字段：">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
         <div style="margin: 15px 0;" />
         <el-checkbox-group v-model="writerForm.columns" @change="wHandleCheckedChange">
           <el-checkbox v-for="c in fromColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="preSql">
-        <el-input v-model="writerForm.preSql" placeholder="preSql" type="textarea" style="width: 42%" />
+      <el-form-item label="前置sql语句：">
+        <el-input v-model="writerForm.preSql" placeholder="前置sql在insert之前执行" type="textarea" style="width: 42%" />
       </el-form-item>
     </el-form>
   </div>
@@ -55,6 +57,11 @@ export default {
   name: 'RDBMSWriter',
   data() {
     return {
+      jdbcDsQuery: {
+        current: 1,
+        size: 50,
+        ascs:'datasource_name'
+      },
       wDsList: [],
       fromTableName: '',
       fromColumnList: [],

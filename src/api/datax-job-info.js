@@ -90,3 +90,11 @@ export function getJobIdList(params) {
     params
   })
 }
+
+export function getJobProjectList(params) {
+  return request({
+    url: 'api/job/projects',
+    method: 'get',
+    params
+  })
+}

@@ -45,14 +45,14 @@
             <el-table-column label="任务描述" align="center">
               <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
             </el-table-column>
+            <el-table-column label="所属项目" align="center">
+              <template slot-scope="scope">{{ scope.row.jobProject }}</template>
+            </el-table-column>
             <el-table-column label="Cron" align="center">
               <template slot-scope="scope"><span>{{ scope.row.jobCron }}</span></template>
             </el-table-column>
             <el-table-column label="路由策略" align="center">
               <template slot-scope="scope"> {{ routeStrategies.find(t => t.value === scope.row.executorRouteStrategy).label }}</template>
-            </el-table-column>
-            <el-table-column label="负责人" align="center">
-              <template slot-scope="scope">{{ scope.row.author }}</template>
             </el-table-column>
           </el-table>
           <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
