@@ -27,6 +27,9 @@
       <el-table-column label="任务描述" align="center">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
+      <el-table-column label="所属项目" align="center">
+        <template slot-scope="scope">{{ scope.row.jobProject }}</template>
+      </el-table-column>
       <el-table-column label="Cron" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
@@ -91,7 +94,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务描述" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -131,6 +134,13 @@
               </el-select>
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="12">
+                <el-form-item label="所属项目" prop="jobProject">
+                    <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
+                </el-form-item>
+            </el-col>
           <el-col :span="12">
             <el-form-item label="子任务ID">
               <el-select v-model="temp.childJobId" multiple placeholder="子任务ID" value-key="id">
@@ -269,6 +279,7 @@ export default {
         executorRouteStrategy: [{ required: true, message: 'executorRouteStrategy is required', trigger: 'change' }],
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
+        jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
         author: [{ required: true, message: 'author is required', trigger: 'blur' }],
         incStartTime: [{ trigger: 'blur', validator: validateIncStartTime }]
@@ -278,8 +289,8 @@ export default {
         jobGroup: '',
         jobCron: '',
         jobDesc: '',
-        executorRouteStrategy: '',
-        executorBlockStrategy: '',
+        executorRouteStrategy: 'RANDOM',
+        executorBlockStrategy: 'DISCARD_LATER',
         childJobId: '',
         executorFailRetryCount: '',
         alarmEmail: '',
@@ -372,6 +383,7 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+      this.temp.jobGroup = this.executorList[0]["id"]
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })

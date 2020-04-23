@@ -2,7 +2,10 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.jobDesc" placeholder="任务名称" style="width: 200px;" class="filter-item" />
-      <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
+        <el-select v-model="jobProjects" multiple placeholder="所属项目" class="filter-item">
+            <el-option v-for="item in jobProjectList" :key="item.jobProject" :label="item.jobProject" :value="item.jobProject" />
+        </el-select>
+        <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
       <el-select v-model="listQuery.glueType" placeholder="任务类型" style="width: 200px" class="filter-item">
         <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
@@ -30,7 +33,10 @@
       <el-table-column label="任务名称" align="center">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
-      <el-table-column label="Cron" align="center" width="100">
+      <el-table-column label="所属项目" align="center" width="120">
+        <template slot-scope="scope">{{ scope.row.jobProject }}</template>
+      </el-table-column>
+      <el-table-column label="Cron" align="center" width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
         </template>
@@ -114,7 +120,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务名称" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -180,6 +186,11 @@
               <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
+            <el-col :span="12">
+                <el-form-item label="所属项目" prop="jobProject">
+                    <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
+                </el-form-item>
+            </el-col>
         </el-row>
         <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
           <el-col>
@@ -281,6 +292,7 @@ export default {
       callback()
     }
     return {
+      jobProjects: '',
       list: null,
       listLoading: true,
       total: 0,
@@ -288,6 +300,7 @@ export default {
         current: 1,
         size: 10,
         jobGroup: 0,
+        jobProject: '',
         triggerStatus: -1,
         jobDesc: '',
         glueType: '',
@@ -307,6 +320,7 @@ export default {
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
         glueType: [{ required: true, message: 'jobType is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
+        jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
         author: [{ required: true, message: 'author is required', trigger: 'blur' }],
         incStartTime: [{ trigger: 'blur', validator: validateIncStartTime }]
@@ -346,6 +360,7 @@ export default {
       },
       executorList: '',
       JobIdList: '',
+      jobProjectList:'',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
         { value: 'DISCARD_LATER', label: '丢弃后续调度' },
@@ -399,6 +414,7 @@ export default {
     this.fetchData()
     this.getExecutor()
     this.getJobIdList()
+    this.getJobProject()
   },
 
   methods: {
@@ -406,6 +422,13 @@ export default {
       job.getExecutorList().then(response => {
         const { content } = response
         this.executorList = content
+      })
+    },
+    getJobProject(){
+      job.getJobProjectList().then(response=>{
+        const { content } = response
+        this.jobProjectList= content
+        console.log(content)
       })
     },
     getJobIdList() {
@@ -416,6 +439,10 @@ export default {
     },
     fetchData() {
       this.listLoading = true
+      if (this.jobProjects) {
+        this.listQuery.jobProject = this.jobProjects.toString()
+      }
+
       job.getList(this.listQuery).then(response => {
         const { content } = response
         this.total = content.recordsTotal

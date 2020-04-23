@@ -123,12 +123,12 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog title="日志查看" :visible.sync="logShow" width="78%">
+    <el-dialog title="日志查看" :visible.sync="dialogVisible" width="95%">
       <div class="log-container">
         <pre :loading="logLoading" v-text="logContent" />
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
+        <el-button @click="dialogVisible = false">
           关闭
         </el-button>
         <el-button type="primary" @click="loadLog">
@@ -136,7 +136,9 @@
         </el-button>
       </div>
     </el-dialog>
+
   </div>
+
 </template>
 
 <script>
@@ -161,6 +163,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       list: null,
       listLoading: true,
       total: 0,
@@ -217,11 +220,11 @@ export default {
         fromLineNum: 1
       },
       // 日志内容
-      logContent: undefined,
+      logContent: '',
       // 显示日志
       logShow: false,
       // 日志显示加载中效果
-      logLoading: false
+      logLoading: false,
     }
   },
   created() {
@@ -279,14 +282,16 @@ export default {
     handleViewJobLog(row) {
       // const str = location.href.split('#')[0]
       // window.open(`${str}#/ router的name `)
+      this.dialogVisible= true
+
       this.jobLogQuery.executorAddress = row.executorAddress
       this.jobLogQuery.id = row.id
       this.jobLogQuery.triggerTime = Date.parse(row.triggerTime)
-      // if (this.logShow === false) {
-      //   this.logShow = true
-      // }
-      window.open(`#/data/log?executorAddress=${this.jobLogQuery.executorAddress}&triggerTime=${this.jobLogQuery.triggerTime}&id=${this.jobLogQuery.id}&fromLineNum=${this.jobLogQuery.fromLineNum}`)
-      // this.loadLog()
+      if (this.logShow === false) {
+        this.logShow = true
+      }
+      // window.open(`#/data/log?executorAddress=${this.jobLogQuery.executorAddress}&triggerTime=${this.jobLogQuery.triggerTime}&id=${this.jobLogQuery.id}&fromLineNum=${this.jobLogQuery.fromLineNum}`)
+      this.loadLog()
     },
     // 获取日志
     loadLog() {
@@ -327,9 +332,8 @@ export default {
     margin-bottom: 20px;
     background: #f5f5f5;
     width: 100%;
-    height: 500px;
+    height: 400px;
     overflow: scroll;
-
     pre {
       display: block;
       padding: 10px;
