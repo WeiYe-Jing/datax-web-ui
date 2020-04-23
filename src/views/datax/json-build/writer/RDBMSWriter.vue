@@ -30,8 +30,8 @@
           />
         </el-select>
         <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
-        <el-input v-model="createTableName" style="width: 195px" />
-        <el-button type="primary" @click="createTable">新增</el-button>
+        <!--<el-input v-model="createTableName" style="width: 195px" />
+        <el-button type="primary" @click="createTable">新增</el-button>-->
       </el-form-item>
       <div style="margin: 5px 0;" />
       <el-form-item label="字段">

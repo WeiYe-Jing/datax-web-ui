@@ -29,19 +29,10 @@
       <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index+1 }}</template>
       </el-table-column>
-      <el-table-column label="昵称" width="120" align="center">
-        <template slot-scope="scope">{{ scope.row.nickname }}</template>
-      </el-table-column>
-      <el-table-column label="用户名" width="100" align="center">
+      <el-table-column label="用户名" align="center">
         <template slot-scope="scope">{{ scope.row.username }}</template>
       </el-table-column>
-      <el-table-column label="手机号码" width="150" align="center">
-        <template slot-scope="scope">{{ scope.row.phone }}</template>
-      </el-table-column>
-      <el-table-column label="邮箱" width="260" align="center">
-        <template slot-scope="scope">{{ scope.row.email }}</template>
-      </el-table-column>
-      <el-table-column label="角色" width="200" align="center">
+      <el-table-column label="角色" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.role }}</span>
         </template>
@@ -51,7 +42,7 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
+          <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -79,15 +70,6 @@
         </el-form-item>
         <el-form-item label="密  码" prop="password">
           <el-input v-model="temp.password" placeholder="密码" />
-        </el-form-item>
-        <el-form-item label="昵  称" prop="nickname">
-          <el-input v-model="temp.nickname" placeholder="昵称" />
-        </el-form-item>
-        <el-form-item label="邮  箱" prop="email">
-          <el-input v-model="temp.email" placeholder="邮箱" />
-        </el-form-item>
-        <el-form-item label="手机号码" prop="phone">
-          <el-input v-model="temp.phone" placeholder="手机号码" />
         </el-form-item>
         <el-form-item label="角色" prop="role">
           <el-select v-model="temp.role" class="filter-item" placeholder="角色类型">
@@ -148,20 +130,14 @@ export default {
       rules: {
         role: [{ required: true, message: 'role is required', trigger: 'change' }],
         username: [{ required: true, message: 'username is required', trigger: 'blur' }],
-        password: [{ required: false, message: 'password is required', trigger: 'blur' }],
-        nickname: [{ required: true, message: 'nickname is required', trigger: 'blur' }],
-        email: [{ required: true, message: 'email is required', trigger: 'blur' }],
-        phone: [{ required: true, message: 'phone is required', trigger: 'blur' }]
+        password: [{ required: false, message: 'password is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,
         role: '',
         username: '',
         password: '',
-        permission: '',
-        nickname: '',
-        email: '',
-        phone: ''
+        permission: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp

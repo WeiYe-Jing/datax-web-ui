@@ -27,7 +27,7 @@
       <el-table-column align="center" label="ID" width="80">
         <template slot-scope="scope">{{ scope.row.id }}</template>
       </el-table-column>
-      <el-table-column label="任务名称" align="center" width="200">
+      <el-table-column label="任务名称" align="center">
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
       <el-table-column label="Cron" align="center" width="100">
@@ -35,16 +35,18 @@
           <span>{{ scope.row.jobCron }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="路由策略" align="center" width="100">
+      <el-table-column label="路由策略" align="center" width="130">
         <template slot-scope="scope"> {{ routeStrategies.find(t => t.value === scope.row.executorRouteStrategy).label }}</template>
       </el-table-column>
-      <el-table-column label="状态" align="center" width="80">
+      <el-table-column label="状态" align="center" width="150">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.triggerStatus"
             active-color="#00A854"
+            active-text="启动"
             :active-value="1"
             inactive-color="#F04134"
+            inactive-text="停止"
             :inactive-value="0"
             @change="changeSwitch(scope.row)"
           />
@@ -87,7 +89,7 @@
             执行一次
           </el-button>
           <el-button type="primary" size="mini" @click="handlerViewLog(row)">
-            查询日志
+            日志
           </el-button>
           <el-button type="primary" size="mini" @click="handlerUpdate(row)">
             编辑
@@ -138,12 +140,9 @@
               </el-select>
             </el-form-item>
           </el-col>
-
           <el-col :span="12">
             <el-form-item label="负责人" prop="author">
-              <el-select v-model="temp.author" multiple placeholder="请输入负责人" value-key="id">
-                <el-option v-for="item in authorList" :key="item.id" :label="item.nickname" :value="item" />
-              </el-select>
+              <el-input v-model="temp.author" placeholder="请输入负责人" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -155,13 +154,16 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="报警邮件">
+              <el-input v-model="temp.alarmEmail" placeholder="请输入报警邮件，多个用逗号分隔" />
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="父任务ID">
-              <el-select v-model="temp.parentJobId" multiple placeholder="父任务ID" value-key="id">
-                <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
-              </el-select>
+            <el-form-item label="超时时间(分钟)">
+              <el-input-number v-model="temp.executorTimeout" :min="0" :max="20" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -173,11 +175,6 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="超时时间(分钟)">
-              <el-input-number v-model="temp.executorTimeout" :min="0" :max="20" />
-            </el-form-item>
-          </el-col>
           <el-col :span="12">
             <el-form-item label="失败重试次数">
               <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
@@ -191,7 +188,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-
         <el-row v-if="temp.glueType==='BEAN'" v-show="temp.replaceParam" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量时间格式" prop="replaceParamType">
@@ -335,7 +331,7 @@ export default {
         jobJson: '',
         executorParam: '',
         replaceParam: '',
-        replaceParamType: 'UnitTime',
+        replaceParamType: 'Timestamp',
         jvmParam: '',
         incStartTime: '',
         partitionInfo: ''
@@ -349,7 +345,6 @@ export default {
         this.partitionField = ''
       },
       executorList: '',
-      authorList: '',
       JobIdList: '',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
@@ -387,10 +382,10 @@ export default {
         { value: 'yyyy/MM/dd', label: 'yyyy/MM/dd' }
       ],
       replaceFormatTypes: [
-        { value: 'yyyy/MM/dd', label: '日期' },
-        { value: 'HH:mm:ss', label: '时间' },
-        { value: 'yyyy/MM/dd HH:mm:ss', label: '日期+时间' },
-        { value: 'UnitTime', label: '时间戳' }
+        { value: 'yyyy/MM/dd', label: 'yyyy/MM/dd' },
+        { value: 'HH:mm:ss', label: 'HH:mm:ss' },
+        { value: 'yyyy/MM/dd HH:mm:ss', label: 'yyyy/MM/dd HH:mm:ss' },
+        { value: 'Timestamp', label: '时间戳' }
       ],
       statusList: [
         { value: 500, label: '失败' },
@@ -403,7 +398,6 @@ export default {
   created() {
     this.fetchData()
     this.getExecutor()
-    this.getUsers()
     this.getJobIdList()
   },
 
@@ -412,12 +406,6 @@ export default {
       job.getExecutorList().then(response => {
         const { content } = response
         this.executorList = content
-      })
-    },
-    getUsers() {
-      job.getUsersList().then(response => {
-        const { content } = response
-        this.authorList = content
       })
     },
     getJobIdList() {
@@ -494,10 +482,7 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       if (this.temp.jobJson) this.jobJson = JSON.parse(this.temp.jobJson)
       this.glueSource = this.temp.glueSource
-
-      const arrIntSet = []
       const arrchildSet = []
-      const arrparentSet = []
       const arrJobIdList = []
       if (this.JobIdList) {
         for (const n in this.JobIdList) {
@@ -506,20 +491,6 @@ export default {
           }
         }
         this.JobIdList = arrJobIdList
-      }
-
-      if (this.temp.author) {
-        // eslint-disable-next-line no-unused-vars
-        const arrString = this.temp.author.split(',')
-        for (const i in arrString) {
-          for (const n in this.authorList) {
-            // eslint-disable-next-line eqeqeq
-            if (this.authorList[n].id == arrString[i]) {
-              arrIntSet.push(this.authorList[n])
-            }
-          }
-        }
-        this.temp.author = arrIntSet
       }
 
       if (this.temp.childJobId) {
@@ -537,23 +508,6 @@ export default {
         }
         this.temp.childJobId = arrchildSet
       }
-
-      console.log(this.temp.childJobId)
-
-      if (this.temp.parentJobId) {
-        // eslint-disable-next-line no-unused-vars
-        const arrString = this.temp.parentJobId.split(',')
-        for (const i in arrString) {
-          for (const n in this.JobIdList) {
-            // eslint-disable-next-line eqeqeq
-            if (this.JobIdList[n].id == arrString[i]) {
-              arrparentSet.push(this.JobIdList[n])
-            }
-          }
-        }
-        this.temp.parentJobId = arrparentSet
-      }
-
       if (this.temp.partitionInfo) {
         const partition = this.temp.partitionInfo.split(',')
         this.partitionField = partition[0]
