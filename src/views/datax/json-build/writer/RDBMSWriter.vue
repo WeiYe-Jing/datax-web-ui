@@ -6,8 +6,7 @@
           v-model="writerForm.datasourceId"
           filterable
           @change="wDsChange"
-          style="width: 300px;"
-        >
+          style="width: 300px;">
           <el-option
             v-for="item in wDsList"
             :key="item.id"
@@ -22,8 +21,7 @@
           :disabled="writerForm.ifCreateTable"
           filterable
           @change="wTbChange"
-          style="width: 300px"
-        >
+          style="width: 300px">
           <el-option
             v-for="item in wTbList"
             :key="item"
@@ -45,6 +43,7 @@
       </el-form-item>
       <el-form-item label="前置sql语句：">
         <el-input v-model="writerForm.preSql" placeholder="前置sql在insert之前执行" type="textarea" style="width: 42%" />
+      </el-form-item>
       <el-form-item label="postSql">
         <el-input v-model="writerForm.postSql" placeholder="多个用;分隔" type="textarea" style="width: 42%" />
       </el-form-item>
@@ -63,7 +62,7 @@ export default {
       jdbcDsQuery: {
         current: 1,
         size: 200,
-        ascs:'datasource_name'
+        ascs: 'datasource_name'
       },
       wDsList: [],
       fromTableName: '',

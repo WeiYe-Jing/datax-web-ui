@@ -224,7 +224,7 @@ export default {
       // 显示日志
       logShow: false,
       // 日志显示加载中效果
-      logLoading: false,
+      logLoading: false
     }
   },
   created() {
@@ -282,7 +282,7 @@ export default {
     handleViewJobLog(row) {
       // const str = location.href.split('#')[0]
       // window.open(`${str}#/ router的name `)
-      this.dialogVisible= true
+      this.dialogVisible = true
 
       this.jobLogQuery.executorAddress = row.executorAddress
       this.jobLogQuery.id = row.id

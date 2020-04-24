@@ -136,11 +136,11 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
-            <el-col :span="12">
-                <el-form-item label="所属项目" prop="jobProject">
-                    <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
-                </el-form-item>
-            </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属项目" prop="jobProject">
+              <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
+            </el-form-item>
+          </el-col>
           <el-col :span="12">
             <el-form-item label="子任务ID">
               <el-select v-model="temp.childJobId" multiple placeholder="子任务ID" value-key="id">

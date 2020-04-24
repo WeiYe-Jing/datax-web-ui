@@ -2,10 +2,10 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.jobDesc" placeholder="任务名称" style="width: 200px;" class="filter-item" />
-        <el-select v-model="jobProjects" multiple placeholder="所属项目" class="filter-item">
-            <el-option v-for="item in jobProjectList" :key="item.jobProject" :label="item.jobProject" :value="item.jobProject" />
-        </el-select>
-        <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
+      <el-select v-model="jobProjects" multiple placeholder="所属项目" class="filter-item">
+        <el-option v-for="item in jobProjectList" :key="item.jobProject" :label="item.jobProject" :value="item.jobProject" />
+      </el-select>
+      <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
       <el-select v-model="listQuery.glueType" placeholder="任务类型" style="width: 200px" class="filter-item">
         <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
@@ -120,7 +120,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务名称" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%"/>
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -186,11 +186,11 @@
               <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
-            <el-col :span="12">
-                <el-form-item label="所属项目" prop="jobProject">
-                    <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
-                </el-form-item>
-            </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属项目" prop="jobProject">
+              <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
           <el-col>
@@ -360,7 +360,7 @@ export default {
       },
       executorList: '',
       JobIdList: '',
-      jobProjectList:'',
+      jobProjectList: '',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
         { value: 'DISCARD_LATER', label: '丢弃后续调度' },
@@ -424,11 +424,10 @@ export default {
         this.executorList = content
       })
     },
-    getJobProject(){
-      job.getJobProjectList().then(response=>{
+    getJobProject() {
+      job.getJobProjectList().then(response => {
         const { content } = response
-        this.jobProjectList= content
-        console.log(content)
+        this.jobProjectList = content
       })
     },
     getJobIdList() {
