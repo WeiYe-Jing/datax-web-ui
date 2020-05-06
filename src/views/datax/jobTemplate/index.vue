@@ -94,7 +94,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务描述" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%"/>
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -134,11 +134,16 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="报警邮件">
+              <el-input v-model="temp.alarmEmail" placeholder="请输入报警邮件，多个用逗号分隔" />
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="所属项目" prop="jobProject">
-              <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
+            <el-form-item label="超时时间(分钟)">
+              <el-input-number v-model="temp.executorTimeout" :min="0" :max="20" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -151,13 +156,13 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="超时时间(分钟)">
-              <el-input-number v-model="temp.executorTimeout" :min="0" :max="20" />
+            <el-form-item label="失败重试次数">
+              <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="失败重试次数">
-              <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
+            <el-form-item label="所属项目" prop="jobProject">
+              <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -383,7 +388,7 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.temp.jobGroup = this.executorList[0]["id"]
+      this.temp.jobGroup = this.executorList[0]['id']
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -391,20 +396,12 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.temp.author) {
-            const auth = []
-            for (const i in this.temp.author) {
-              auth.push(this.temp.author[i].id)
-            }
-            this.temp.author = auth.toString()
-          }
-
           if (this.temp.childJobId) {
-            const auth = []
+            const childJobs = []
             for (const i in this.temp.childJobId) {
-              auth.push(this.temp.childJobId[i].id)
+              childJobs.push(this.temp.childJobId[i].id)
             }
-            this.temp.childJobId = auth.toString()
+            this.temp.childJobId = childJobs.toString()
           }
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.createJob(this.temp).then(() => {
@@ -442,7 +439,7 @@ export default {
         for (const i in arrString) {
           for (const n in this.JobIdList) {
             // eslint-disable-next-line eqeqeq
-            if (this.JobIdList[n].id == arrString[i]) {
+            if (this.JobIdList[n].id === arrString[i]) {
               arrchildSet.push(this.JobIdList[n])
             }
           }
@@ -463,22 +460,13 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.temp.author) {
-            const auth = []
-            for (const i in this.temp.author) {
-              auth.push(this.temp.author[i].id)
-            }
-            this.temp.author = auth.toString()
-          }
-
           if (this.temp.childJobId) {
-            const auth = []
+            const childJobs = []
             for (const i in this.temp.childJobId) {
-              auth.push(this.temp.childJobId[i].id)
+              childJobs.push(this.temp.childJobId[i].id)
             }
-            this.temp.childJobId = auth.toString()
+            this.temp.childJobId = childJobs.toString()
           }
-
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.updateJob(this.temp).then(() => {
             this.fetchData()

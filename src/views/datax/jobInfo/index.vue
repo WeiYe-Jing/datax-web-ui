@@ -94,11 +94,11 @@
           <el-button type="primary" size="mini" @click="handlerExecute(row)">
             执行一次
           </el-button>
-          <el-button type="primary" size="mini" @click="handlerViewLog(row)">
-            日志
-          </el-button>
           <el-button type="primary" size="mini" @click="handlerUpdate(row)">
             编辑
+          </el-button>
+          <el-button type="primary" size="mini" @click="handlerViewLog(row)">
+            日志
           </el-button>
           <el-button size="mini" type="danger" @click="handlerDelete(row)">
             删除
@@ -120,7 +120,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务名称" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" style="width: 56%" />
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -462,14 +462,6 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.temp.author) {
-            const auth = []
-            for (const i in this.temp.author) {
-              auth.push(this.temp.author[i].id)
-            }
-            this.temp.author = auth.toString()
-          }
-
           if (this.temp.childJobId) {
             const auth = []
             for (const i in this.temp.childJobId) {
@@ -477,15 +469,6 @@ export default {
             }
             this.temp.childJobId = auth.toString()
           }
-
-          if (this.temp.parentJobId) {
-            const auth = []
-            for (const i in this.temp.parentJobId) {
-              auth.push(this.temp.parentJobId[i].id)
-            }
-            this.temp.parentJobId = auth.toString()
-          }
-
           this.temp.jobJson = this.jobJson
           this.temp.glueSource = this.glueSource
           this.temp.executorHandler = this.temp.glueType === 'BEAN' ? 'executorJobHandler' : ''
@@ -522,12 +505,10 @@ export default {
       if (this.temp.childJobId) {
         // eslint-disable-next-line no-unused-vars
         const arrString = this.temp.childJobId.split(',')
-        console.log(arrString)
-        console.log(this.JobIdList)
         for (const i in arrString) {
           for (const n in this.JobIdList) {
             // eslint-disable-next-line eqeqeq
-            if (this.JobIdList[n].id == arrString[i]) {
+            if (this.JobIdList[n].id === arrString[i]) {
               arrchildSet.push(this.JobIdList[n])
             }
           }
@@ -549,28 +530,12 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.temp.author) {
-            const auth = []
-            for (const i in this.temp.author) {
-              auth.push(this.temp.author[i].id)
-            }
-            this.temp.author = auth.toString()
-          }
-
           if (this.temp.childJobId) {
             const auth = []
             for (const i in this.temp.childJobId) {
               auth.push(this.temp.childJobId[i].id)
             }
             this.temp.childJobId = auth.toString()
-          }
-
-          if (this.temp.parentJobId) {
-            const auth = []
-            for (const i in this.temp.parentJobId) {
-              auth.push(this.temp.parentJobId[i].id)
-            }
-            this.temp.parentJobId = auth.toString()
           }
           this.temp.executorHandler = this.temp.glueType === 'BEAN' ? 'executorJobHandler' : ''
           this.temp.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson

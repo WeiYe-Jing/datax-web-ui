@@ -150,12 +150,6 @@ export const asyncRoutes = [
         component: () => import('@/views/datax/jobInfo/index'),
         meta: { title: '任务管理', icon: 'task-cfg' }
       },
-      // {
-      //   path: 'plugin',
-      //   name: 'DataxPlugin',
-      //   component: () => import('@/views/datax/plugin/index'),
-      //   meta: { title: '插件查看', icon: 'table' }
-      // },
       {
         path: 'jobTemplate',
         name: 'JobTemplate',
@@ -211,13 +205,13 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/datax/user',
     name: 'user',
-    meta: { title: '用户管理', icon: 'work' },
+    meta: { title: '用户管理', icon: 'work', roles: ['ROLE_ADMIN'] },
     children: [
       {
         path: 'user',
         name: 'User',
         component: () => import('@/views/datax/user/index'),
-        meta: { title: '用户管理', icon: 'table', roles: ['ROLE_ADMIN'] }
+        meta: { title: '用户管理', icon: 'table'}
       }
     ]
   },
@@ -237,7 +231,6 @@ export const asyncRoutes = [
     ]
   },
   toolRouter,
-  // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
 
