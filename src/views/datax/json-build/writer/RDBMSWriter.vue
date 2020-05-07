@@ -18,8 +18,10 @@
       <el-form-item label="数据库表名：" prop="tableName">
         <el-select
           v-model="fromTableName"
-          :disabled="writerForm.ifCreateTable"
+          allow-create
+          default-first-option
           filterable
+          :disabled="writerForm.ifCreateTable"
           @change="wTbChange"
           style="width: 300px">
           <el-option

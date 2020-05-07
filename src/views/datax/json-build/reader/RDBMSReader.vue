@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="数据库表名：" prop="tableName">
-        <el-select v-model="readerForm.tableName" filterable style="width: 300px" @change="rTbChange" >
+        <el-select v-model="readerForm.tableName" allow-create default-first-option filterable style="width: 300px" @change="rTbChange" >
           <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
