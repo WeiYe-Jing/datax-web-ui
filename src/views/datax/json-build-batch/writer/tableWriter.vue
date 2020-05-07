@@ -42,7 +42,6 @@ export default {
       },
       wDsList: [],
       fromTableName: '',
-      fromColumnList: [],
       wTbList: [],
       dataSource: '',
       createTableName: '',
@@ -85,6 +84,9 @@ export default {
       // 组装
       dsQueryApi.getTables(obj).then(response => {
         this.wTbList = response
+        this.writerForm.tables = this.wTbList
+        this.writerForm.checkAll = true
+        this.writerForm.isIndeterminate = false
       })
     },
     wDsChange(e) {
@@ -101,34 +103,14 @@ export default {
       // 获取可用表
       this.getTables()
     },
-    // 获取表字段
-    getColumns() {
-      const obj = {
-        datasourceId: this.writerForm.datasourceId,
-        tableName: this.writerForm.tableName
-      }
-      dsQueryApi.getColumns(obj).then(response => {
-        this.fromColumnList = response
-        this.writerForm.columns = response
-        this.writerForm.checkAll = true
-        this.writerForm.isIndeterminate = false
-      })
-    },
-    // 表切换
-    wTbChange(t) {
-      this.writerForm.tableName = t
-      this.fromColumnList = []
-      this.writerForm.columns = []
-      this.getColumns('writer')
-    },
     wHandleCheckAllChange(val) {
-      this.writerForm.columns = val ? this.fromColumnList : []
+      this.writerForm.tables = val ? this.wTbList : []
       this.writerForm.isIndeterminate = false
     },
     wHandleCheckedChange(value) {
       const checkedCount = value.length
-      this.writerForm.checkAll = checkedCount === this.fromColumnList.length
-      this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.fromColumnList.length
+      this.writerForm.checkAll = checkedCount === this.wTbList.length
+      this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.wTbList.length
     },
     getData() {
       if (Bus.dataSourceId) {

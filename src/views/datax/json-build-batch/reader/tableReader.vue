@@ -46,7 +46,6 @@ export default {
       },
       rDsList: [],
       rTbList: [],
-      rColumnList: [],
       loading: false,
       active: 1,
       customFields: '',
@@ -93,6 +92,9 @@ export default {
         // 组装
         dsQueryApi.getTables(obj).then(response => {
           this.rTbList = response
+          this.readerForm.tables = this.rTbList
+          this.readerForm.checkAll = true
+          this.readerForm.isIndeterminate = false
         })
       }
     },
@@ -111,39 +113,14 @@ export default {
       // 获取可用表
       this.getTables('reader')
     },
-    getTableColumns() {
-      const obj = {
-        datasourceId: this.readerForm.datasourceId,
-        tableName: this.readerForm.tableName
-      }
-      dsQueryApi.getColumns(obj).then(response => {
-        this.rColumnList = response
-        this.readerForm.columns = response
-        this.readerForm.checkAll = true
-        this.readerForm.isIndeterminate = false
-      })
-    },
-    // 获取表字段
-    getColumns(type) {
-      if (type === 'reader') {
-        this.getTableColumns()
-      }
-    },
-    // 表切换
-    rTbChange(t) {
-      this.readerForm.tableName = t
-      this.rColumnList = []
-      this.readerForm.columns = []
-      this.getColumns('reader')
-    },
     rHandleCheckAllChange(val) {
-      this.readerForm.columns = val ? this.rColumnList : []
+      this.readerForm.tables = val ? this.rTbList : []
       this.readerForm.isIndeterminate = false
     },
     rHandleCheckedChange(value) {
       const checkedCount = value.length
-      this.readerForm.checkAll = checkedCount === this.rColumnList.length
-      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rColumnList.length
+      this.readerForm.checkAll = checkedCount === this.rTbList.length
+      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rTbList.length
     },
     getData() {
       if (Bus.dataSourceId) {

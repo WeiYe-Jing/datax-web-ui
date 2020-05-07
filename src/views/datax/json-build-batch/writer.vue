@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <TableWriter ref="rdbmswriter" @selectDataSource="showDataSource" />
+    <TableWriter ref="tablewriter" @selectDataSource="showDataSource" />
   </div>
 </template>
 
@@ -17,10 +17,10 @@ export default {
   },
   methods: {
     getData() {
-      return this.$refs.rdbmswriter.getData()
+      return this.$refs.tablewriter.getData()
     },
     getTableName() {
-      return this.$refs.rdbmswriter.getTableName()
+      return this.$refs.tablewriter.getTableName()
     },
     getReaderData() {
       return this.$parent.getReaderData()

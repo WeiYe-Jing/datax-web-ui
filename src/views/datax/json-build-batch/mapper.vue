@@ -9,9 +9,9 @@ export default {
   name: 'Mapper',
   components: { TableMapper },
   methods: {
-    sendColumns(fromColumnsList, toColumnsList) {
-      this.$refs.mapper.fromColumnsList = fromColumnsList
-      this.$refs.mapper.toColumnsList = toColumnsList
+    sendTables(fromTablesList, toTablesList) {
+      this.$refs.mapper.fromTablesList = fromTablesList
+      this.$refs.mapper.toTablesList = toTablesList
     },
     getLColumns() {
       return this.$refs.mapper.getLColumns()

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <TableReader ref="rdbmsreader" @selectDataSource="showDataSource" />
+    <TableReader ref="tablereader" @selectDataSource="showDataSource" />
   </div>
 </template>
 
@@ -16,7 +16,7 @@ export default {
   },
   methods: {
     getData() {
-      return this.$refs.rdbmsreader.getData()
+      return this.$refs.tablereader.getData()
     },
     showDataSource(data) {
       this.dataSource = data

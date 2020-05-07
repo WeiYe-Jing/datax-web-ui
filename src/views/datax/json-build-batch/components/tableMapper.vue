@@ -8,8 +8,8 @@
           @change="lHandleCheckAllChange"
         >全选</el-checkbox>
         <div style="margin: 15px 0;" />
-        <el-checkbox-group v-model="readerForm.lcolumns" @change="lHandleCheckedChange">
-          <el-checkbox v-for="c in fromColumnsList" :key="c" :label="c">{{ c }}</el-checkbox>
+        <el-checkbox-group v-model="readerForm.ltables" @change="lHandleCheckedChange">
+          <el-checkbox v-for="c in fromTablesList" :key="c" :label="c">{{ c }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="目标字段">
@@ -19,8 +19,8 @@
           @change="rHandleCheckAllChange"
         >全选</el-checkbox>
         <div style="margin: 20px 0;" />
-        <el-checkbox-group v-model="readerForm.rcolumns" @change="rHandleCheckedChange">
-          <el-checkbox v-for="c in toColumnsList" :key="c" :label="c">{{ c }}</el-checkbox>
+        <el-checkbox-group v-model="readerForm.rtables" @change="rHandleCheckedChange">
+          <el-checkbox v-for="c in toTablesList" :key="c" :label="c">{{ c }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
     </el-form>
@@ -33,8 +33,8 @@ export default {
   data() {
     return {
       mapperJson: {},
-      fromColumnsList: [],
-      toColumnsList: [],
+      fromTablesList: [],
+      toTablesList: [],
       readerForm: {
         ltables: [],
         rtables: [],
@@ -48,28 +48,28 @@ export default {
   },
   methods: {
     lHandleCheckAllChange(val) {
-      this.readerForm.lcolumns = val ? this.fromColumnsList : []
+      this.readerForm.ltables = val ? this.fromTablesList : []
       this.readerForm.isIndeterminate = false
     },
     rHandleCheckAllChange(val) {
-      this.readerForm.rcolumns = val ? this.toColumnsList : []
+      this.readerForm.rtables = val ? this.toTablesList : []
       this.readerForm.isIndeterminate = false
     },
     lHandleCheckedChange(value) {
       const checkedCount = value.length
-      this.readerForm.checkAll = checkedCount === this.fromColumnsList.length
-      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.fromColumnsList.length
+      this.readerForm.checkAll = checkedCount === this.fromTablesList.length
+      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.fromTablesList.length
     },
     rHandleCheckedChange(value) {
       const checkedCount = value.length
-      this.readerForm.checkAll = checkedCount === this.toColumnsList.length
-      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.toColumnsList.length
+      this.readerForm.checkAll = checkedCount === this.toTablesList.length
+      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.toTablesList.length
     },
     getLColumns() {
-      return this.readerForm.lcolumns
+      return this.readerForm.ltables
     },
     getRColumns() {
-      return this.readerForm.rcolumns
+      return this.readerForm.rtables
     }
   }
 }

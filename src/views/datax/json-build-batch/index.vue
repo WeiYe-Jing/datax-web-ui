@@ -148,8 +148,8 @@ export default {
   },
   methods: {
     next() {
-      const fromColumnList = this.$refs.reader.getData().columns
-      const toColumnsList = this.$refs.writer.getData().columns
+      const fromTableList = this.$refs.reader.getData().tables
+      const toTableList = this.$refs.writer.getData().tables
       // const fromTableName = this.$refs.reader.getData().tableName
       // 第一步 reader 判断是否已选字段
       if (this.active === 1) {
@@ -161,7 +161,7 @@ export default {
       } else {
         // 将第一步和第二步得到的字段名字发送到第三步
         if (this.active === 2) {
-          this.$refs.mapper.sendColumns(fromColumnList, toColumnsList)
+          this.$refs.mapper.sendTables(fromTableList, toTableList)
         }
         if (this.active === 4) {
           this.temp.jobJson = this.configJson
