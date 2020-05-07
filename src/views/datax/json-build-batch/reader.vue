@@ -1,14 +1,14 @@
 <template>
   <div class="app-container">
-    <RDBMSReader ref="rdbmsreader" @selectDataSource="showDataSource" />
+    <TableReader ref="rdbmsreader" @selectDataSource="showDataSource" />
   </div>
 </template>
 
 <script>
-import RDBMSReader from './reader/reader'
+import TableReader from './reader/tableReader'
 export default {
   name: 'Reader',
-  components: { RDBMSReader },
+  components: { TableReader },
   data() {
     return {
       dataSource: ''

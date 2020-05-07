@@ -29,7 +29,7 @@
 
 <script>
 export default {
-  name: 'FieldMapper',
+  name: 'TableMapper',
   data() {
     return {
       mapperJson: {},

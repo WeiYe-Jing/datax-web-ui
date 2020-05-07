@@ -32,7 +32,7 @@ import * as dsQueryApi from '@/api/ds-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 import Bus from '../busWriter'
 export default {
-  name: 'RDBMSWriter',
+  name: 'TableWriter',
   data() {
     return {
       jdbcDsQuery: {

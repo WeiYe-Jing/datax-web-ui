@@ -36,7 +36,7 @@ import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 import Bus from '../busReader'
 
 export default {
-  name: 'RDBMSReader',
+  name: 'TableReader',
   data() {
     return {
       jdbcDsQuery: {

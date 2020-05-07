@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
-    <FieldMapper ref="mapper" />
+    <TableMapper ref="mapper" />
   </div>
 </template>
 <script>
-import FieldMapper from './components/tableMapper'
+import TableMapper from './components/tableMapper'
 export default {
   name: 'Mapper',
-  components: { FieldMapper },
+  components: { TableMapper },
   methods: {
     sendColumns(fromColumnsList, toColumnsList) {
       this.$refs.mapper.fromColumnsList = fromColumnsList

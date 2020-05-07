@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
-    <RDBMSWriter ref="rdbmswriter" @selectDataSource="showDataSource" />
+    <TableWriter ref="rdbmswriter" @selectDataSource="showDataSource" />
   </div>
 </template>
 
 <script>
-import RDBMSWriter from './writer/RDBMSWriter'
+import TableWriter from './writer/tableWriter'
 
 export default {
   name: 'Writer',
-  components: { RDBMSWriter },
+  components: { TableWriter },
   data() {
     return {
       dataSource: ''
