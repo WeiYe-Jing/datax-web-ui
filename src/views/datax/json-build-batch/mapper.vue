@@ -13,11 +13,11 @@ export default {
       this.$refs.mapper.fromTablesList = fromTablesList
       this.$refs.mapper.toTablesList = toTablesList
     },
-    getLColumns() {
-      return this.$refs.mapper.getLColumns()
+    getLTables() {
+      return this.$refs.mapper.getLTables()
     },
-    getRColumns() {
-      return this.$refs.mapper.getRColumns()
+    getRTables() {
+      return this.$refs.mapper.getRTables()
     }
   }
 }

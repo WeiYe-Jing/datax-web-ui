@@ -18,10 +18,9 @@
         <Mapper ref="mapper" />
       </div>
       <div v-show="active===4" class="step4">
-        <el-button type="primary" @click="buildJson">1、构建</el-button>
-        <el-button type="primary" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "2、选择模板" }}</el-button>
-        <el-button type="info" @click="handleCopy(inputData,$event)">复制json</el-button>
-        (步骤：构建->选择模板->下一步)
+        <el-button type="primary" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "1、选择模板" }}</el-button>
+        <el-button type="primary" @click="buildJson">2、构建</el-button>
+        (步骤：选择模板->构建)
         <el-drawer
           ref="jobTemplateSelectDrawer"
           title="选择模板"
@@ -58,11 +57,10 @@
           <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
         </el-drawer>
         <div style="margin-bottom: 20px;" />
-        <json-editor v-show="active===4" ref="jsonEditor" v-model="configJson" />
       </div>
 
       <el-button :disabled="active===1" style="margin-top: 12px;" @click="last">上一步</el-button>
-      <el-button type="primary" style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
+      <el-button v-show="active!==4" type="primary" style="margin-top: 12px;margin-bottom: 12px;" @click="next">下一步</el-button>
     </div>
   </div>
 </template>
@@ -72,7 +70,6 @@ import * as dataxJsonApi from '@/api/datax-json'
 import * as jobTemplate from '@/api/datax-job-template'
 import * as job from '@/api/datax-job-info'
 import Pagination from '@/components/Pagination'
-import JsonEditor from '@/components/JsonEditor'
 import Reader from './reader'
 import Writer from './writer'
 import clip from '@/utils/clipboard'
@@ -80,7 +77,7 @@ import Mapper from './mapper'
 
 export default {
   name: 'JsonBuild',
-  components: { Reader, Writer, Pagination, JsonEditor, Mapper },
+  components: { Reader, Writer, Pagination, Mapper },
   data() {
     return {
       configJson: '',
@@ -189,65 +186,22 @@ export default {
     buildJson() {
       const readerData = this.$refs.reader.getData()
       const writeData = this.$refs.writer.getData()
-      const readerColumns = this.$refs.mapper.getLColumns()
-      const writerColumns = this.$refs.mapper.getRColumns()
-      const hiveReader = {
-        readerPath: readerData.path,
-        readerDefaultFS: readerData.defaultFS,
-        readerFileType: readerData.fileType,
-        readerFieldDelimiter: readerData.fieldDelimiter,
-        readerSkipHeader: readerData.skipHeader
-      }
-      const hiveWriter = {
-        writerDefaultFS: writeData.defaultFS,
-        writerFileType: writeData.fileType,
-        writerPath: writeData.path,
-        writerFileName: writeData.fileName,
-        writeMode: writeData.writeMode,
-        writeFieldDelimiter: writeData.fieldDelimiter
-      }
-      const hbaseReader = {
-        readerMode: readerData.mode,
-        readerMaxVersion: readerData.maxVersion,
-        readerRange: readerData.range
-      }
-      const hbaseWriter = {
-        writerMode: writeData.mode,
-        writerRowkeyColumn: writeData.rowkeyColumn,
-        writerVersionColumn: writeData.versionColumn,
-        writeNullMode: writeData.nullMode
-      }
-      const mongoDBReader = {}
-      const mongoDBWriter = {
-        upsertInfo: writeData.upsertInfo
-      }
+      const readerTables = this.$refs.mapper.getLTables()
+      const writerTables = this.$refs.mapper.getRTables()
       const rdbmsReader = {
-        readerSplitPk: readerData.splitPk,
-        whereParams: readerData.where,
-        querySql: readerData.querySql
+        readerSplitPk: readerData.splitPk
       }
-      const rdbmsWriter = {
-        preSql: writeData.preSql,
-        postSql: writeData.postSql
-      }
+      const rdbmsWriter = {}
       const obj = {
         readerDatasourceId: readerData.datasourceId,
-        readerTables: [readerData.tableName],
-        readerColumns: readerColumns,
+        readerTables: readerTables,
         writerDatasourceId: writeData.datasourceId,
-        writerTables: [writeData.tableName],
-        writerColumns: writerColumns,
-        hiveReader: hiveReader,
-        hiveWriter: hiveWriter,
+        writerTables: writerTables,
         rdbmsReader: rdbmsReader,
         rdbmsWriter: rdbmsWriter,
-        hbaseReader: hbaseReader,
-        hbaseWriter: hbaseWriter,
-        mongoDBReader: mongoDBReader,
-        mongoDBWriter: mongoDBWriter
       }
       // 调api
-      dataxJsonApi.buildJobJson(obj).then(response => {
+      dataxJsonApi.batchAddJob(obj).then(response => {
         this.configJson = JSON.parse(response)
       })
     },

@@ -120,7 +120,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务名称" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述"/>
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -166,6 +166,16 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="增量方式" prop="incrementType">
+              <el-select v-model="temp.incrementType" placeholder="请选择增量方式" value="">
+                <el-option v-for="item in incrementTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+        </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="超时时间(分钟)">
@@ -196,6 +206,23 @@
           <el-col>
             <el-form-item label="增量时间字段">
               <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="temp.glueType==='BEAN'" v-show="temp.incrementType == '1'" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="增量主键开始ID">
+              <el-input v-model="temp.incStartId" placeholder="增量首次使用" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="ID增量参数">
+              <el-input v-model="temp.replaceParam" placeholder="-DstartId='%s' -DendId='%s'" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="主键字段名">
+              <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -348,7 +375,10 @@ export default {
         replaceParamType: 'Timestamp',
         jvmParam: '',
         incStartTime: '',
-        partitionInfo: ''
+        partitionInfo: '',
+        incrementType: '1',
+        incStartId: '',
+        primaryKey: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
@@ -383,6 +413,10 @@ export default {
         { value: 'GLUE_SHELL', label: 'Shell任务' },
         { value: 'GLUE_PYTHON', label: 'Python任务' },
         { value: 'GLUE_POWERSHELL', label: 'PowerShell任务' }
+      ],
+      incrementTypes:[
+        { value: '1', label: '主键自增' },
+        { value: '2', label: '时间自增' }
       ],
       triggerNextTimes: '',
       registerNode: [],

@@ -94,7 +94,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="任务描述" prop="jobDesc">
-              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述"/>
+              <el-input v-model="temp.jobDesc" size="medium" placeholder="请输入任务描述" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -167,56 +167,100 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col>
-            <el-form-item label="增量时间字段">
-              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row v-show="temp.replaceParam" :gutter="20">
           <el-col :span="12">
-            <el-form-item label="增量时间格式" prop="replaceParamType">
-              <el-select v-model="temp.replaceParamType" placeholder="增量时间格式">
-                <el-option v-for="item in replaceFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
+            <el-form-item label="增量方式" prop="incrementType">
+              <el-select v-model="temp.incrementType" placeholder="请选择增量方式">
+                <el-option
+                  v-for="item in incrementTypes"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="增量开始时间" prop="incStartTime">
-              <el-date-picker
-                v-model="temp.incStartTime"
-                type="datetime"
-                placeholder="首次增量使用"
-                format="yyyy-MM-dd HH:mm:ss"
-                default-time="00:00:00"
-                style="width: 60%"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="分区字段">
-              <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="7">
-            <el-form-item v-show="partitionField" label="分区时间">
-              <el-select v-model="timeFormatType" placeholder="分区时间格式">
-                <el-option v-for="item in timeFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col v-show="partitionField" :span="5">
-            <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="24">
-            <el-form-item label="JVM启动参数">
-              <el-input v-model="temp.jvmParam" placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError" />
-            </el-form-item>
-          </el-col>
+          <el-row :gutter="20">
+            <el-col>
+              <el-form-item label="增量时间字段">
+                <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row v-show="temp.replaceParam" :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="增量时间格式" prop="replaceParamType">
+                <el-select v-model="temp.replaceParamType" placeholder="增量时间格式">
+                  <el-option
+                    v-for="item in replaceFormatTypes"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="增量开始时间" prop="incStartTime">
+                <el-date-picker
+                  v-model="temp.incStartTime"
+                  type="datetime"
+                  placeholder="首次增量使用"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  default-time="00:00:00"
+                  style="width: 60%"
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row v-show="temp.incrementType == 1" :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="增量主键开始ID">
+                <el-input v-model="temp.incStartId" placeholder="增量首次使用" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="ID增量参数">
+                <el-input v-model="temp.replaceParam" placeholder="-DstartId='%s' -DendId='%s'" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="主键字段名">
+                <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="分区字段">
+                <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="7">
+              <el-form-item v-show="partitionField" label="分区时间">
+                <el-select v-model="timeFormatType" placeholder="分区时间格式">
+                  <el-option
+                    v-for="item in timeFormatTypes"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col v-show="partitionField" :span="5">
+              <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item label="JVM启动参数">
+                <el-input
+                  v-model="temp.jvmParam"
+                  placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -308,7 +352,10 @@ export default {
         replaceParam: '',
         jvmParam: '',
         incStartTime: '',
-        partitionInfo: ''
+        partitionInfo: '',
+        incrementType: '1',
+        incStartId: '',
+        primaryKey: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
@@ -343,6 +390,10 @@ export default {
       ],
       glueTypes: [
         { value: 'BEAN', label: 'DataX任务' }
+      ],
+      incrementTypes: [
+        { value: '1', label: '主键自增' },
+        { value: '2', label: '时间自增' }
       ],
       triggerNextTimes: '',
       registerNode: [],

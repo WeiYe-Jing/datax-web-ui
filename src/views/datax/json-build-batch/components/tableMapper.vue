@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form label-position="left" label-width="80px" :model="readerForm">
-      <el-form-item label="源端字段">
+      <el-form-item label="源端表">
         <el-checkbox
           v-model="readerForm.lcheckAll"
           :indeterminate="readerForm.isIndeterminate"
@@ -12,7 +12,7 @@
           <el-checkbox v-for="c in fromTablesList" :key="c" :label="c">{{ c }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="目标字段">
+      <el-form-item label="目标表">
         <el-checkbox
           v-model="readerForm.rcheckAll"
           :indeterminate="readerForm.isIndeterminate"
@@ -65,10 +65,10 @@ export default {
       this.readerForm.checkAll = checkedCount === this.toTablesList.length
       this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.toTablesList.length
     },
-    getLColumns() {
+    getLTables() {
       return this.readerForm.ltables
     },
-    getRColumns() {
+    getRTables() {
       return this.readerForm.rtables
     }
   }

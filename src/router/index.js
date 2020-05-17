@@ -166,7 +166,7 @@ export const asyncRoutes = [
         path: 'jsonBuildBatch',
         name: 'JsonBuildBatch',
         component: () => import('@/views/datax/json-build-batch/index'),
-        meta: { title: '任务批量构建', icon: 'guide', noCache: false }
+        meta: { title: '任务批量构建', icon: 'batch-create', noCache: false }
       },
       {
         path: 'jdbcDatasource',
@@ -217,7 +217,7 @@ export const asyncRoutes = [
         path: 'user',
         name: 'User',
         component: () => import('@/views/datax/user/index'),
-        meta: { title: '用户管理', icon: 'table'}
+        meta: { title: '用户管理', icon: 'table' }
       }
     ]
   },
