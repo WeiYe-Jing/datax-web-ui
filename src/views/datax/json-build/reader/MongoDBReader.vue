@@ -69,7 +69,7 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
+      this.getTables('mongodbReader')
     }
   },
   created() {
@@ -87,7 +87,7 @@ export default {
     },
     // 获取表名
     getTables(type) {
-      if (type === 'reader') {
+      if (type === 'mongodbReader') {
         const obj = {
           datasourceId: this.readerForm.datasourceId
         }

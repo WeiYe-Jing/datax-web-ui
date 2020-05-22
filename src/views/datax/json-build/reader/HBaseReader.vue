@@ -103,7 +103,7 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
+      this.getTables('hbaseReader')
     }
   },
   created() {
@@ -121,7 +121,7 @@ export default {
     },
     // 获取表名
     getTables(type) {
-      if (type === 'reader') {
+      if (type === 'hbaseReader') {
         const obj = {
           datasourceId: this.readerForm.datasourceId
         }

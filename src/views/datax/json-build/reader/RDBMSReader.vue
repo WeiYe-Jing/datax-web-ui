@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form label-position="right" label-width="120px" :model="readerForm" :rules="rules">
       <el-form-item label="数据库源：" prop="datasourceId">
-        <el-select v-model="readerForm.datasourceId" filterable style="width: 300px" @change="rDsChange" >
+        <el-select v-model="readerForm.datasourceId" filterable style="width: 300px" @change="rDsChange">
           <el-option
             v-for="item in rDsList"
             :key="item.id"
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="数据库表名：" prop="tableName">
-        <el-select v-model="readerForm.tableName" allow-create default-first-option filterable style="width: 300px" @change="rTbChange" >
+        <el-select v-model="readerForm.tableName" allow-create default-first-option filterable style="width: 300px" @change="rTbChange">
           <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
@@ -83,7 +83,7 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
+      this.getTables('rdbmsReader')
     }
   },
   created() {
@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs() {
+    getJdbcDs(type) {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -101,7 +101,7 @@ export default {
     },
     // 获取表名
     getTables(type) {
-      if (type === 'reader') {
+      if (type === 'rdbmsReader') {
         const obj = {
           datasourceId: this.readerForm.datasourceId
         }

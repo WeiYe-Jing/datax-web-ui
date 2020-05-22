@@ -106,7 +106,7 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
+      this.getTables('hiveReader')
     }
   },
   created() {
@@ -114,7 +114,7 @@ export default {
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs() {
+    getJdbcDs(type) {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -124,7 +124,7 @@ export default {
     },
     // 获取表名
     getTables(type) {
-      if (type === 'reader') {
+      if (type === 'hiveReader') {
         const obj = {
           datasourceId: this.readerForm.datasourceId
         }

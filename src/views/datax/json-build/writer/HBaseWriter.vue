@@ -128,7 +128,7 @@ export default {
   },
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
+      this.getTables('hbaseWriter')
     }
   },
   created() {
@@ -136,7 +136,7 @@ export default {
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs() {
+    getJdbcDs(type) {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -145,14 +145,16 @@ export default {
       })
     },
     // 获取表名
-    getTables() {
-      const obj = {
-        datasourceId: this.writerForm.datasourceId
+    getTables(type) {
+      if (type === 'hbaseWriter') {
+        const obj = {
+          datasourceId: this.writerForm.datasourceId
+        }
+        // 组装
+        dsQueryApi.getTables(obj).then(response => {
+          this.wTbList = response
+        })
       }
-      // 组装
-      dsQueryApi.getTables(obj).then(response => {
-        this.wTbList = response
-      })
     },
     wDsChange(e) {
       // 清空

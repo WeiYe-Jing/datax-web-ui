@@ -166,16 +166,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="增量方式" prop="incrementType">
-              <el-select v-model="temp.incrementType" placeholder="请选择增量方式" value="">
-                <el-option v-for="item in incrementTypes" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-
-        </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="超时时间(分钟)">
@@ -183,8 +173,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="子任务ID">
-              <el-select v-model="temp.childJobId" multiple placeholder="子任务ID" value-key="id">
+            <el-form-item label="子任务">
+              <el-select v-model="temp.childJobId" multiple placeholder="子任务" value-key="id">
                 <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
               </el-select>
             </el-form-item>
@@ -203,16 +193,18 @@
           </el-col>
         </el-row>
         <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
-          <el-col>
-            <el-form-item label="增量时间字段">
-              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+          <el-col :span="12">
+            <el-form-item label="辅助参数" prop="incrementType">
+              <el-select v-model="temp.incrementType" placeholder="请选择参数类型" value="">
+                <el-option v-for="item in incrementTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="temp.glueType==='BEAN'" v-show="temp.incrementType == '1'" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量主键开始ID">
-              <el-input v-model="temp.incStartId" placeholder="增量首次使用" />
+              <el-input v-model="temp.incStartId" placeholder="首次增量使用" style="width: 57%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -222,18 +214,11 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="主键字段名">
-              <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" />
+              <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" style="width: 57%" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" v-show="temp.replaceParam" :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="增量时间格式" prop="replaceParamType">
-              <el-select v-model="temp.replaceParamType" placeholder="增量时间格式" @change="incStartTimeFormat">
-                <el-option v-for="item in replaceFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </el-form-item>
-          </el-col>
+        <el-row v-if="temp.glueType==='BEAN'" v-show="temp.incrementType == '2'" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
@@ -241,25 +226,38 @@
                 type="datetime"
                 placeholder="首次增量使用"
                 format="yyyy-MM-dd HH:mm:ss"
-                style="width: 60%"
+                style="width: 57%"
               />
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="增量时间字段">
+              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="增量时间格式" prop="replaceParamType">
+              <el-select v-model="temp.replaceParamType" placeholder="增量时间格式" @change="incStartTimeFormat">
+                <el-option v-for="item in replaceFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
+        <el-row v-if="temp.glueType==='BEAN'" v-show="temp.incrementType == '3'" :gutter="20">
           <el-col :span="12">
             <el-form-item label="分区字段">
               <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
             </el-form-item>
           </el-col>
           <el-col :span="7">
-            <el-form-item v-show="partitionField" label="分区时间">
+            <el-form-item  label="分区时间">
               <el-select v-model="timeFormatType" placeholder="分区时间格式">
                 <el-option v-for="item in timeFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col v-show="partitionField" :span="5">
+          <el-col :span="5">
             <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
           </el-col>
         </el-row>
@@ -376,7 +374,7 @@ export default {
         jvmParam: '',
         incStartTime: '',
         partitionInfo: '',
-        incrementType: '1',
+        incrementType: '0',
         incStartId: '',
         primaryKey: ''
       },
@@ -414,9 +412,11 @@ export default {
         { value: 'GLUE_PYTHON', label: 'Python任务' },
         { value: 'GLUE_POWERSHELL', label: 'PowerShell任务' }
       ],
-      incrementTypes:[
+      incrementTypes: [
+        { value: '0', label: '无' },
         { value: '1', label: '主键自增' },
-        { value: '2', label: '时间自增' }
+        { value: '2', label: '时间自增' },
+        { value: '3', label: 'HIVE分区' }
       ],
       triggerNextTimes: '',
       registerNode: [],
