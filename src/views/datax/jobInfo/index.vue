@@ -201,24 +201,24 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" v-show="temp.incrementType == '1'" :gutter="20">
+        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 1" :gutter="20">
           <el-col :span="12">
-            <el-form-item label="增量主键开始ID">
+            <el-form-item label="增量主键开始ID"  prop="incStartId">
               <el-input v-model="temp.incStartId" placeholder="首次增量使用" style="width: 57%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="ID增量参数">
+            <el-form-item label="ID增量参数" prop="replaceParam">
               <el-input v-model="temp.replaceParam" placeholder="-DstartId='%s' -DendId='%s'" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="主键字段名">
+            <el-form-item label="主键字段名" prop="primaryKey">
               <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" style="width: 57%" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" v-show="temp.incrementType == '2'" :gutter="20">
+        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 2" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
@@ -231,7 +231,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="增量时间字段">
+            <el-form-item label="增量时间字段" prop="replaceParam">
               <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
             </el-form-item>
           </el-col>
@@ -244,9 +244,9 @@
           </el-col>
 
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" v-show="temp.incrementType == '3'" :gutter="20">
+        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 3" :gutter="20">
           <el-col :span="12">
-            <el-form-item label="分区字段">
+            <el-form-item label="分区字段" prop="partitionField">
               <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
             </el-form-item>
           </el-col>
@@ -310,9 +310,15 @@ export default {
     }
   },
   data() {
-    const validateIncStartTime = (rule, value, callback) => {
-      if (this.temp.replaceParam && !this.temp.incStartTime) {
-        callback(new Error('incStartTime is required'))
+    const validateIncParam = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('Increment parameters is required'))
+      }
+      callback()
+    }
+    const validatePartitionParam = (rule, value, callback) => {
+      if (!this.partitionField) {
+        callback(new Error('Partition parameters is required'))
       }
       callback()
     }
@@ -348,7 +354,12 @@ export default {
         jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
         author: [{ required: true, message: 'author is required', trigger: 'blur' }],
-        incStartTime: [{ trigger: 'blur', validator: validateIncStartTime }]
+        incStartId: [{ trigger: 'blur', validator: validateIncParam }],
+        replaceParam: [{ trigger: 'blur', validator: validateIncParam }],
+        primaryKey: [{ trigger: 'blur', validator: validateIncParam }],
+        incStartTime: [{ trigger: 'change', validator: validateIncParam }],
+        replaceParamType: [{ trigger: 'change', validator: validateIncParam }],
+        partitionField: [{ trigger: 'blur', validator: validatePartitionParam }]
       },
       temp: {
         id: undefined,
@@ -374,7 +385,7 @@ export default {
         jvmParam: '',
         incStartTime: '',
         partitionInfo: '',
-        incrementType: '0',
+        incrementType: 0,
         incStartId: '',
         primaryKey: ''
       },
@@ -413,10 +424,10 @@ export default {
         { value: 'GLUE_POWERSHELL', label: 'PowerShell任务' }
       ],
       incrementTypes: [
-        { value: '0', label: '无' },
-        { value: '1', label: '主键自增' },
-        { value: '2', label: '时间自增' },
-        { value: '3', label: 'HIVE分区' }
+        { value: 0, label: '无' },
+        { value: 1, label: '主键自增' },
+        { value: 2, label: '时间自增' },
+        { value: 3, label: 'HIVE分区' }
       ],
       triggerNextTimes: '',
       registerNode: [],

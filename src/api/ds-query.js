@@ -11,6 +11,15 @@ export function getTables(params) {
   })
 }
 
+// 获取schema
+export function getTableSchema(params) {
+  return request({
+    url: '/api/jdbcDatasourceQuery/pgTableSchema',
+    method: 'get',
+    params
+  })
+}
+
 // 获取字段
 export function getColumns(params) {
   return request({

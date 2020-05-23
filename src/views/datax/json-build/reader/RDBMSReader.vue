@@ -11,6 +11,16 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item v-if="dataSource==='postgresql'" label="Schema：" prop="tableSchema">
+        <el-select v-model="readerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
+          <el-option
+            v-for="item in schemaList"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="数据库表名：" prop="tableName">
         <el-select v-model="readerForm.tableName" allow-create default-first-option filterable style="width: 300px" @change="rTbChange">
           <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
@@ -58,6 +68,7 @@ export default {
       },
       rDsList: [],
       rTbList: [],
+      schemaList: [],
       rColumnList: [],
       loading: false,
       active: 1,
@@ -73,17 +84,23 @@ export default {
         querySql: '',
         checkAll: false,
         isIndeterminate: true,
-        splitPk: ''
+        splitPk: '',
+        tableSchema: ''
       },
       rules: {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
-        tableName: [{ required: true, message: 'this is required', trigger: 'change' }]
+        tableName: [{ required: true, message: 'this is required', trigger: 'change' }],
+        tableSchema: [{ required: true, message: 'this is required', trigger: 'change' }]
       }
     }
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('rdbmsReader')
+      if (this.dataSource === 'postgresql') {
+        this.getSchema()
+      } else {
+        this.getTables('rdbmsReader')
+      }
     }
   },
   created() {
@@ -102,14 +119,36 @@ export default {
     // 获取表名
     getTables(type) {
       if (type === 'rdbmsReader') {
-        const obj = {
-          datasourceId: this.readerForm.datasourceId
+        let obj = {}
+        if (this.dataSource === 'postgresql') {
+          obj = {
+            datasourceId: this.readerForm.datasourceId,
+            tableSchema: this.readerForm.tableSchema
+          }
+        } else {
+          obj = {
+            datasourceId: this.readerForm.datasourceId
+          }
         }
         // 组装
         dsQueryApi.getTables(obj).then(response => {
           this.rTbList = response
         })
       }
+    },
+    getSchema() {
+      const obj = {
+        datasourceId: this.readerForm.datasourceId
+      }
+      dsQueryApi.getTableSchema(obj).then(response => {
+        this.schemaList = response
+      })
+    },
+    // schema 切换
+    schemaChange(e) {
+      this.readerForm.tableSchema = e
+      // 获取可用表
+      this.getTables('rdbmsReader')
     },
     // reader 数据源切换
     rDsChange(e) {
@@ -123,8 +162,6 @@ export default {
       })
       Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
-      // 获取可用表
-      this.getTables('reader')
     },
     getTableColumns() {
       const obj = {

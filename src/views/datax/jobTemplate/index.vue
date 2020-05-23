@@ -176,9 +176,9 @@
           </el-col>
         </el-row>
 
-        <el-row v-show="temp.incrementType == 2" :gutter="20">
+        <el-row v-if="temp.incrementType === 2" :gutter="20">
           <el-col :span="12">
-            <el-form-item label="增量开始时间">
+            <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
                 v-model="temp.incStartTime"
                 type="datetime"
@@ -190,12 +190,12 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="增量时间字段">
+            <el-form-item label="增量时间字段" prop="replaceParam">
               <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="增量时间格式">
+            <el-form-item label="增量时间格式" prop="replaceParamType">
               <el-select v-model="temp.replaceParamType" placeholder="增量时间格式">
                 <el-option
                   v-for="item in replaceFormatTypes"
@@ -207,7 +207,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-show="temp.incrementType == 1" :gutter="20">
+        <el-row v-if="temp.incrementType === 1" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量主键开始ID" prop="incStartId">
               <el-input v-model="temp.incStartId" placeholder="增量首次使用" style="width: 57%" />
@@ -224,9 +224,9 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-show="temp.incrementType == 3" :gutter="20">
+        <el-row v-if="temp.incrementType === 3" :gutter="20">
           <el-col :span="12">
-            <el-form-item label="分区字段">
+            <el-form-item label="分区字段" prop="partitionField">
               <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
             </el-form-item>
           </el-col>
@@ -290,9 +290,15 @@ export default {
     }
   },
   data() {
-    const validateIdInc = (rule, value, callback) => {
+    const validateIncParam = (rule, value, callback) => {
       if (!value) {
-        callback(new Error('ID increment parameters is required'))
+        callback(new Error('Increment parameters is required'))
+      }
+      callback()
+    }
+    const validatePartitionParam = (rule, value, callback) => {
+      if (!this.partitionField) {
+        callback(new Error('Partition parameters is required'))
       }
       callback()
     }
@@ -325,9 +331,12 @@ export default {
         jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
         author: [{ required: true, message: 'author is required', trigger: 'blur' }],
-        incStartId: [{ trigger: 'blur', validator: validateIdInc }],
-        replaceParam: [{ trigger: 'blur', validator: validateIdInc }],
-        primaryKey: [{ trigger: 'blur', validator: validateIdInc }]
+        incStartId: [{ trigger: 'blur', validator: validateIncParam }],
+        replaceParam: [{ trigger: 'blur', validator: validateIncParam }],
+        primaryKey: [{ trigger: 'blur', validator: validateIncParam }],
+        incStartTime: [{ trigger: 'change', validator: validateIncParam }],
+        replaceParamType: [{ trigger: 'change', validator: validateIncParam }],
+        partitionField: [{ trigger: 'blur', validator: validatePartitionParam }]
       },
       temp: {
         id: undefined,

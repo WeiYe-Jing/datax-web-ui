@@ -151,12 +151,6 @@ export const asyncRoutes = [
         meta: { title: '任务管理', icon: 'task-cfg' }
       },
       {
-        path: 'jobTemplate',
-        name: 'JobTemplate',
-        component: () => import('@/views/datax/jobTemplate/index'),
-        meta: { title: 'datax 任务模板', icon: 'task-tmp' }
-      },
-      {
         path: 'jsonBuild',
         name: 'JsonBuild',
         component: () => import('@/views/datax/json-build/index'),
@@ -168,6 +162,21 @@ export const asyncRoutes = [
         component: () => import('@/views/datax/json-build-batch/index'),
         meta: { title: '任务批量构建', icon: 'batch-create', noCache: false }
       },
+      {
+        path: 'jobTemplate',
+        name: 'JobTemplate',
+        component: () => import('@/views/datax/jobTemplate/index'),
+        meta: { title: 'DataX任务模板', icon: 'task-tmp' }
+      },
+    ]
+  },
+  {
+    path: '/datax/datasource',
+    component: Layout,
+    redirect: '/datax/jdbc-datasource',
+    name: 'datasource',
+    meta: { title: '数据源管理', icon: 'cfg-datasouce' },
+    children: [
       {
         path: 'jdbcDatasource',
         name: 'JdbcDatasource',
