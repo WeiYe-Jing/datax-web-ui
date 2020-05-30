@@ -137,6 +137,21 @@ export const asyncRoutes = [
     meta: { title: '任务日志', icon: 'work' }
   },
   {
+    path: '/datax/project',
+    component: Layout,
+    redirect: '/datax/jobProject',
+    name: 'datasource',
+    meta: { title: '项目管理', icon: 'project' },
+    children: [
+      {
+        path: 'jobProject',
+        name: 'jobProject',
+        component: () => import('@/views/datax/jobProject/index'),
+        meta: { title: '项目管理', icon: 'project' }
+      }
+    ]
+  },
+  {
     path: '/datax/job',
     component: Layout,
     redirect: '/datax/job',
