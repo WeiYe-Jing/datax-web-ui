@@ -93,7 +93,7 @@ export function getJobIdList(params) {
 
 export function getJobProjectList(params) {
   return request({
-    url: 'api/job/projects',
+    url: 'api/jobProject/list',
     method: 'get',
     params
   })

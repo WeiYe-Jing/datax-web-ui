@@ -2,10 +2,10 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.jobDesc" placeholder="任务名称" style="width: 200px;" class="filter-item" />
-      <el-select v-model="jobProjects" multiple placeholder="所属项目" class="filter-item">
-        <el-option v-for="item in jobProjectList" :key="item.jobProject" :label="item.jobProject" :value="item.jobProject" />
+      <el-select v-model="projectIds" multiple placeholder="所属项目" class="filter-item">
+        <el-option v-for="item in jobProjectList" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-input v-model="listQuery.author" placeholder="负责人" style="width: 200px;" class="filter-item" />
+      <el-input v-model="listQuery.userId" placeholder="负责人" style="width: 200px;" class="filter-item" />
       <el-select v-model="listQuery.glueType" placeholder="任务类型" style="width: 200px" class="filter-item">
         <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
@@ -34,7 +34,7 @@
         <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
       </el-table-column>
       <el-table-column label="所属项目" align="center" width="120">
-        <template slot-scope="scope">{{ scope.row.jobProject }}</template>
+        <template slot-scope="scope">{{ scope.row.projectName }}</template>
       </el-table-column>
       <el-table-column label="Cron" align="center" width="150">
         <template slot-scope="scope">
@@ -187,8 +187,10 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="所属项目" prop="jobProject">
-              <el-input v-model="temp.jobProject" size="medium" placeholder="请输入所属项目" />
+            <el-form-item label="所属项目" prop="projectId">
+              <el-select v-model="temp.projectId" placeholder="所属项目" class="filter-item">
+                <el-option v-for="item in jobProjectList" :key="item.id" :label="item.name" :value="item.id" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -323,7 +325,7 @@ export default {
       callback()
     }
     return {
-      jobProjects: '',
+      projectIds: '',
       list: null,
       listLoading: true,
       total: 0,
@@ -331,11 +333,11 @@ export default {
         current: 1,
         size: 10,
         jobGroup: 0,
-        jobProject: '',
+        projectIds: '',
         triggerStatus: -1,
         jobDesc: '',
         glueType: '',
-        author: ''
+        userId: 0
       },
       dialogPluginVisible: false,
       pluginData: [],
@@ -350,10 +352,10 @@ export default {
         executorRouteStrategy: [{ required: true, message: 'executorRouteStrategy is required', trigger: 'change' }],
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
         glueType: [{ required: true, message: 'jobType is required', trigger: 'change' }],
+        projectId: [{ required: true, message: 'projectId is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
         jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
-        author: [{ required: true, message: 'author is required', trigger: 'blur' }],
         incStartId: [{ trigger: 'blur', validator: validateIncParam }],
         replaceParam: [{ trigger: 'blur', validator: validateIncParam }],
         primaryKey: [{ trigger: 'blur', validator: validateIncParam }],
@@ -369,11 +371,10 @@ export default {
         executorRouteStrategy: '',
         executorBlockStrategy: '',
         childJobId: '',
-        parentJobId: '',
         executorFailRetryCount: '',
         alarmEmail: '',
         executorTimeout: '',
-        author: '',
+        userId: 0,
         jobConfigId: '',
         executorHandler: '',
         glueType: '',
@@ -387,7 +388,8 @@ export default {
         partitionInfo: '',
         incrementType: 0,
         incStartId: '',
-        primaryKey: ''
+        primaryKey: '',
+        projectId: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
@@ -471,8 +473,7 @@ export default {
     },
     getJobProject() {
       job.getJobProjectList().then(response => {
-        const { content } = response
-        this.jobProjectList = content
+        this.jobProjectList = response
       })
     },
     getJobIdList() {
@@ -483,8 +484,8 @@ export default {
     },
     fetchData() {
       this.listLoading = true
-      if (this.jobProjects) {
-        this.listQuery.jobProject = this.jobProjects.toString()
+      if (this.projectIds) {
+        this.listQuery.projectIds = this.projectIds.toString()
       }
 
       job.getList(this.listQuery).then(response => {
