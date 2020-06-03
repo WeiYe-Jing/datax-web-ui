@@ -5,7 +5,6 @@
       <el-select v-model="projectIds" multiple placeholder="所属项目" class="filter-item">
         <el-option v-for="item in jobProjectList" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
-      <el-input v-model="listQuery.userId" placeholder="负责人" style="width: 200px;" class="filter-item" />
       <el-select v-model="listQuery.glueType" placeholder="任务类型" style="width: 200px" class="filter-item">
         <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
@@ -36,7 +35,7 @@
       <el-table-column label="所属项目" align="center" width="120">
         <template slot-scope="scope">{{ scope.row.projectName }}</template>
       </el-table-column>
-      <el-table-column label="Cron" align="center" width="150">
+      <el-table-column label="Cron" align="center" width="120">
         <template slot-scope="scope">
           <span>{{ scope.row.jobCron }}</span>
         </template>
@@ -88,6 +87,9 @@
       </el-table-column>
       <el-table-column label="执行状态" align="center" width="80">
         <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.lastHandleCode).label }}</template>
+      </el-table-column>
+      <el-table-column label="修改用户" align="center" width="80">
+        <template slot-scope="scope">{{ scope.row.userName }}</template>
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row}">
@@ -147,8 +149,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="负责人" prop="author">
-              <el-input v-model="temp.author" placeholder="请输入负责人" />
+            <el-form-item label="报警邮件">
+              <el-input v-model="temp.alarmEmail" placeholder="请输入报警邮件，多个用逗号分隔" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -161,31 +163,12 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="报警邮件">
-              <el-input v-model="temp.alarmEmail" placeholder="请输入报警邮件，多个用逗号分隔" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="超时时间(分钟)">
-              <el-input-number v-model="temp.executorTimeout" :min="0" :max="20" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="子任务">
-              <el-select v-model="temp.childJobId" multiple placeholder="子任务" value-key="id">
-                <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
             <el-form-item label="失败重试次数">
               <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="所属项目" prop="projectId">
               <el-select v-model="temp.projectId" placeholder="所属项目" class="filter-item">
@@ -193,6 +176,21 @@
               </el-select>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="超时时间(分钟)">
+              <el-input-number v-model="temp.executorTimeout" :min="0" :max="120" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="子任务">
+              <el-select v-model="temp.childJobId" multiple placeholder="子任务" value-key="id">
+                <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" />
         </el-row>
         <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
           <el-col :span="12">
@@ -205,8 +203,8 @@
         </el-row>
         <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 1" :gutter="20">
           <el-col :span="12">
-            <el-form-item label="增量主键开始ID"  prop="incStartId">
-              <el-input v-model="temp.incStartId" placeholder="首次增量使用" style="width: 57%" />
+            <el-form-item label="增量主键开始ID" prop="incStartId">
+              <el-input v-model="temp.incStartId" placeholder="首次增量使用" style="width: 56%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -215,8 +213,20 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="主键字段名" prop="primaryKey">
-              <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" style="width: 57%" />
+            <el-form-item label="reader数据源" prop="datasourceId">
+              <el-select v-model="temp.datasourceId" placeholder="reader数据源" class="filter-item">
+                <el-option v-for="item in dataSourceList" :key="item.id" :label="item.datasourceName" :value="item.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item label="reader表" prop="readerTable">
+              <el-input v-model="temp.readerTable" placeholder="读表的表名" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="主键" label-width="40px" prop="primaryKey">
+              <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -253,7 +263,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="7">
-            <el-form-item  label="分区时间">
+            <el-form-item label="分区时间">
               <el-select v-model="timeFormatType" placeholder="分区时间格式">
                 <el-option v-for="item in timeFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
@@ -296,6 +306,8 @@ import JsonEditor from '@/components/JsonEditor'
 import ShellEditor from '@/components/ShellEditor'
 import PythonEditor from '@/components/PythonEditor'
 import PowershellEditor from '@/components/PowershellEditor'
+import * as datasourceApi from '@/api/datax-jdbcDatasource'
+import * as jobProjectApi from '@/api/datax-job-project'
 
 export default {
   name: 'JobInfo',
@@ -336,8 +348,7 @@ export default {
         projectIds: '',
         triggerStatus: -1,
         jobDesc: '',
-        glueType: '',
-        userId: 0
+        glueType: ''
       },
       dialogPluginVisible: false,
       pluginData: [],
@@ -361,7 +372,9 @@ export default {
         primaryKey: [{ trigger: 'blur', validator: validateIncParam }],
         incStartTime: [{ trigger: 'change', validator: validateIncParam }],
         replaceParamType: [{ trigger: 'change', validator: validateIncParam }],
-        partitionField: [{ trigger: 'blur', validator: validatePartitionParam }]
+        partitionField: [{ trigger: 'blur', validator: validatePartitionParam }],
+        datasourceId: [{ trigger: 'change', validator: validateIncParam }],
+        readerTable: [{ trigger: 'blur', validator: validateIncParam }]
       },
       temp: {
         id: undefined,
@@ -389,7 +402,9 @@ export default {
         incrementType: 0,
         incStartId: '',
         primaryKey: '',
-        projectId: ''
+        projectId: '',
+        datasourceId: 0,
+        readerTable: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
@@ -402,6 +417,7 @@ export default {
       executorList: '',
       JobIdList: '',
       jobProjectList: '',
+      dataSourceList: '',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
         { value: 'DISCARD_LATER', label: '丢弃后续调度' },
@@ -445,8 +461,10 @@ export default {
       ],
       replaceFormatTypes: [
         { value: 'yyyy/MM/dd', label: 'yyyy/MM/dd' },
+        { value: 'yyyy-MM-dd', label: 'yyyy-MM-dd' },
         { value: 'HH:mm:ss', label: 'HH:mm:ss' },
         { value: 'yyyy/MM/dd HH:mm:ss', label: 'yyyy/MM/dd HH:mm:ss' },
+        { value: 'yyyy-MM-dd HH:mm:ss', label: 'yyyy-MM-dd HH:mm:ss' },
         { value: 'Timestamp', label: '时间戳' }
       ],
       statusList: [
@@ -462,6 +480,7 @@ export default {
     this.getExecutor()
     this.getJobIdList()
     this.getJobProject()
+    this.getDataSourceList()
   },
 
   methods: {
@@ -471,15 +490,20 @@ export default {
         this.executorList = content
       })
     },
-    getJobProject() {
-      job.getJobProjectList().then(response => {
-        this.jobProjectList = response
-      })
-    },
     getJobIdList() {
       job.getJobIdList().then(response => {
         const { content } = response
         this.JobIdList = content
+      })
+    },
+    getJobProject() {
+      jobProjectApi.getJobProjectList().then(response => {
+        this.jobProjectList = response
+      })
+    },
+    getDataSourceList() {
+      datasourceApi.getDataSourceList().then(response => {
+        this.dataSourceList = response
       })
     },
     fetchData() {
@@ -549,11 +573,9 @@ export default {
       }
 
       if (this.temp.childJobId) {
-        // eslint-disable-next-line no-unused-vars
         const arrString = this.temp.childJobId.split(',')
         for (const i in arrString) {
           for (const n in this.JobIdList) {
-            // eslint-disable-next-line eqeqeq
             if (this.JobIdList[n].id === arrString[i]) {
               arrchildSet.push(this.JobIdList[n])
             }

@@ -34,3 +34,11 @@ export function deleted(data) {
   })
 }
 
+export function getJobProjectList(params) {
+  return request({
+    url: 'api/jobProject/list',
+    method: 'get',
+    params
+  })
+}
+

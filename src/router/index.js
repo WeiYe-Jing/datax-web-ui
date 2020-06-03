@@ -182,7 +182,7 @@ export const asyncRoutes = [
         name: 'JobTemplate',
         component: () => import('@/views/datax/jobTemplate/index'),
         meta: { title: 'DataX任务模板', icon: 'task-tmp' }
-      },
+      }
     ]
   },
   {

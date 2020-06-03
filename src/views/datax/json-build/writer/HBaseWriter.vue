@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import * as dsQueryApi from '@/api/ds-query'
+import * as dsQueryApi from '@/api/metadata-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 import Bus from '../busWriter'
 export default {
