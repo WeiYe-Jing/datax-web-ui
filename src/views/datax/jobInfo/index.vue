@@ -186,7 +186,7 @@
           <el-col :span="12">
             <el-form-item label="子任务">
               <el-select v-model="temp.childJobId" multiple placeholder="子任务" value-key="id">
-                <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
+                <el-option v-for="item in jobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -415,7 +415,7 @@ export default {
         this.partitionField = ''
       },
       executorList: '',
-      JobIdList: '',
+      jobIdList: '',
       jobProjectList: '',
       dataSourceList: '',
       blockStrategies: [
@@ -493,7 +493,7 @@ export default {
     getJobIdList() {
       job.getJobIdList().then(response => {
         const { content } = response
-        this.JobIdList = content
+        this.jobIdList = content
       })
     },
     getJobProject() {
@@ -563,10 +563,10 @@ export default {
       this.glueSource = this.temp.glueSource
       const arrchildSet = []
       const arrJobIdList = []
-      if (this.JobIdList) {
-        for (const n in this.JobIdList) {
-          if (this.JobIdList[n].id !== this.temp.id) {
-            arrJobIdList.push(this.JobIdList[n])
+      if (this.jobIdList) {
+        for (const n in this.jobIdList) {
+          if (this.jobIdList[n].id !== this.temp.id) {
+            arrJobIdList.push(this.jobIdList[n])
           }
         }
         this.JobIdList = arrJobIdList
@@ -575,9 +575,9 @@ export default {
       if (this.temp.childJobId) {
         const arrString = this.temp.childJobId.split(',')
         for (const i in arrString) {
-          for (const n in this.JobIdList) {
-            if (this.JobIdList[n].id === arrString[i]) {
-              arrchildSet.push(this.JobIdList[n])
+          for (const n in this.jobIdList) {
+            if (this.jobIdList[n].id === parseInt(arrString[i])) {
+              arrchildSet.push(this.jobIdList[n])
             }
           }
         }

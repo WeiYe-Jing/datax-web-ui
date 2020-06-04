@@ -160,7 +160,7 @@
           <el-col :span="12">
             <el-form-item label="子任务">
               <el-select v-model="temp.childJobId" multiple placeholder="子任务" value-key="id">
-                <el-option v-for="item in JobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
+                <el-option v-for="item in jobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -191,11 +191,12 @@
 
 <script>
 import * as executor from '@/api/datax-executor'
-import * as job from '@/api/datax-job-template'
+import * as jobTemp from '@/api/datax-job-template'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import * as datasourceApi from '@/api/datax-jdbcDatasource'
 import * as jobProjectApi from '@/api/datax-job-project'
+import * as job from '@/api/datax-job-info'
 
 export default {
   name: 'JobTemplate',
@@ -271,7 +272,7 @@ export default {
         jobDesc: '',
         executorRouteStrategy: 'RANDOM',
         executorBlockStrategy: 'DISCARD_LATER',
-        childJobId: '',
+        childJobId: 0,
         executorFailRetryCount: '',
         alarmEmail: '',
         executorTimeout: '',
@@ -289,7 +290,7 @@ export default {
         this.temp = this.$options.data().temp
       },
       executorList: '',
-      JobIdList: '',
+      jobIdList: '',
       jobProjectList: '',
       dataSourceList: '',
       blockStrategies: [
@@ -326,7 +327,7 @@ export default {
 
   methods: {
     getExecutor() {
-      job.getExecutorList().then(response => {
+      jobTemp.getExecutorList().then(response => {
         const { content } = response
         this.executorList = content
       })
@@ -334,7 +335,7 @@ export default {
     getJobIdList() {
       job.getJobIdList().then(response => {
         const { content } = response
-        this.JobIdList = content
+        this.jobIdList = content
       })
     },
     getJobProject() {
@@ -352,7 +353,7 @@ export default {
       if (this.projectIds) {
         this.listQuery.projectIds = this.projectIds.toString()
       }
-      job.getList(this.listQuery).then(response => {
+      jobTemp.getList(this.listQuery).then(response => {
         const { content } = response
         this.total = content.recordsTotal
         this.list = content.data
@@ -379,7 +380,7 @@ export default {
             this.temp.childJobId = childJobs.toString()
           }
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
-          job.createJob(this.temp).then(() => {
+          jobTemp.createJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -411,9 +412,9 @@ export default {
       if (this.temp.childJobId) {
         const arrString = this.temp.childJobId.split(',')
         for (const i in arrString) {
-          for (const n in this.JobIdList) {
-            if (this.JobIdList[n].id === arrString[i]) {
-              arrchildSet.push(this.JobIdList[n])
+          for (const n in this.jobIdList) {
+            if (this.jobIdList[n].id === parseInt(arrString[i])) {
+              arrchildSet.push(this.jobIdList[n])
             }
           }
         }
@@ -441,7 +442,7 @@ export default {
             this.temp.childJobId = childJobs.toString()
           }
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
-          job.updateJob(this.temp).then(() => {
+          jobTemp.updateJob(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -460,7 +461,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        job.removeJob(row.id).then(response => {
+        jobTemp.removeJob(row.id).then(response => {
           this.fetchData()
           this.$notify({
             title: 'Success',
@@ -474,7 +475,7 @@ export default {
       // const index = this.list.indexOf(row)
     },
     nextTriggerTime(row) {
-      job.nextTriggerTime(row.jobCron).then(response => {
+      jobTemp.nextTriggerTime(row.jobCron).then(response => {
         const { content } = response
         this.triggerNextTimes = content.join('<br>')
       })

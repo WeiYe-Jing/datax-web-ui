@@ -11,7 +11,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="dataSource==='postgresql'" label="Schema：" prop="tableSchema">
+      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：" prop="tableSchema">
         <el-select v-model="readerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"

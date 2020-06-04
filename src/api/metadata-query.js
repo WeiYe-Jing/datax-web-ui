@@ -14,7 +14,7 @@ export function getTables(params) {
 // 获取schema
 export function getTableSchema(params) {
   return request({
-    url: '/api/metadata/pgTableSchema',
+    url: '/api/metadata/getDBSchema',
     method: 'get',
     params
   })
