@@ -55,7 +55,7 @@
               <el-table-column width="150" property="appName" label="appName" />
               <el-table-column width="150" property="registryList" label="机器地址" />
             </el-table>
-            <el-button slot="reference">查看</el-button>
+            <el-button slot="reference" size="small">查看</el-button>
           </el-popover>
         </template>
       </el-table-column>
@@ -67,24 +67,27 @@
             @show="nextTriggerTime(scope.row)"
           >
             <h5 v-html="triggerNextTimes" />
-            <el-button slot="reference">查看</el-button>
+            <el-button slot="reference" size="small">查看</el-button>
           </el-popover>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handlerUpdate(row)">
-            编辑
-          </el-button>
-          <el-button size="mini" type="danger" @click="handlerDelete(row)">
-            删除
-          </el-button>
+          <el-dropdown trigger="click">
+            <span class="el-dropdown-link">
+              操作<i class="el-icon-arrow-down el-icon--right" />
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item divided @click.native="handlerUpdate(row)">编辑</el-dropdown-item>
+              <el-dropdown-item @click.native="handlerDelete(row)">删除</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1000px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1000px" :before-close="handleClose">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="110px">
         <el-row :gutter="20">
           <el-col :span="12">
@@ -109,8 +112,23 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-dialog
+              title="提示"
+              :visible.sync="showCronBox"
+              width="60%"
+              append-to-body
+            >
+              <cron v-model="temp.jobCron" />
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="showCronBox = false;">关闭</el-button>
+                <el-button type="primary" @click="showCronBox = false">确 定</el-button>
+              </span>
+            </el-dialog>
             <el-form-item label="Cron" prop="jobCron">
-              <el-input v-model="temp.jobCron" placeholder="请输入Cron表达式" />
+              <el-input v-model="temp.jobCron" auto-complete="off" placeholder="请输入Cron表达式">
+                <el-button v-if="!showCronBox" slot="append" icon="el-icon-turn-off" title="打开图形配置" @click="showCronBox = true" />
+                <el-button v-else slot="append" icon="el-icon-open" title="关闭图形配置" @click="showCronBox = false" />
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -191,6 +209,7 @@
 
 <script>
 import * as executor from '@/api/datax-executor'
+import Cron from '@/components/Cron'
 import * as jobTemp from '@/api/datax-job-template'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -200,7 +219,7 @@ import * as job from '@/api/datax-job-info'
 
 export default {
   name: 'JobTemplate',
-  components: { Pagination },
+  components: { Pagination, Cron },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -240,6 +259,7 @@ export default {
         userId: 0,
         projectIds: ''
       },
+      showCronBox: false,
       dialogPluginVisible: false,
       pluginData: [],
       dialogFormVisible: false,
@@ -326,6 +346,13 @@ export default {
   },
 
   methods: {
+    handleClose(done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {})
+    },
     getExecutor() {
       jobTemp.getExecutorList().then(response => {
         const { content } = response
@@ -492,6 +519,10 @@ export default {
 </script>
 
 <style>
+  .el-dropdown-link {
+    cursor: pointer;
+    color: #409EFF;
+  }
   .el-dropdown + .el-dropdown {
     margin-left: 15px;
   }
