@@ -275,7 +275,6 @@ export default {
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
         jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
         jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
-        author: [{ required: true, message: 'author is required', trigger: 'blur' }],
         incStartId: [{ trigger: 'blur', validator: validateIncParam }],
         replaceParam: [{ trigger: 'blur', validator: validateIncParam }],
         primaryKey: [{ trigger: 'blur', validator: validateIncParam }],
