@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        v-model="listQuery.name"
+        v-model="listQuery.searchVal"
         clearable
         placeholder="项目名称"
         style="width: 200px;"
