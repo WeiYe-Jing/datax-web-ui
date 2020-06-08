@@ -45,8 +45,8 @@
             <el-table-column label="任务描述" align="center">
               <template slot-scope="scope">{{ scope.row.jobDesc }}</template>
             </el-table-column>
-            <el-table-column label="所属项目" align="center">
-              <template slot-scope="scope">{{ scope.row.jobProject }}</template>
+            <el-table-column label="所属项目" align="center" width="120">
+              <template slot-scope="scope">{{ scope.row.projectName }}</template>
             </el-table-column>
             <el-table-column label="Cron" align="center">
               <template slot-scope="scope"><span>{{ scope.row.jobCron }}</span></template>
@@ -98,7 +98,7 @@ export default {
         triggerStatus: -1,
         jobDesc: '',
         executorHandler: '',
-        author: ''
+        userId: 0
       },
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
@@ -131,7 +131,7 @@ export default {
         executorFailRetryCount: '',
         alarmEmail: '',
         executorTimeout: '',
-        author: '',
+        userId: 0,
         jobConfigId: '',
         executorHandler: 'executorJobHandler',
         glueType: 'BEAN',

@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
-        v-model="listQuery.name"
+        v-model="listQuery.searchVal"
         clearable
         placeholder="项目名称"
         style="width: 200px;"
@@ -27,17 +27,17 @@
       <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index+1 }}</template>
       </el-table-column>
-      <el-table-column label="项目名称" width="200" align="center">
+      <el-table-column label="项目名称" align="center">
         <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
-      <el-table-column label="项目描述" width="150" align="center">
+      <el-table-column label="项目描述" align="center">
         <template slot-scope="scope">{{ scope.row.description }}</template>
       </el-table-column>
       <el-table-column label="所属用户" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.userName }}
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="150" align="center">
+      <el-table-column label="创建时间" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.createTime }}</template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">

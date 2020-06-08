@@ -96,7 +96,7 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      if (this.dataSource === 'postgresql') {
+      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
         this.getSchema()
       } else {
         this.getTables('rdbmsReader')
@@ -120,7 +120,7 @@ export default {
     getTables(type) {
       if (type === 'rdbmsReader') {
         let obj = {}
-        if (this.dataSource === 'postgresql') {
+        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
           obj = {
             datasourceId: this.readerForm.datasourceId,
             tableSchema: this.readerForm.tableSchema
@@ -132,7 +132,9 @@ export default {
         }
         // 组装
         dsQueryApi.getTables(obj).then(response => {
-          this.rTbList = response
+          if (response) {
+            this.rTbList = response
+          }
         })
       }
     },
