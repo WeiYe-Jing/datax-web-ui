@@ -38,7 +38,7 @@ export default {
       lint: true
     })
 
-    this.pythonEditor.setValue(this.value)
+    this.pythonEditor.setValue(this.value ? this.value : '')
     this.pythonEditor.on('change', cm => {
       this.$emit('changed', cm.getValue())
       this.$emit('input', cm.getValue())

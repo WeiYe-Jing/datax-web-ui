@@ -38,7 +38,7 @@ export default {
       lint: true
     })
 
-    this.shellEditor.setValue(this.value)
+    this.shellEditor.setValue(this.value ? this.value : '')
     this.shellEditor.on('change', cm => {
       this.$emit('changed', cm.getValue())
       this.$emit('input', cm.getValue())

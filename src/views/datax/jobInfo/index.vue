@@ -324,6 +324,7 @@ import PythonEditor from '@/components/PythonEditor'
 import PowershellEditor from '@/components/PowershellEditor'
 import * as datasourceApi from '@/api/datax-jdbcDatasource'
 import * as jobProjectApi from '@/api/datax-job-project'
+import { isJSON } from '@/utils/validate'
 
 export default {
   name: 'JobInfo',
@@ -554,6 +555,15 @@ export default {
       })
     },
     createData() {
+      if (this.temp.glueType === 'BEAN' && !isJSON(this.jobJson)) {
+        this.$notify({
+          title: 'Fail',
+          message: 'json格式错误',
+          type: 'error',
+          duration: 2000
+        })
+        return
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           if (this.temp.childJobId) {
@@ -620,6 +630,16 @@ export default {
       })
     },
     updateData() {
+      this.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
+      if (this.temp.glueType === 'BEAN' && !isJSON(this.jobJson)) {
+        this.$notify({
+          title: 'Fail',
+          message: 'json格式错误',
+          type: 'error',
+          duration: 2000
+        })
+        return
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           if (this.temp.childJobId) {
