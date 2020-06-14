@@ -630,8 +630,8 @@ export default {
       })
     },
     updateData() {
-      this.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
-      if (this.temp.glueType === 'BEAN' && !isJSON(this.jobJson)) {
+      this.temp.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
+      if (this.temp.glueType === 'BEAN' && !isJSON(this.temp.jobJson)) {
         this.$notify({
           title: 'Fail',
           message: 'json格式错误',
@@ -650,7 +650,6 @@ export default {
             this.temp.childJobId = auth.toString()
           }
           this.temp.executorHandler = this.temp.glueType === 'BEAN' ? 'executorJobHandler' : ''
-          this.temp.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
           this.temp.glueSource = this.glueSource
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.updateJob(this.temp).then(() => {
