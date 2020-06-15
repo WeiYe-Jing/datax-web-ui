@@ -421,7 +421,7 @@ export default {
         incStartId: '',
         primaryKey: '',
         projectId: '',
-        datasourceId: 0,
+        datasourceId: '',
         readerTable: ''
       },
       resetTemp() {

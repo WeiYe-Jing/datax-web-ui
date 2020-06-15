@@ -5,13 +5,24 @@
         <el-select
           v-model="writerForm.datasourceId"
           filterable
+          style="width: 300px;"
           @change="wDsChange"
-          style="width: 300px;">
+        >
           <el-option
             v-for="item in wDsList"
             :key="item.id"
             :label="item.datasourceName"
             :value="item.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：">
+        <el-select v-model="writerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
+          <el-option
+            v-for="item in schemaList"
+            :key="item"
+            :label="item"
+            :value="item"
           />
         </el-select>
       </el-form-item>
@@ -41,6 +52,7 @@ export default {
         ascs: 'datasource_name'
       },
       wDsList: [],
+      schemaList: [],
       fromTableName: '',
       wTbList: [],
       dataSource: '',
@@ -49,7 +61,8 @@ export default {
         datasourceId: undefined,
         tables: [],
         checkAll: false,
-        isIndeterminate: true
+        isIndeterminate: true,
+        tableSchema: ''
       },
       readerForm: this.getReaderData(),
       rules: {
@@ -60,7 +73,11 @@ export default {
   },
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
+      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+        this.getSchema()
+      } else {
+        this.getTables('writer')
+      }
     }
   },
   created() {
@@ -77,17 +94,38 @@ export default {
       })
     },
     // 获取表名
-    getTables() {
+    getTables(type) {
+      if (type === 'writer') {
+        let obj = {}
+        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+          obj = {
+            datasourceId: this.writerForm.datasourceId,
+            tableSchema: this.writerForm.tableSchema
+          }
+        } else {
+          obj = {
+            datasourceId: this.writerForm.datasourceId
+          }
+        }
+        // 组装
+        dsQueryApi.getTables(obj).then(response => {
+          this.wTbList = response
+        })
+      }
+    },
+    getSchema() {
       const obj = {
         datasourceId: this.writerForm.datasourceId
       }
-      // 组装
-      dsQueryApi.getTables(obj).then(response => {
-        this.wTbList = response
-        this.writerForm.tables = this.wTbList
-        this.writerForm.checkAll = true
-        this.writerForm.isIndeterminate = false
+      dsQueryApi.getTableSchema(obj).then(response => {
+        this.schemaList = response
       })
+    },
+    // schema 切换
+    schemaChange(e) {
+      this.writerForm.tableSchema = e
+      // 获取可用表
+      this.getTables('writer')
     },
     wDsChange(e) {
       // 清空

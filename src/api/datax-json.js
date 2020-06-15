@@ -8,12 +8,3 @@ export function buildJobJson(data) {
     data
   })
 }
-
-// batchAdd
-export function batchAddJob(data) {
-  return request({
-    url: '/api/job/batchAdd',
-    method: 'post',
-    data
-  })
-}

@@ -4,8 +4,8 @@
       <el-steps :active="active" finish-status="success">
         <el-step title="步骤 1" description="构建reader">1</el-step>
         <el-step title="步骤 2" description="构建writer">2</el-step>
-        <el-step title="步骤 3" description="字段映射">3</el-step>
-        <el-step title="步骤 4" description="构建">4</el-step>
+        <el-step title="步骤 3" description="表映射">3</el-step>
+        <el-step title="步骤 4" description="批量创建">4</el-step>
       </el-steps>
 
       <div v-show="active===1" class="step1">
@@ -18,9 +18,9 @@
         <Mapper ref="mapper" />
       </div>
       <div v-show="active===4" class="step4">
-        <el-button type="primary" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "1、选择模板" }}</el-button>
-        <el-button type="primary" @click="buildJson">2、构建</el-button>
-        (步骤：选择模板->构建)
+        <el-button type="primary" @click="handleJobTemplateSelectDrawer">{{ jobTemplate ? jobTemplate : "1.选择模板" }}</el-button>
+        <el-button type="primary" @click="createJob">2.批量创建任务</el-button>
+        (步骤：选择模板->批量创建任务)
         <el-drawer
           ref="jobTemplateSelectDrawer"
           title="选择模板"
@@ -66,7 +66,6 @@
 </template>
 
 <script>
-import * as dataxJsonApi from '@/api/datax-json'
 import * as jobTemplate from '@/api/datax-job-template'
 import * as job from '@/api/datax-job-info'
 import Pagination from '@/components/Pagination'
@@ -95,7 +94,7 @@ export default {
         triggerStatus: -1,
         jobDesc: '',
         executorHandler: '',
-        author: ''
+        userId: 0
       },
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
@@ -128,7 +127,7 @@ export default {
         executorFailRetryCount: '',
         alarmEmail: '',
         executorTimeout: '',
-        author: '',
+        userId: 0,
         jobConfigId: '',
         executorHandler: 'executorJobHandler',
         glueType: 'BEAN',
@@ -160,19 +159,7 @@ export default {
         if (this.active === 2) {
           this.$refs.mapper.sendTables(fromTableList, toTableList)
         }
-        if (this.active === 4) {
-          this.temp.jobJson = this.configJson
-          job.createJob(this.temp).then(() => {
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-            // 切回第一步
-            this.active = 1
-          })
-        } else {
+        if (this.active !== 4) {
           this.active++
         }
       }
@@ -182,8 +169,8 @@ export default {
         this.active--
       }
     },
-    // 构建json
-    buildJson() {
+    // Create job
+    createJob() {
       const readerData = this.$refs.reader.getData()
       const writeData = this.$refs.writer.getData()
       const readerTables = this.$refs.mapper.getLTables()
@@ -198,11 +185,18 @@ export default {
         writerDatasourceId: writeData.datasourceId,
         writerTables: writerTables,
         rdbmsReader: rdbmsReader,
-        rdbmsWriter: rdbmsWriter,
+        rdbmsWriter: rdbmsWriter
       }
       // 调api
-      dataxJsonApi.batchAddJob(obj).then(response => {
-        this.configJson = JSON.parse(response)
+      job.batchAddJob(obj).then(response => {
+        this.$notify({
+          title: 'Success',
+          message: 'Created Successfully',
+          type: 'success',
+          duration: 2000
+        })
+        // 切回第一步
+        this.active = 1
       })
     },
     handleCopy(text, event) {

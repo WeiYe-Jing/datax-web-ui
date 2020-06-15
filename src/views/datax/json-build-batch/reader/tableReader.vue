@@ -2,12 +2,22 @@
   <div class="app-container">
     <el-form label-position="right" label-width="120px" :model="readerForm" :rules="rules">
       <el-form-item label="数据库源：" prop="datasourceId">
-        <el-select v-model="readerForm.datasourceId" filterable style="width: 300px" @change="rDsChange" >
+        <el-select v-model="readerForm.datasourceId" filterable style="width: 300px" @change="rDsChange">
           <el-option
             v-for="item in rDsList"
             :key="item.id"
             :label="item.datasourceName"
             :value="item.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：">
+        <el-select v-model="readerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
+          <el-option
+            v-for="item in schemaList"
+            :key="item"
+            :label="item"
+            :value="item"
           />
         </el-select>
       </el-form-item>
@@ -46,6 +56,7 @@ export default {
       },
       rDsList: [],
       rTbList: [],
+      schemaList: [],
       loading: false,
       active: 1,
       customFields: '',
@@ -57,7 +68,8 @@ export default {
         tables: [],
         checkAll: false,
         isIndeterminate: true,
-        splitPk: ''
+        splitPk: '',
+        tableSchema: ''
       },
       rules: {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
@@ -67,7 +79,11 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      this.getTables('reader')
+      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+        this.getSchema()
+      } else {
+        this.getTables('reader')
+      }
     }
   },
   created() {
@@ -86,17 +102,38 @@ export default {
     // 获取表名
     getTables(type) {
       if (type === 'reader') {
-        const obj = {
-          datasourceId: this.readerForm.datasourceId
+        let obj = {}
+        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+          obj = {
+            datasourceId: this.readerForm.datasourceId,
+            tableSchema: this.readerForm.tableSchema
+          }
+        } else {
+          obj = {
+            datasourceId: this.readerForm.datasourceId
+          }
         }
         // 组装
         dsQueryApi.getTables(obj).then(response => {
-          this.rTbList = response
-          this.readerForm.tables = this.rTbList
-          this.readerForm.checkAll = true
-          this.readerForm.isIndeterminate = false
+          if (response) {
+            this.rTbList = response
+          }
         })
       }
+    },
+    getSchema() {
+      const obj = {
+        datasourceId: this.readerForm.datasourceId
+      }
+      dsQueryApi.getTableSchema(obj).then(response => {
+        this.schemaList = response
+      })
+    },
+    // schema 切换
+    schemaChange(e) {
+      this.readerForm.tableSchema = e
+      // 获取可用表
+      this.getTables('reader')
     },
     // reader 数据源切换
     rDsChange(e) {
