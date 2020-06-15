@@ -137,40 +137,64 @@ export const asyncRoutes = [
     meta: { title: '任务日志', icon: 'work' }
   },
   {
+    path: '/datax/project',
+    component: Layout,
+    redirect: '/datax/jobProject',
+    name: 'datasource',
+    meta: { title: '项目管理', icon: 'project' },
+    children: [
+      {
+        path: 'jobProject',
+        name: 'jobProject',
+        component: () => import('@/views/datax/jobProject/index'),
+        meta: { title: '项目管理', icon: 'project' }
+      }
+    ]
+  },
+  {
     path: '/datax/job',
     component: Layout,
     redirect: '/datax/job',
-    name: 'Example',
+    name: 'job',
     meta: { title: '任务管理', icon: 'work' },
     children: [
 
       {
         path: 'jobInfo',
-        name: 'jobInfo',
+        name: 'JobInfo',
         component: () => import('@/views/datax/jobInfo/index'),
         meta: { title: '任务管理', icon: 'task-cfg' }
       },
-      // {
-      //   path: 'plugin',
-      //   name: 'DataxPlugin',
-      //   component: () => import('@/views/datax/plugin/index'),
-      //   meta: { title: '插件查看', icon: 'table' }
-      // },
-      {
-        path: 'jobTemplate',
-        name: 'jobTemplate',
-        component: () => import('@/views/datax/jobTemplate/index'),
-        meta: { title: 'datax 任务模板', icon: 'task-tmp' }
-      },
       {
         path: 'jsonBuild',
-        name: 'jsonBuild',
+        name: 'JsonBuild',
         component: () => import('@/views/datax/json-build/index'),
-        meta: { title: '任务构建', icon: 'guide' }
+        meta: { title: '任务构建', icon: 'guide', noCache: false }
       },
       {
+        path: 'jsonBuildBatch',
+        name: 'JsonBuildBatch',
+        component: () => import('@/views/datax/json-build-batch/index'),
+        meta: { title: '任务批量构建', icon: 'batch-create', noCache: false }
+      },
+      {
+        path: 'jobTemplate',
+        name: 'JobTemplate',
+        component: () => import('@/views/datax/jobTemplate/index'),
+        meta: { title: 'DataX任务模板', icon: 'task-tmp' }
+      }
+    ]
+  },
+  {
+    path: '/datax/datasource',
+    component: Layout,
+    redirect: '/datax/jdbc-datasource',
+    name: 'datasource',
+    meta: { title: '数据源管理', icon: 'cfg-datasouce' },
+    children: [
+      {
         path: 'jdbcDatasource',
-        name: 'jdbcDatasource',
+        name: 'JdbcDatasource',
         component: () => import('@/views/datax/jdbc-datasource/index'),
         meta: { title: '数据源管理', icon: 'cfg-datasouce' }
       }
@@ -180,12 +204,12 @@ export const asyncRoutes = [
     path: '/datax/log',
     component: Layout,
     redirect: '/datax/jobLog',
-    name: 'Example',
+    name: 'log',
     meta: { title: '日志管理', icon: 'work' },
     children: [
       {
         path: 'jobLog',
-        name: 'jobLog',
+        name: 'JobLog',
         component: () => import('@/views/datax/jobLog/index'),
         meta: { title: '日志管理', icon: 'log' }
       }
@@ -195,12 +219,12 @@ export const asyncRoutes = [
     path: '/datax/executor',
     component: Layout,
     redirect: '/datax/executor',
-    name: 'Example',
+    name: 'executor',
     meta: { title: '执行器管理', icon: 'work' },
     children: [
       {
         path: 'executor',
-        name: 'executor',
+        name: 'Executor',
         component: () => import('@/views/datax/executor/index'),
         meta: { title: '执行器管理', icon: 'exe-cfg' }
       }
@@ -210,14 +234,14 @@ export const asyncRoutes = [
     path: '/datax/user',
     component: Layout,
     redirect: '/datax/user',
-    name: 'Example',
-    meta: { title: '用户管理', icon: 'work' },
+    name: 'user',
+    meta: { title: '用户管理', icon: 'work', roles: ['ROLE_ADMIN'] },
     children: [
       {
         path: 'user',
-        name: 'user',
+        name: 'User',
         component: () => import('@/views/datax/user/index'),
-        meta: { title: '用户管理', icon: 'table', roles: ['ROLE_ADMIN'] }
+        meta: { title: '用户管理', icon: 'table' }
       }
     ]
   },
@@ -225,19 +249,18 @@ export const asyncRoutes = [
     path: '/datax/registry',
     component: Layout,
     redirect: '/datax/registry',
-    name: 'Example',
+    name: 'registry',
     meta: { title: '资源监控', icon: 'work' },
     children: [
       {
         path: 'registry',
-        name: 'registry',
+        name: 'Registry',
         component: () => import('@/views/datax/registry/index'),
         meta: { title: '资源监控', icon: 'battery-line' }
       }
     ]
   },
   toolRouter,
-  // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
 

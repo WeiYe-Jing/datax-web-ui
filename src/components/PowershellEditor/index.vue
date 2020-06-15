@@ -38,7 +38,7 @@ export default {
       lint: true
     })
 
-    this.powershellEditor.setValue(this.value)
+    this.powershellEditor.setValue(this.value ? this.value : '')
     this.powershellEditor.on('change', cm => {
       this.$emit('changed', cm.getValue())
       this.$emit('input', cm.getValue())

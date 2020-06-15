@@ -1,19 +1,20 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.pluginName" placeholder="插件名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.pluginType" placeholder="插件类型" clearable style="width: 120px" class="filter-item">
-        <el-option v-for="item in pluginTypeOptions" :key="item" :label="item" :value="item" />
-      </el-select>
+      <el-input
+        v-model="listQuery.searchVal"
+        clearable
+        placeholder="项目名称"
+        style="width: 200px;"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
-        Search
+        搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Add
+        添加
       </el-button>
-      <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        reviewer
-      </el-checkbox> -->
     </div>
     <el-table
       v-loading="listLoading"
@@ -26,48 +27,45 @@
       <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index+1 }}</template>
       </el-table-column>
-      <el-table-column label="pluginType" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.pluginType }}</template>
+      <el-table-column label="项目名称" align="center">
+        <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
-      <el-table-column label="pluginName" width="110" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.pluginName }}</span>
+      <el-table-column label="项目描述" align="center">
+        <template slot-scope="scope">{{ scope.row.description }}</template>
+      </el-table-column>
+      <el-table-column label="所属用户" width="200" align="center">
+        <template slot-scope="scope">{{ scope.row.userName }}
         </template>
       </el-table-column>
-      <el-table-column label="templateJson" width="150" align="center">
-        <template slot-scope="scope">{{ scope.row.templateJson }}</template>
+      <el-table-column label="创建时间" width="200" align="center">
+        <template slot-scope="scope">{{ scope.row.createTime }}</template>
       </el-table-column>
-      <el-table-column label="comments" width="110" align="center">
-        <template slot-scope="scope">{{ scope.row.comments }}</template>
-      </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
-            Delete
+          <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row)">
+            删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="listQuery.pageNo"
+      :limit.sync="listQuery.pageSize"
+      @pagination="fetchData"
+    />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="类型" prop="pluginType">
-          <el-select v-model="temp.pluginType" class="filter-item" placeholder="插件类型">
-            <el-option v-for="item in pluginTypeOptions" :key="item.key" :label="item" :value="item" />
-          </el-select>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="800px">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
+        <el-form-item label="项目名称" prop="name">
+          <el-input v-model="temp.name" placeholder="项目名称" style="width: 40%" />
         </el-form-item>
-        <el-form-item label="名称" prop="pluginName">
-          <el-input v-model="temp.pluginName" placeholder="插件名称" />
-        </el-form-item>
-        <el-form-item label="模板">
-          <el-input v-model="temp.templateJson" :autosize="{ minRows: 2, maxRows: 8}" type="textarea" placeholder="Please input" />
-        </el-form-item>
-        <el-form-item label="注释">
-          <el-input v-model="temp.comments" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+        <el-form-item label="项目描述" prop="description">
+          <el-input v-model="temp.description" placeholder="项目描述" style="width: 40%" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -92,13 +90,12 @@
 </template>
 
 <script>
-import { getList, fetchPlugin, createPlugin, updatePlugin, deletePlugin } from '@/api/datax-plugin'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import * as jobProjectApi from '@/api/datax-job-project'
+import waves from '@/directive/waves'
+import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'DataxPlugin',
+  name: 'JobProject',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -117,9 +114,9 @@ export default {
       listLoading: true,
       total: 0,
       listQuery: {
-        current: 1,
-        size: 10,
-        pluginName: undefined
+        pageNo: 1,
+        pageSize: 10,
+        searchVal: ''
       },
       pluginTypeOptions: ['reader', 'writer'],
       dialogPluginVisible: false,
@@ -131,16 +128,15 @@ export default {
         create: 'Create'
       },
       rules: {
-        pluginType: [{ required: true, message: 'type is required', trigger: 'change' }],
-        pluginName: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        name: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        description: [{ required: true, message: 'this is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,
-        pluginName: '',
-        pluginType: '',
-        templateJson: '',
-        comments: ''
-      }
+        name: '',
+        description: ''
+      },
+      visible: true
     }
   },
   created() {
@@ -149,7 +145,7 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      getList(this.listQuery).then(response => {
+      jobProjectApi.list(this.listQuery).then(response => {
         const { records } = response
         const { total } = response
         this.total = total
@@ -160,12 +156,8 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        name: '',
+        description: ''
       }
     },
     handleCreate() {
@@ -179,7 +171,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          createPlugin(this.temp).then(() => {
+          jobProjectApi.created(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -204,7 +196,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          updatePlugin(tempData).then(() => {
+          jobProjectApi.updated(tempData).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
             this.$notify({
@@ -221,9 +213,7 @@ export default {
       console.log('删除')
       const idList = []
       idList.push(row.id)
-      // 拼成 idList=xx
-      // 多个比较麻烦，这里不处理
-      deletePlugin({ idList: row.id }).then(response => {
+      jobProjectApi.deleted({ idList: row.id }).then(response => {
         this.fetchData()
         this.$notify({
           title: 'Success',
@@ -232,22 +222,6 @@ export default {
           duration: 2000
         })
       })
-      // const index = this.list.indexOf(row)
-    },
-    handleFetchPv(id) {
-      fetchPlugin(id).then(response => {
-        this.pluginData = response
-        this.dialogPvVisible = true
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
     }
   }
 }

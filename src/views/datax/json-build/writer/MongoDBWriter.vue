@@ -55,8 +55,9 @@
 </template>
 
 <script>
-import * as dsQueryApi from '@/api/ds-query'
+import * as dsQueryApi from '@/api/metadata-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
+import Bus from '../busWriter'
 export default {
   name: 'MongoDBWriter',
   data() {
@@ -94,12 +95,17 @@ export default {
       readerForm: this.getReaderData()
     }
   },
+  watch: {
+    'writerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('mongodbWriter')
+    }
+  },
   created() {
     this.getJdbcDs()
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs() {
+    getJdbcDs(type) {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -108,14 +114,16 @@ export default {
       })
     },
     // 获取表名
-    getTables() {
-      const obj = {
-        datasourceId: this.writerForm.datasourceId
+    getTables(type) {
+      if (type === 'mongodbWriter') {
+        const obj = {
+          datasourceId: this.writerForm.datasourceId
+        }
+        // 组装
+        dsQueryApi.getTables(obj).then(response => {
+          this.wTbList = response
+        })
       }
-      // 组装
-      dsQueryApi.getTables(obj).then(response => {
-        this.wTbList = response
-      })
     },
     wDsChange(e) {
       // 清空
@@ -126,6 +134,7 @@ export default {
           this.dataSource = item.datasource
         }
       })
+      Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
       // 获取可用表
       this.getTables()
@@ -167,6 +176,9 @@ export default {
       this.writerForm.isIndeterminate = false
     },
     getData() {
+      if (Bus.dataSourceId) {
+        this.writerForm.datasourceId = Bus.dataSourceId
+      }
       return this.writerForm
     },
     getReaderData() {
@@ -174,24 +186,6 @@ export default {
     },
     getTableName() {
       return this.fromTableName
-    },
-    createTable() {
-      const tableName = this.fromTableName
-      const datasourceId = this.writerForm.datasourceId
-      const columns = this.fromColumnList
-      const jsonString = {}
-      jsonString['datasourceId'] = datasourceId
-      jsonString['tableName'] = tableName
-      jsonString['columns'] = columns
-      console.info(jsonString)
-      dsQueryApi.createTable(jsonString).then(response => {
-        this.$notify({
-          title: 'Success',
-          message: 'Create Table Successfully',
-          type: 'success',
-          duration: 2000
-        })
-      }).catch(() => console.log('promise catch err'))
     }
   }
 }

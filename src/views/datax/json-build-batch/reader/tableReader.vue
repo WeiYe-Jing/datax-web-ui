@@ -11,7 +11,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：" prop="tableSchema">
+      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：">
         <el-select v-model="readerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"
@@ -21,19 +21,10 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="数据库表名：" prop="tableName">
-        <el-select v-model="readerForm.tableName" allow-create default-first-option filterable style="width: 300px" @change="rTbChange">
-          <el-option v-for="item in rTbList" :key="item" :label="item" :value="item" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="SQL语句：">
-        <el-input v-model="readerForm.querySql" :autosize="{ minRows: 3, maxRows: 20}" type="textarea" placeholder="sql查询，一般用于多表关联查询时才用" style="width: 42%" />
-        <el-button type="primary" @click.prevent="getColumns('reader')">解析字段</el-button>
-      </el-form-item>
       <el-form-item label="切分字段：">
         <el-input v-model="readerForm.splitPk" placeholder="切分主键" style="width: 13%" />
       </el-form-item>
-      <el-form-item label="表所有字段：">
+      <el-form-item label="数据库表名：">
         <el-checkbox
           v-model="readerForm.checkAll"
           :indeterminate="readerForm.isIndeterminate"
@@ -41,12 +32,9 @@
         >全选
         </el-checkbox>
         <div style="margin: 15px 0;" />
-        <el-checkbox-group v-model="readerForm.columns" @change="rHandleCheckedChange">
-          <el-checkbox v-for="c in rColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
+        <el-checkbox-group v-model="readerForm.tables" @change="rHandleCheckedChange">
+          <el-checkbox v-for="c in rTbList" :key="c" :label="c">{{ c }}</el-checkbox>
         </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="where条件：" prop="where">
-        <el-input v-model="readerForm.where" placeholder="where条件，不需要再加where" type="textarea" style="width: 42%" />
       </el-form-item>
     </el-form>
   </div>
@@ -58,7 +46,7 @@ import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
 import Bus from '../busReader'
 
 export default {
-  name: 'RDBMSReader',
+  name: 'TableReader',
   data() {
     return {
       jdbcDsQuery: {
@@ -69,7 +57,6 @@ export default {
       rDsList: [],
       rTbList: [],
       schemaList: [],
-      rColumnList: [],
       loading: false,
       active: 1,
       customFields: '',
@@ -78,10 +65,7 @@ export default {
       dataSource: '',
       readerForm: {
         datasourceId: undefined,
-        tableName: '',
-        columns: [],
-        where: '',
-        querySql: '',
+        tables: [],
         checkAll: false,
         isIndeterminate: true,
         splitPk: '',
@@ -89,8 +73,7 @@ export default {
       },
       rules: {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
-        tableName: [{ required: true, message: 'this is required', trigger: 'change' }],
-        tableSchema: [{ required: true, message: 'this is required', trigger: 'change' }]
+        tableName: [{ required: true, message: 'this is required', trigger: 'change' }]
       }
     }
   },
@@ -99,7 +82,7 @@ export default {
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
         this.getSchema()
       } else {
-        this.getTables('rdbmsReader')
+        this.getTables('reader')
       }
     }
   },
@@ -108,7 +91,7 @@ export default {
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs(type) {
+    getJdbcDs() {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -118,7 +101,7 @@ export default {
     },
     // 获取表名
     getTables(type) {
-      if (type === 'rdbmsReader') {
+      if (type === 'reader') {
         let obj = {}
         if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
           obj = {
@@ -150,7 +133,7 @@ export default {
     schemaChange(e) {
       this.readerForm.tableSchema = e
       // 获取可用表
-      this.getTables('rdbmsReader')
+      this.getTables('reader')
     },
     // reader 数据源切换
     rDsChange(e) {
@@ -164,56 +147,17 @@ export default {
       })
       Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
-    },
-    getTableColumns() {
-      const obj = {
-        datasourceId: this.readerForm.datasourceId,
-        tableName: this.readerForm.tableName
-      }
-      dsQueryApi.getColumns(obj).then(response => {
-        this.rColumnList = response
-        this.readerForm.columns = response
-        this.readerForm.checkAll = true
-        this.readerForm.isIndeterminate = false
-      })
-    },
-    getColumnsByQuerySql() {
-      const obj = {
-        datasourceId: this.readerForm.datasourceId,
-        querySql: this.readerForm.querySql
-      }
-      dsQueryApi.getColumnsByQuerySql(obj).then(response => {
-        this.rColumnList = response
-        this.readerForm.columns = response
-        this.readerForm.checkAll = true
-        this.readerForm.isIndeterminate = false
-      })
-    },
-    // 获取表字段
-    getColumns(type) {
-      if (type === 'reader') {
-        if (this.readerForm.querySql !== '') {
-          this.getColumnsByQuerySql()
-        } else {
-          this.getTableColumns()
-        }
-      }
-    },
-    // 表切换
-    rTbChange(t) {
-      this.readerForm.tableName = t
-      this.rColumnList = []
-      this.readerForm.columns = []
-      this.getColumns('reader')
+      // 获取可用表
+      this.getTables('reader')
     },
     rHandleCheckAllChange(val) {
-      this.readerForm.columns = val ? this.rColumnList : []
+      this.readerForm.tables = val ? this.rTbList : []
       this.readerForm.isIndeterminate = false
     },
     rHandleCheckedChange(value) {
       const checkedCount = value.length
-      this.readerForm.checkAll = checkedCount === this.rColumnList.length
-      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rColumnList.length
+      this.readerForm.checkAll = checkedCount === this.rTbList.length
+      this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rTbList.length
     },
     getData() {
       if (Bus.dataSourceId) {

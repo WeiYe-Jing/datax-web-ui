@@ -5,7 +5,13 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px;"
+        type="primary"
+        icon="el-icon-edit"
+        @click="handleCreate"
+      >
         添加
       </el-button>
       <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
@@ -23,42 +29,52 @@
       <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index+1 }}</template>
       </el-table-column>
-      <el-table-column label="用户名" width="200" align="center">
+      <el-table-column label="用户名" align="center">
         <template slot-scope="scope">{{ scope.row.username }}</template>
       </el-table-column>
-      <el-table-column label="角色" width="200" align="center">
+      <el-table-column label="角色" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.role }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="权限" width="150" align="center">
-        <template slot-scope="scope">{{ scope.row.permission }}</template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
+          <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="listQuery.current"
+      :limit.sync="listQuery.size"
+      @pagination="fetchData"
+    />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="temp"
+        label-position="right"
+        label-width="100px"
+        style="width: 400px; margin-left:50px;"
+      >
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="temp.username" placeholder="用户名" />
+        </el-form-item>
+        <el-form-item label="密  码" prop="password">
+          <el-input v-model="temp.password" placeholder="密码" />
+        </el-form-item>
         <el-form-item label="角色" prop="role">
           <el-select v-model="temp.role" class="filter-item" placeholder="角色类型">
             <el-option v-for="item in roles" :key="item.key" :label="item" :value="item" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="temp.username" placeholder="用户名" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="temp.password" placeholder="密码" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -114,7 +130,7 @@ export default {
       rules: {
         role: [{ required: true, message: 'role is required', trigger: 'change' }],
         username: [{ required: true, message: 'username is required', trigger: 'blur' }],
-        password: [{ required: true, message: 'password is required', trigger: 'blur' }]
+        password: [{ required: false, message: 'password is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,

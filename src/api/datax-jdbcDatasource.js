@@ -48,3 +48,11 @@ export function test(data) {
     data
   })
 }
+
+export function getDataSourceList(params) {
+  return request({
+    url: '/api/jobJdbcDatasource/all',
+    method: 'get',
+    params
+  })
+}

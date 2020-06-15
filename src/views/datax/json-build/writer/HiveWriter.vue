@@ -74,8 +74,9 @@
 </template>
 
 <script>
-import * as dsQueryApi from '@/api/ds-query'
+import * as dsQueryApi from '@/api/metadata-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
+import Bus from '../busWriter'
 export default {
   name: 'HiveWriter',
   data() {
@@ -124,12 +125,17 @@ export default {
       ]
     }
   },
+  watch: {
+    'writerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('hiveWriter')
+    }
+  },
   created() {
     this.getJdbcDs()
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs() {
+    getJdbcDs(type) {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -138,14 +144,16 @@ export default {
       })
     },
     // 获取表名
-    getTables() {
-      const obj = {
-        datasourceId: this.writerForm.datasourceId
+    getTables(type) {
+      if (type === 'hiveWriter') {
+        const obj = {
+          datasourceId: this.writerForm.datasourceId
+        }
+        // 组装
+        dsQueryApi.getTables(obj).then(response => {
+          this.wTbList = response
+        })
       }
-      // 组装
-      dsQueryApi.getTables(obj).then(response => {
-        this.wTbList = response
-      })
     },
     wDsChange(e) {
       // 清空
@@ -156,6 +164,7 @@ export default {
           this.dataSource = item.datasource
         }
       })
+      Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
       // 获取可用表
       this.getTables()
@@ -197,6 +206,9 @@ export default {
       this.writerForm.isIndeterminate = false
     },
     getData() {
+      if (Bus.dataSourceId) {
+        this.writerForm.datasourceId = Bus.dataSourceId
+      }
       return this.writerForm
     },
     getReaderData() {

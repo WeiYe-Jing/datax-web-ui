@@ -30,6 +30,11 @@
       <el-form-item label="fieldDelimiter" prop="fieldDelimiter">
         <el-input v-model="readerForm.fieldDelimiter" placeholder="读取的字段分隔符" style="width: 42%" />
       </el-form-item>
+      <el-form-item label="skipHeader">
+        <el-select v-model="readerForm.skipHeader" placeholder="是否跳过表头">
+          <el-option v-for="item in skipHeaderTypes" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="字段">
         <el-checkbox
           v-model="readerForm.checkAll"
@@ -46,8 +51,9 @@
 </template>
 
 <script>
-import * as dsQueryApi from '@/api/ds-query'
+import * as dsQueryApi from '@/api/metadata-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
+import Bus from '../busReader'
 
 export default {
   name: 'HiveReader',
@@ -75,7 +81,8 @@ export default {
         path: '',
         defaultFS: '',
         fileType: '',
-        fieldDelimiter: ''
+        fieldDelimiter: '',
+        skipHeader: ''
       },
       rules: {
         path: [{ required: true, message: 'this is required', trigger: 'blur' }],
@@ -90,7 +97,16 @@ export default {
         { value: 'rc', label: 'rc' },
         { value: 'seq', label: 'seq' },
         { value: 'csv', label: 'csv' }
+      ],
+      skipHeaderTypes: [
+        { value: 'true', label: '读取跳过表头' },
+        { value: 'false', label: '读取包含表头' }
       ]
+    }
+  },
+  watch: {
+    'readerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('hiveReader')
     }
   },
   created() {
@@ -98,7 +114,7 @@ export default {
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs() {
+    getJdbcDs(type) {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -108,7 +124,7 @@ export default {
     },
     // 获取表名
     getTables(type) {
-      if (type === 'reader') {
+      if (type === 'hiveReader') {
         const obj = {
           datasourceId: this.readerForm.datasourceId
         }
@@ -128,6 +144,7 @@ export default {
           this.dataSource = item.datasource
         }
       })
+      Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
       // 获取可用表
       this.getTables('reader')
@@ -179,6 +196,9 @@ export default {
       this.readerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.rColumnList.length
     },
     getData() {
+      if (Bus.dataSourceId) {
+        this.readerForm.datasourceId = Bus.dataSourceId
+      }
       return this.readerForm
     }
   }

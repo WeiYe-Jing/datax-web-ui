@@ -43,7 +43,7 @@
       <!--<el-table-column label="用户名" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.jdbcUsername ? scope.row.jdbcUsername:'-' }}</template>
       </el-table-column>-->
-      <el-table-column label="jdbc url" width="200" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="jdbc连接串" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.jdbcUrl ? scope.row.jdbcUrl:'-' }}</template>
       </el-table-column>
       <!-- <el-table-column label="jdbc驱动类" width="200" align="center" :show-overflow-tooltip="true">
@@ -52,13 +52,13 @@
       <el-table-column label="ZK地址" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.zkAdress ? scope.row.zkAdress:'-' }}</template>
       </el-table-column>
-      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.databaseName ? scope.row.databaseName:'-' }}</template>
+      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">-->
+        <template slot-scope="scope">{{ scope.row.databaseName ? scope.row.databaseName:'-' }}</template>-->
       </el-table-column>
-      <el-table-column label="注释" width="150" align="center">
+      <el-table-column label="备注" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.comments }}</template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
@@ -95,15 +95,15 @@
         <el-form-item label="数据源分组" prop="datasourceGroup">
           <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="jdbc || mongodb" label="用户名">
+        <el-form-item v-if="jdbc" label="用户名">
           <el-input v-model="temp.jdbcUsername" placeholder="用户名" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="visible" v-show="jdbc || mongodb" label="密码">
+        <el-form-item v-if="visible" v-show="jdbc" label="密码">
           <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
           </el-input>
         </el-form-item>
-        <el-form-item v-show="jdbc || mongodb" v-else label="密码">
+        <el-form-item v-show="jdbc" v-else label="密码">
           <el-input v-model="temp.jdbcPassword" type="text" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
@@ -176,7 +176,7 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'DataxJdbcDatasource',
+  name: 'JdbcDatasource',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -238,7 +238,8 @@ export default {
         { value: 'sqlserver', label: 'sqlserver' },
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
-        { value: 'mongodb', label: 'mongodb' }
+        { value: 'mongodb', label: 'mongodb' },
+        { value: 'clickhouse', label: 'clickhouse' }
       ],
       jdbc: true,
       hbase: false,
@@ -262,6 +263,9 @@ export default {
       } else if (datasource === 'sqlserver') {
         this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
         this.temp.jdbcDriverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+      } else if (datasource === 'clickhouse') {
+        this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}/{database}'
+        this.temp.jdbcDriverClass = 'ru.yandex.clickhouse.ClickHouseDriver'
       } else if (datasource === 'hive') {
         this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.apache.hive.jdbc.HiveDriver'
@@ -372,7 +376,7 @@ export default {
       } else if (datasource === 'mongodb') {
         this.jdbc = this.hbase = false
         this.mongodb = true
-        this.temp.jdbcUrl = '{host}:{port}'
+        this.temp.jdbcUrl = 'mongodb://[username:password@]host1[:port1][,...hostN[:portN]]][/[database][?options]]'
       } else {
         this.hbase = this.mongodb = false
         this.jdbc = true

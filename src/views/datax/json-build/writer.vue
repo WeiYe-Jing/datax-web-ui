@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
-    <RDBMSWriter v-if="dataSource!=='hive' && dataSource!=='hbase' && dataSource!=='mongodb'" ref="rdbmswriter" @selectDataSource="showDataSource" />
-    <HiveWriter v-if="dataSource==='hive'" ref="hivewriter" @selectDataSource="showDataSource" />
-    <HBaseWriter v-if="dataSource==='hbase'" ref="hbasewriter" @selectDataSource="showDataSource" />
-    <MongoDBWriter v-if="dataSource==='mongodb'" ref="mongodbwriter" @selectDataSource="showDataSource" />
+    <RDBMSWriter v-show="dataSource!=='hive' && dataSource!=='hbase' && dataSource!=='mongodb'" ref="rdbmswriter" @selectDataSource="showDataSource" />
+    <HiveWriter v-show="dataSource==='hive'" ref="hivewriter" @selectDataSource="showDataSource" />
+    <HBaseWriter v-show="dataSource==='hbase'" ref="hbasewriter" @selectDataSource="showDataSource" />
+    <MongoDBWriter v-show="dataSource==='mongodb'" ref="mongodbwriter" @selectDataSource="showDataSource" />
 
   </div>
 </template>
@@ -49,6 +49,7 @@ export default {
     },
     showDataSource(data) {
       this.dataSource = data
+      this.getData()
     },
     sendTableNameAndColumns(fromTableName, fromColumnList) {
       this.$refs.hivewriter.fromTableName = fromTableName

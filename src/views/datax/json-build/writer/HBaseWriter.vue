@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form label-position="left" label-width="105px" :model="writerForm" :rules="rules">
+    <el-form label-position="left" label-width="115px" :model="writerForm" :rules="rules">
       <el-form-item label="数据源" prop="datasourceId">
         <el-select
           v-model="writerForm.datasourceId"
@@ -34,23 +34,9 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <!--<el-col :span="6">
-          <el-form-item>
-            <el-button type="primary" :disabled="!this.fromTableName" @click="createTable()">一键生成目标表</el-button>
-          </el-form-item>
-        </el-col>-->
       </el-row>
-      <el-form-item label="mode" prop="mode">
-        <el-input v-model="writerForm.mode" disabled style="width: 42%" />
-      </el-form-item>
-      <el-form-item label="rowkeyColumn">
-        <el-input v-model="writerForm.rowkeyColumn.index" placeholder="index指定该列对应reader端column的索引" style="width: 42%" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="writerForm.rowkeyColumn.type" placeholder="type指定写入数据类型" style="width: 42%" />
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="writerForm.rowkeyColumn.value" placeholder="value配置常量，常作为多个字段的拼接符" style="width: 42%" />
+      <el-form-item label="rowkeyColumn" prop="rowkeyColumn">
+        <el-input v-model="writerForm.rowkeyColumn" :autosize="{ minRows: 5, maxRows: 20}" type="textarea" style="width: 42%" />
       </el-form-item>
       <el-form-item label="versionColumn">
         <el-input v-model="writerForm.versionColumn.index" placeholder="index指定对应reader端column的索引" style="width: 42%" />
@@ -75,11 +61,30 @@
 </template>
 
 <script>
-import * as dsQueryApi from '@/api/ds-query'
+import * as dsQueryApi from '@/api/metadata-query'
 import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
+import Bus from '../busWriter'
 export default {
   name: 'HBaseWriter',
   data() {
+    const checkJson = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('不能为空'))
+      }
+      if (typeof value === 'string') {
+        try {
+          var obj = JSON.parse(value)
+          if (typeof obj !== 'object' || !obj) {
+            callback(new Error('JSON格式错误'))
+          }
+          if (!(obj instanceof Array)) {
+            callback(new Error('JSON必须为数组'))
+          }
+        } catch (e) {
+          callback(new Error('JSON格式错误'))
+        }
+      }
+    }
     return {
       jdbcDsQuery: {
         current: 1,
@@ -98,11 +103,10 @@ export default {
         isIndeterminate: true,
         ifCreateTable: false,
         mode: 'normal',
-        rowkeyColumn: {
-          index: '',
-          type: '',
-          value: ''
-        },
+        rowkeyColumn: '[{\n' +
+          '\t"index": 0,\n' +
+          '\t"type": "string"\n' +
+          '}]',
         versionColumn: {
           index: '',
           value: ''
@@ -116,9 +120,15 @@ export default {
       rules: {
         mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fromTableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        fromTableName: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        rowkeyColumn: [{ required: true, trigger: 'blur', validator: checkJson }]
       },
       readerForm: this.getReaderData()
+    }
+  },
+  watch: {
+    'writerForm.datasourceId': function(oldVal, newVal) {
+      this.getTables('hbaseWriter')
     }
   },
   created() {
@@ -126,7 +136,7 @@ export default {
   },
   methods: {
     // 获取可用数据源
-    getJdbcDs() {
+    getJdbcDs(type) {
       this.loading = true
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
@@ -135,14 +145,16 @@ export default {
       })
     },
     // 获取表名
-    getTables() {
-      const obj = {
-        datasourceId: this.writerForm.datasourceId
+    getTables(type) {
+      if (type === 'hbaseWriter') {
+        const obj = {
+          datasourceId: this.writerForm.datasourceId
+        }
+        // 组装
+        dsQueryApi.getTables(obj).then(response => {
+          this.wTbList = response
+        })
       }
-      // 组装
-      dsQueryApi.getTables(obj).then(response => {
-        this.wTbList = response
-      })
     },
     wDsChange(e) {
       // 清空
@@ -153,6 +165,7 @@ export default {
           this.dataSource = item.datasource
         }
       })
+      Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
       // 获取可用表
       this.getTables()
@@ -194,6 +207,9 @@ export default {
       this.writerForm.isIndeterminate = false
     },
     getData() {
+      if (Bus.dataSourceId) {
+        this.writerForm.datasourceId = Bus.dataSourceId
+      }
       return this.writerForm
     },
     getReaderData() {
@@ -201,24 +217,6 @@ export default {
     },
     getTableName() {
       return this.fromTableName
-    },
-    createTable() {
-      const tableName = this.fromTableName
-      const datasourceId = this.writerForm.datasourceId
-      const columns = this.fromColumnList
-      const jsonString = {}
-      jsonString['datasourceId'] = datasourceId
-      jsonString['tableName'] = tableName
-      jsonString['columns'] = columns
-      console.info(jsonString)
-      dsQueryApi.createTable(jsonString).then(response => {
-        this.$notify({
-          title: 'Success',
-          message: 'Create Table Successfully',
-          type: 'success',
-          duration: 2000
-        })
-      }).catch(() => console.log('promise catch err'))
     }
   }
 }
