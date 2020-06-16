@@ -282,7 +282,8 @@ export default {
         replaceParamType: [{ trigger: 'change', validator: validateIncParam }],
         partitionField: [{ trigger: 'blur', validator: validatePartitionParam }],
         datasourceId: [{ trigger: 'change', validator: validateIncParam }],
-        readerTable: [{ trigger: 'blur', validator: validateIncParam }]
+        readerTable: [{ trigger: 'blur', validator: validateIncParam }],
+        projectId: [{ required: true, message: 'projectId is required', trigger: 'change' }]
       },
       temp: {
         id: undefined,
