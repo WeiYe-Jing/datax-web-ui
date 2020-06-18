@@ -292,7 +292,7 @@ export default {
         jobDesc: '',
         executorRouteStrategy: 'RANDOM',
         executorBlockStrategy: 'DISCARD_LATER',
-        childJobId: 0,
+        childJobId: '',
         executorFailRetryCount: '',
         alarmEmail: '',
         executorTimeout: '',
