@@ -135,7 +135,8 @@ export default {
         executorParam: '',
         replaceParam: '',
         jvmParam: '',
-        incStartTime: ''
+        incStartTime: '',
+        templateId: 0
       }
     }
   },
@@ -185,7 +186,8 @@ export default {
         writerDatasourceId: writeData.datasourceId,
         writerTables: writerTables,
         rdbmsReader: rdbmsReader,
-        rdbmsWriter: rdbmsWriter
+        rdbmsWriter: rdbmsWriter,
+        templateId: this.templateId
       }
       // 调api
       job.batchAddJob(obj).then(response => {
@@ -237,6 +239,7 @@ export default {
       this.temp.jobDesc = this.getReaderData().tableName
       this.$refs.jobTemplateSelectDrawer.closeDrawer()
       this.jobTemplate = val.id + '(' + val.jobDesc + ')'
+      this.temp.templateId = val.id
     }
   }
 }
