@@ -187,7 +187,7 @@ export default {
         writerTables: writerTables,
         rdbmsReader: rdbmsReader,
         rdbmsWriter: rdbmsWriter,
-        templateId: this.templateId
+        templateId: this.temp.templateId
       }
       // 调api
       job.batchAddJob(obj).then(response => {
