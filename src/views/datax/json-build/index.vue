@@ -162,6 +162,29 @@ export default {
         // 将第一步和第二步得到的字段名字发送到第三步
         if (this.active === 2) {
           this.$refs.mapper.sendColumns(fromColumnList, toColumnsList)
+          this.$refs.mapper.sendRuleSettings()
+        }
+        if (this.active === 3) {
+          const readerColumns = this.$refs.mapper.getLColumns()
+          const writerColumns = this.$refs.mapper.getRColumns()
+          var tmps = JSON.parse(JSON.stringify(readerColumns)).sort()
+          for (var i = 0; i < tmps.length - 1; i++) {
+            if (tmps[i] === tmps[i + 1]) {
+              this.$message('源端有相同字段【' + tmps[i] + '】，请注意修改')
+              throw new Error('源端有相同字段【' + tmps[i] + '】，请注意修改')
+            }
+          }
+          var tmps1 = JSON.parse(JSON.stringify(writerColumns)).sort()
+          for (i = 0; i < tmps1.length - 1; i++) {
+            if (tmps1[i] === tmps1[i + 1]) {
+              this.$message(
+                '目标端含有相同字段【' + tmps1[i] + '】，请注意修改'
+              )
+              throw new Error(
+                '目标端含有相同字段【' + tmps1[i] + '】，请注意修改'
+              )
+            }
+          }
         }
         if (this.active === 4) {
           this.temp.jobJson = this.configJson
@@ -191,6 +214,7 @@ export default {
       const writeData = this.$refs.writer.getData()
       const readerColumns = this.$refs.mapper.getLColumns()
       const writerColumns = this.$refs.mapper.getRColumns()
+      const transformer = this.$refs.mapper.getRules()
       const hiveReader = {
         readerPath: readerData.path,
         readerDefaultFS: readerData.defaultFS,
@@ -237,6 +261,7 @@ export default {
         writerDatasourceId: writeData.datasourceId,
         writerTables: [writeData.tableName],
         writerColumns: writerColumns,
+        transformer: transformer,
         hiveReader: hiveReader,
         hiveWriter: hiveWriter,
         rdbmsReader: rdbmsReader,
@@ -262,17 +287,10 @@ export default {
       this.jobTemplateSelectDrawer = !this.jobTemplateSelectDrawer
       if (this.jobTemplateSelectDrawer) {
         this.fetchData()
-        this.getExecutor()
       }
     },
     getReaderData() {
       return this.$refs.reader.getData()
-    },
-    getExecutor() {
-      jobTemplate.getExecutorList().then(response => {
-        const { content } = response
-        this.executorList = content
-      })
     },
     fetchData() {
       this.listLoading = true
