@@ -116,7 +116,7 @@ export default {
       triggerNextTimes: '',
       registerNode: [],
       jobJson: '',
-      templateId: 0,
+      templateId: 0
     }
   },
   created() {
