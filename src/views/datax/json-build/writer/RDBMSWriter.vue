@@ -17,7 +17,7 @@
         </el-select>
       </el-form-item>
       <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：" prop="tableSchema">
-        <el-select v-model="writerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
+        <el-select v-model="writerForm.tableSchema" allow-create default-first-option filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"
             :key="item"
@@ -106,11 +106,8 @@ export default {
   },
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
-      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
-        this.getSchema()
-      } else {
-        this.getTables('rdbmsWriter')
-      }
+      this.getSchema()
+      this.getTables('rdbmsWriter')
     }
   },
   created() {

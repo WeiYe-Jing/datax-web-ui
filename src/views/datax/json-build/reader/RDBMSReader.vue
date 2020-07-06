@@ -96,11 +96,8 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
-        this.getSchema()
-      } else {
-        this.getTables('rdbmsReader')
-      }
+      this.getSchema()
+      this.getTables('rdbmsReader')
     }
   },
   created() {
