@@ -245,6 +245,18 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 5" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="主键开始ID" prop="incStartId">
+              <el-input v-model="temp.incStartId" placeholder="首次增量使用（ObjectId)" style="width: 56%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="ID增量参数" prop="replaceParam">
+              <el-input v-model="temp.replaceParam" placeholder="-DstartId='%s' -DendId='%s'" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 2" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
@@ -504,7 +516,9 @@ export default {
         { value: 1, label: '主键自增' },
         { value: 2, label: '时间自增' },
         { value: 3, label: 'HIVE分区' },
-        { value: 4, label: 'HIVE分区自增' }
+        { value: 4, label: 'HIVE分区自增' },
+        { value: 5, label: 'MongoDB主键增量' }
+
       ],
       triggerNextTimes: '',
       registerNode: [],
