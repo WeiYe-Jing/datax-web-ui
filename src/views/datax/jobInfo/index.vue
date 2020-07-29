@@ -245,6 +245,18 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 5" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="主键开始ID" prop="incStartId">
+              <el-input v-model="temp.incStartId" placeholder="首次增量使用（ObjectId)" style="width: 56%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="ID增量参数" prop="replaceParam">
+              <el-input v-model="temp.replaceParam" placeholder="-DstartId='%s' -DendId='%s'" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 2" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
@@ -286,6 +298,46 @@
           </el-col>
           <el-col :span="5">
             <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
+          </el-col>
+        </el-row>
+        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 4" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="增量开始时间" prop="incStartTime">
+              <el-date-picker
+                v-model="temp.incStartTime"
+                type="datetime"
+                placeholder="首次增量使用"
+                format="yyyy-MM-dd HH:mm:ss"
+                style="width: 57%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="增量时间字段" prop="replaceParam">
+              <el-input v-model="temp.replaceParam" placeholder="-DlastTime='%s' -DcurrentTime='%s'" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="增量时间格式" prop="replaceParamType">
+              <el-select v-model="temp.replaceParamType" placeholder="增量时间格式" @change="incStartTimeFormat">
+                <el-option v-for="item in replaceFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item label="分区时间">
+              <el-select v-model="timeFormatType" placeholder="分区时间格式">
+                <el-option v-for="item in timeFormatTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="分区字段" prop="partitionField">
+              <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
+            </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
@@ -463,7 +515,10 @@ export default {
         { value: 0, label: '无' },
         { value: 1, label: '主键自增' },
         { value: 2, label: '时间自增' },
-        { value: 3, label: 'HIVE分区' }
+        { value: 3, label: 'HIVE分区' },
+        { value: 4, label: 'HIVE分区自增' },
+        { value: 5, label: 'MongoDB主键增量' }
+
       ],
       triggerNextTimes: '',
       registerNode: [],

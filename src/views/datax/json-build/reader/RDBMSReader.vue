@@ -98,9 +98,8 @@ export default {
     'readerForm.datasourceId': function(oldVal, newVal) {
       if (this.dataSource === 'postgresql' || this.dataSource === 'greenplum' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
         this.getSchema()
-      } else {
-        this.getTables('rdbmsReader')
       }
+      this.getTables('rdbmsReader')
     }
   },
   created() {

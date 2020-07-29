@@ -116,32 +116,10 @@ export default {
       triggerNextTimes: '',
       registerNode: [],
       jobJson: '',
-      temp: {
-        id: undefined,
-        jobGroup: '',
-        jobCron: '',
-        jobDesc: '',
-        executorRouteStrategy: '',
-        executorBlockStrategy: '',
-        childJobId: '',
-        executorFailRetryCount: '',
-        alarmEmail: '',
-        executorTimeout: '',
-        userId: 0,
-        jobConfigId: '',
-        executorHandler: 'executorJobHandler',
-        glueType: 'BEAN',
-        jobJson: '',
-        executorParam: '',
-        replaceParam: '',
-        jvmParam: '',
-        incStartTime: '',
-        templateId: 0
-      }
+      templateId: 0
     }
   },
   created() {
-    // this.getJdbcDs()
   },
   methods: {
     next() {
@@ -187,7 +165,7 @@ export default {
         writerTables: writerTables,
         rdbmsReader: rdbmsReader,
         rdbmsWriter: rdbmsWriter,
-        templateId: this.temp.templateId
+        templateId: this.templateId
       }
       // 调api
       job.batchAddJob(obj).then(response => {
@@ -234,12 +212,9 @@ export default {
       })
     },
     handleCurrentChange(val) {
-      this.temp = Object.assign({}, val)
-      this.temp.id = undefined
-      this.temp.jobDesc = this.getReaderData().tableName
       this.$refs.jobTemplateSelectDrawer.closeDrawer()
       this.jobTemplate = val.id + '(' + val.jobDesc + ')'
-      this.temp.templateId = val.id
+      this.templateId = val.id
     }
   }
 }

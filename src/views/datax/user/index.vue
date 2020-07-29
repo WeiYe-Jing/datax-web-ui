@@ -109,6 +109,13 @@ export default {
     }
   },
   data() {
+    const validatePassword = (rule, value, callback) => {
+      if (value.length < 6) {
+        callback(new Error('The password can not be less than 6 digits'))
+      } else {
+        callback()
+      }
+    }
     return {
       list: null,
       listLoading: true,
@@ -130,7 +137,7 @@ export default {
       rules: {
         role: [{ required: true, message: 'role is required', trigger: 'change' }],
         username: [{ required: true, message: 'username is required', trigger: 'blur' }],
-        password: [{ required: false, message: 'password is required', trigger: 'blur' }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       temp: {
         id: undefined,

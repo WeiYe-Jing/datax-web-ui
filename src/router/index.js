@@ -169,13 +169,13 @@ export const asyncRoutes = [
         path: 'jsonBuild',
         name: 'JsonBuild',
         component: () => import('@/views/datax/json-build/index'),
-        meta: { title: '任务构建', icon: 'guide', noCache: false }
+        meta: { title: '任务构建', icon: 'guide' }
       },
       {
         path: 'jsonBuildBatch',
         name: 'JsonBuildBatch',
         component: () => import('@/views/datax/json-build-batch/index'),
-        meta: { title: '任务批量构建', icon: 'batch-create', noCache: false }
+        meta: { title: '任务批量构建', icon: 'batch-create' }
       },
       {
         path: 'jobTemplate',
