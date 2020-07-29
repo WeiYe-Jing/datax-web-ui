@@ -235,6 +235,7 @@ export default {
         { value: 'mysql', label: 'mysql' },
         { value: 'oracle', label: 'oracle' },
         { value: 'postgresql', label: 'postgresql' },
+        { value: 'greenplum', label: 'greenplum' }
         { value: 'sqlserver', label: 'sqlserver' },
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
@@ -258,6 +259,9 @@ export default {
         this.temp.jdbcUrl = 'jdbc:oracle:thin:@//{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'oracle.jdbc.OracleDriver'
       } else if (datasource === 'postgresql') {
+        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}/{database}'
+        this.temp.jdbcDriverClass = 'org.postgresql.Driver'
+      } else if (datasource === 'greenplum') {
         this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.postgresql.Driver'
       } else if (datasource === 'sqlserver') {
