@@ -45,7 +45,7 @@ export function test(data) {
   return request({
     url: '/api/jobJdbcDatasource/test',
     method: 'post',
-    params: data
+    data
   })
 }
 
