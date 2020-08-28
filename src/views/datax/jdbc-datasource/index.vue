@@ -90,15 +90,15 @@
           <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
         <el-form-item v-if="jdbc" label="用户名">
-          <el-input v-model="temp.userName" placeholder="用户名" style="width: 40%" />
+          <el-input v-model="temp.jdbcUsername" placeholder="用户名" style="width: 40%" />
         </el-form-item>
         <el-form-item v-if="visible" v-show="jdbc" label="密码">
-          <el-input v-model="temp.password" type="password" placeholder="密码" style="width: 40%">
+          <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
           </el-input>
         </el-form-item>
         <el-form-item v-show="jdbc" v-else label="密码">
-          <el-input v-model="temp.password" type="text" placeholder="密码" style="width: 40%">
+          <el-input v-model="temp.jdbcPassword" type="text" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
         </el-form-item>
@@ -203,8 +203,8 @@ export default {
       },
       rules: {
         datasourceName: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        userName: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        password: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        jdbcUsername: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        jdbcPassword: [{ required: true, message: 'this is required', trigger: 'blur' }],
         jdbcUrl: [{ required: true, message: 'this is required', trigger: 'blur' }],
         datasource: [{ required: true, message: 'this is required', trigger: 'change' }],
         zkAdress: [{ required: true, message: 'this is required', trigger: 'blur' }],
@@ -214,8 +214,8 @@ export default {
         id: undefined,
         datasourceName: '',
         datasourceGroup: 'Default',
-        userName: '',
-        password: '',
+        jdbcUsername: '',
+        jdbcPassword: '',
         jdbcUrl: '',
         comments: '',
         datasource: '',
@@ -227,7 +227,7 @@ export default {
         { value: 'MYSQL', label: 'MYSQL' },
         { value: 'oracle', label: 'oracle' },
         { value: 'postgresql', label: 'postgresql' },
-        { value: 'greenplum', label: 'greenplum' }
+        { value: 'greenplum', label: 'greenplum' },
         { value: 'sqlserver', label: 'sqlserver' },
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
@@ -280,8 +280,8 @@ export default {
         id: undefined,
         datasourceName: '',
         datasourceGroup: 'Default',
-        userName: '',
-        password: '',
+        jdbcUsername: '',
+        jdbcPassword: '',
         jdbcUrl: '',
         jdbcDriverClass: '',
         comments: ''
