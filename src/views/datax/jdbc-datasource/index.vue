@@ -227,7 +227,7 @@ export default {
         { value: 'MYSQL', label: 'MYSQL' },
         { value: 'oracle', label: 'oracle' },
         { value: 'postgresql', label: 'postgresql' },
-        { value: 'greenplum', label: 'greenplum' }
+        { value: 'greenplum', label: 'greenplum' },
         { value: 'sqlserver', label: 'sqlserver' },
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
