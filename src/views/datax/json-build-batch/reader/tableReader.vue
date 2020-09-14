@@ -11,7 +11,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver' ||dataSource==='db2'" label="Schema：">
+      <el-form-item v-show="needSchema" label="Schema：">
         <el-select v-model="readerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"
@@ -63,6 +63,7 @@ export default {
       customType: '',
       customValue: '',
       dataSource: '',
+      needSchema:false,
       readerForm: {
         datasourceId: undefined,
         tables: [],
@@ -81,8 +82,10 @@ export default {
     'readerForm.datasourceId': function(oldVal, newVal) {
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
         this.getSchema()
+        this.needSchema = true
       } else {
         this.getTables('reader')
+        this.needSchema = false
       }
     }
   },
@@ -96,6 +99,13 @@ export default {
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
         this.rDsList = records
+        this.dataSource = this.rDsList[0].datasource
+        this.readerForm.datasourceId = this.rDsList[0].id;
+        if(this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2'){
+           this.needSchema = true;
+        }else{
+          this.needSchema = false;
+        }
         this.loading = false
       })
     },
@@ -103,7 +113,7 @@ export default {
     getTables(type) {
       if (type === 'reader') {
         let obj = {}
-        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
+        if (this.needSchema) {
           obj = {
             datasourceId: this.readerForm.datasourceId,
             tableSchema: this.readerForm.tableSchema

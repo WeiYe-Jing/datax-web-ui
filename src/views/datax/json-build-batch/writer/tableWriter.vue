@@ -16,7 +16,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver' ||dataSource==='db2'" label="Schema：">
+      <el-form-item v-show="needSchema" label="Schema：">
         <el-select v-model="writerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"
@@ -56,6 +56,7 @@ export default {
       fromTableName: '',
       wTbList: [],
       dataSource: '',
+      needSchema:false,
       createTableName: '',
       writerForm: {
         datasourceId: undefined,
@@ -75,8 +76,10 @@ export default {
     'writerForm.datasourceId': function(oldVal, newVal) {
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
         this.getSchema()
+        this.needSchema = true
       } else {
         this.getTables('writer')
+        this.needSchema = false
       }
     }
   },
@@ -90,6 +93,13 @@ export default {
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
         this.wDsList = records
+        this.dataSource = this.wDsList[0].datasource
+        this.writerForm.datasourceId = this.wDsList[0].id;
+        if(this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2'){
+           this.needSchema = true;
+        }else{
+          this.needSchema = false;
+        }
         this.loading = false
       })
     },
@@ -97,7 +107,7 @@ export default {
     getTables(type) {
       if (type === 'writer') {
         let obj = {}
-        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
+        if (this.needSchema) {
           obj = {
             datasourceId: this.writerForm.datasourceId,
             tableSchema: this.writerForm.tableSchema
