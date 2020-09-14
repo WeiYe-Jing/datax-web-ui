@@ -16,7 +16,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：">
+      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver' ||dataSource==='db2'" label="Schema：">
         <el-select v-model="writerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"
@@ -73,7 +73,7 @@ export default {
   },
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
-      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
         this.getSchema()
       } else {
         this.getTables('writer')
@@ -97,7 +97,7 @@ export default {
     getTables(type) {
       if (type === 'writer') {
         let obj = {}
-        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
           obj = {
             datasourceId: this.writerForm.datasourceId,
             tableSchema: this.writerForm.tableSchema
@@ -138,8 +138,9 @@ export default {
       })
       Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
-      // 获取可用表
-      this.getTables()
+      // 切换数据源时，清空可用表列表，当需要选择schemas时，先选择schemas再加载表
+      this.writerForm.tableSchema = ''
+      this.wTbList = []
     },
     wHandleCheckAllChange(val) {
       this.writerForm.tables = val ? this.wTbList : []

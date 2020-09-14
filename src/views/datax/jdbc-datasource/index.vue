@@ -236,6 +236,7 @@ export default {
         { value: 'oracle', label: 'oracle' },
         { value: 'postgresql', label: 'postgresql' },
         { value: 'sqlserver', label: 'sqlserver' },
+        { value: 'db2', label: 'db2' },
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
         { value: 'mongodb', label: 'mongodb' },
