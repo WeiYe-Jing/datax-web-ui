@@ -109,8 +109,8 @@ export default {
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
         this.getSchema()
       }
-      //当需要选择schemas时，先选择schemas再加载表
-      //this.getTables('rdbmsWriter')
+      // 当需要选择schemas时，先选择schemas再加载表
+      // this.getTables('rdbmsWriter')
     }
   },
   created() {
