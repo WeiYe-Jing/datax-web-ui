@@ -138,7 +138,7 @@ export default {
     // reader 数据源切换
     rDsChange(e) {
       // 清空
-      this.readerForm.tableName = ''
+      this.readerForm.tables = []
       this.readerForm.datasourceId = e
       this.rDsList.find((item) => {
         if (item.id === e) {

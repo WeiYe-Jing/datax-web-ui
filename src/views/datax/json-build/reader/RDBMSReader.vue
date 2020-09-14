@@ -96,11 +96,12 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
+      // 当需要选择schemas时，先选择schemas再加载表
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
         this.getSchema()
+      } else {
+        this.getTables('rdbmsReader')
       }
-      // 当需要选择schemas时，先选择schemas再加载表
-      // this.getTables('rdbmsReader')
     }
   },
   created() {
@@ -164,6 +165,9 @@ export default {
       })
       Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
+      // 切换数据源时，清空可用表列表,当需要选择schemas时，先选择schemas再加载表
+      this.readerForm.tableSchema = ''
+      this.rTbList = []
     },
     getTableColumns() {
       const obj = {

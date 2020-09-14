@@ -264,6 +264,9 @@ export default {
       } else if (datasource === 'sqlserver') {
         this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
         this.temp.jdbcDriverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+      } else if (datasource === 'db2') {
+        this.temp.jdbcUrl = 'jdbc:db2://{host}[:{port}]/{database}'
+        this.temp.jdbcDriverClass = 'com.ibm.db2.jcc.DB2Driver'
       } else if (datasource === 'clickhouse') {
         this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'ru.yandex.clickhouse.ClickHouseDriver'

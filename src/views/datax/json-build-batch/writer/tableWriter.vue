@@ -129,7 +129,7 @@ export default {
     },
     wDsChange(e) {
       // 清空
-      this.writerForm.tableName = ''
+      this.writerForm.tables = []
       this.writerForm.datasourceId = e
       this.wDsList.find((item) => {
         if (item.id === e) {

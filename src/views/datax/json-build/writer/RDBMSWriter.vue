@@ -106,11 +106,12 @@ export default {
   },
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
+      // 当需要选择schemas时，先选择schemas再加载表
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
         this.getSchema()
+      } else {
+        this.getTables('rdbmsWriter')
       }
-      // 当需要选择schemas时，先选择schemas再加载表
-      // this.getTables('rdbmsWriter')
     }
   },
   created() {
@@ -162,6 +163,7 @@ export default {
     },
     wDsChange(e) {
       // 清空
+      this.fromTableName = ''
       this.writerForm.tableName = ''
       this.writerForm.datasourceId = e
       this.wDsList.find((item) => {
@@ -171,6 +173,9 @@ export default {
       })
       Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
+      // 切换数据源时，清空可用表列表，当需要选择schemas时，先选择schemas再加载表
+      this.writerForm.tableSchema = ''
+      this.wTbList = []
     },
     // 获取表字段
     getColumns() {
