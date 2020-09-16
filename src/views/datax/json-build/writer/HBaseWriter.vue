@@ -141,6 +141,7 @@ export default {
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
         this.wDsList = records
+        this.wDsList.unshift({ id: -1, datasourceName: 'TXT文件', datasource: 'txtfile' })
         this.loading = false
       })
     },
