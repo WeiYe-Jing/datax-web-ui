@@ -299,7 +299,7 @@ export default {
         userId: 0,
         jobConfigId: '',
         executorHandler: 'executorJobHandler',
-        glueType: 'BEAN',
+        glueType: 'DATAX',
         executorParam: '',
         jvmParam: '',
         projectId: '',
@@ -331,7 +331,7 @@ export default {
         // { value: 'SHARDING_BROADCAST', label: '分片广播' }
       ],
       glueTypes: [
-        { value: 'BEAN', label: 'DataX任务' }
+        { value: 'DATAX', label: 'DataX任务' }
       ],
       triggerNextTimes: '',
       registerNode: []
