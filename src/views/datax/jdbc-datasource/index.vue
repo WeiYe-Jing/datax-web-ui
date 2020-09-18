@@ -269,6 +269,8 @@ export default {
         this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}'
         this.hbase = this.mongodb = false
         this.jdbc = true
+      } else if (type === 'DB2') {
+        this.temp.jdbcUrl = 'jdbc:db2://{host}[:{port}]'
       }
       this.getShowStrategy(type)
     },

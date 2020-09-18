@@ -16,7 +16,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-show="dataSource==='postgresql' || dataSource==='greenplum' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：" prop="tableSchema">
+      <el-form-item v-show="needSchema" label="Schema：" prop="tableSchema">
         <el-select v-model="writerForm.tableSchema" allow-create default-first-option filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"
@@ -84,6 +84,7 @@ export default {
       fromColumnList: [],
       wTbList: [],
       dataSource: '',
+      needSchema:false,
       createTableName: '',
       writerForm: {
         datasourceId: undefined,
@@ -106,10 +107,14 @@ export default {
   },
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
-      if (this.dataSource === 'postgresql' || this.dataSource === 'greenplum' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+      // 当需要选择schemas时，先选择schemas再加载表
+      if (this.dataSource === 'postgresql' || this.dataSource === 'greenplum' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
         this.getSchema()
+        this.needSchema = true
+      } else {
+        this.getTables('rdbmsWriter')
+        this.needSchema = false
       }
-      this.getTables('rdbmsWriter')
     }
   },
   created() {
@@ -122,6 +127,13 @@ export default {
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
         this.wDsList = records
+        this.dataSource = this.wDsList[0].datasource
+        this.writerForm.datasourceId = this.wDsList[0].id
+        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
+          this.needSchema = true
+        } else {
+          this.needSchema = false
+        }
         this.loading = false
       })
     },
@@ -129,7 +141,7 @@ export default {
     getTables(type) {
       if (type === 'rdbmsWriter') {
         let obj = {}
-        if (this.dataSource === 'postgresql' || this.dataSource === 'greenplum' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+        if (this.needSchema) {
           obj = {
             datasourceId: this.writerForm.datasourceId,
             tableSchema: this.writerForm.tableSchema
@@ -161,6 +173,7 @@ export default {
     },
     wDsChange(e) {
       // 清空
+      this.fromTableName = ''
       this.writerForm.tableName = ''
       this.writerForm.datasourceId = e
       this.wDsList.find((item) => {
@@ -170,6 +183,9 @@ export default {
       })
       Bus.dataSourceId = e
       this.$emit('selectDataSource', this.dataSource)
+      // 切换数据源时，清空可用表列表，当需要选择schemas时，先选择schemas再加载表
+      this.writerForm.tableSchema = ''
+      this.wTbList = []
     },
     // 获取表字段
     getColumns() {

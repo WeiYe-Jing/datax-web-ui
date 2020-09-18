@@ -178,8 +178,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="失败重试次数">
-              <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
+            <el-form-item v-if="temp.glueType==='JAVA_BEAN'" label="JobHandler" prop="executorHandler">
+              <el-input v-model="temp.executorHandler" placeholder="请输入JobHandler" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -192,8 +192,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="超时时间(分钟)">
-              <el-input-number v-model="temp.executorTimeout" :min="0" :max="120" />
+            <el-form-item label="失败重试次数">
+              <el-input-number v-model="temp.executorFailRetryCount" :min="0" :max="20" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -205,9 +205,13 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12" />
+          <el-col :span="12">
+            <el-form-item label="超时时间(分钟)">
+              <el-input-number v-model="temp.executorTimeout" :min="0" :max="120" />
+            </el-form-item>
+          </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
+        <el-row v-if="temp.glueType==='DATAX'" :gutter="20">
           <el-col :span="12">
             <el-form-item label="辅助参数" prop="incrementType">
               <el-select v-model="temp.incrementType" placeholder="请选择参数类型" value="">
@@ -216,7 +220,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 1" :gutter="20">
+        <el-row v-if="temp.glueType==='DATAX' && temp.incrementType === 1" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量主键开始ID" prop="incStartId">
               <el-input v-model="temp.incStartId" placeholder="首次增量使用" style="width: 56%" />
@@ -257,7 +261,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 2" :gutter="20">
+        <el-row v-if="temp.glueType==='DATAX' && temp.incrementType === 2" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
@@ -283,7 +287,7 @@
           </el-col>
 
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 3" :gutter="20">
+        <el-row v-if="temp.glueType==='DATAX' && temp.incrementType === 3" :gutter="20">
           <el-col :span="12">
             <el-form-item label="分区字段" prop="partitionField">
               <el-input v-model="partitionField" placeholder="请输入分区字段" style="width: 56%" />
@@ -300,7 +304,7 @@
             <el-input-number v-model="timeOffset" :min="-20" :max="0" style="width: 65%" />
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 4" :gutter="20">
+        <el-row v-if="temp.glueType==='DATAX' && temp.incrementType === 4" :gutter="20">
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
@@ -340,7 +344,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-if="temp.glueType==='BEAN'" :gutter="20">
+        <el-row v-if="temp.glueType==='DATAX'" :gutter="20">
           <el-col :span="24">
             <el-form-item label="JVM启动参数">
               <el-input v-model="temp.jvmParam" placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError" />
@@ -348,7 +352,7 @@
           </el-col>
         </el-row>
       </el-form>
-      <json-editor v-if="temp.glueType==='BEAN'" ref="jsonEditor" v-model="jobJson" />
+      <json-editor v-if="temp.glueType==='DATAX' || temp.glueType==='JAVA_BEAN'" ref="jsonEditor" v-model="jobJson" />
       <shell-editor v-if="temp.glueType==='GLUE_SHELL'" ref="shellEditor" v-model="glueSource" />
       <python-editor v-if="temp.glueType==='GLUE_PYTHON'" ref="pythonEditor" v-model="glueSource" />
       <powershell-editor v-if="temp.glueType==='GLUE_POWERSHELL'" ref="powershellEditor" v-model="glueSource" />
@@ -433,6 +437,7 @@ export default {
         executorRouteStrategy: [{ required: true, message: 'executorRouteStrategy is required', trigger: 'change' }],
         executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
         glueType: [{ required: true, message: 'jobType is required', trigger: 'change' }],
+        executorHandler: [{ required: true, message: 'executorHandler is required', trigger: 'change' }],
         projectId: [{ required: true, message: 'projectId is required', trigger: 'change' }],
         jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
         jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
@@ -506,7 +511,8 @@ export default {
         // { value: 'SHARDING_BROADCAST', label: '分片广播' }
       ],
       glueTypes: [
-        { value: 'BEAN', label: 'DataX任务' },
+        { value: 'DATAX', label: 'DataX任务' },
+        { value: 'JAVA_BEAN', label: 'Java任务' },
         { value: 'GLUE_SHELL', label: 'Shell任务' },
         { value: 'GLUE_PYTHON', label: 'Python任务' },
         { value: 'GLUE_POWERSHELL', label: 'PowerShell任务' }
@@ -610,7 +616,7 @@ export default {
       })
     },
     createData() {
-      if (this.temp.glueType === 'BEAN' && !isJSON(this.jobJson)) {
+      if ((this.temp.glueType === 'DATAX' || this.temp.glueType === 'JAVA_BEAN') && !isJSON(this.jobJson)) {
         this.$notify({
           title: 'Fail',
           message: 'json格式错误',
@@ -630,7 +636,7 @@ export default {
           }
           this.temp.jobJson = this.jobJson
           this.temp.glueSource = this.glueSource
-          this.temp.executorHandler = this.temp.glueType === 'BEAN' ? 'executorJobHandler' : ''
+          this.temp.executorHandler = this.temp.glueType === 'DATAX' ? 'executorJobHandler' : (this.temp.glueType === 'JAVA_BEAN' ? this.temp.executorHandler : '')
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.createJob(this.temp).then(() => {
             this.fetchData()
@@ -686,7 +692,7 @@ export default {
     },
     updateData() {
       this.temp.jobJson = typeof (this.jobJson) !== 'string' ? JSON.stringify(this.jobJson) : this.jobJson
-      if (this.temp.glueType === 'BEAN' && !isJSON(this.temp.jobJson)) {
+      if ((this.temp.glueType === 'DATAX' || this.temp.glueType === 'JAVA_BEAN') && !isJSON(this.temp.jobJson)) {
         this.$notify({
           title: 'Fail',
           message: 'json格式错误',
@@ -704,7 +710,7 @@ export default {
             }
             this.temp.childJobId = auth.toString()
           }
-          this.temp.executorHandler = this.temp.glueType === 'BEAN' ? 'executorJobHandler' : ''
+          this.temp.executorHandler = this.temp.glueType === 'DATAX' ? 'executorJobHandler' : (this.temp.glueType === 'JAVA_BEAN' ? this.temp.executorHandler : '')
           this.temp.glueSource = this.glueSource
           if (this.partitionField) this.temp.partitionInfo = this.partitionField + ',' + this.timeOffset + ',' + this.timeFormatType
           job.updateJob(this.temp).then(() => {
