@@ -19,17 +19,17 @@ export function fetched(params) {
 
 export function updated(data) {
   return request({
-    url: '/api/jobJdbcDatasource',
+    url: '/api/jobJdbcDatasource/update',
     method: 'put',
-    data
+    params: data
   })
 }
 
 export function created(data) {
   return request({
-    url: '/api/jobJdbcDatasource',
+    url: '/api/jobJdbcDatasource/create',
     method: 'post',
-    data
+    params: data
   })
 }
 

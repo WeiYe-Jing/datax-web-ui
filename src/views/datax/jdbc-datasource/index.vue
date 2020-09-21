@@ -30,24 +30,27 @@
       <!-- <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index }}</template>
       </el-table-column> -->
-      <el-table-column label="数据源" width="200" align="center">
-        <template slot-scope="scope">{{ scope.row.datasource }}</template>
-      </el-table-column>
-      <el-table-column label="数据源名称" width="150" align="center">
-        <template slot-scope="scope">{{ scope.row.datasourceName }}</template>
-      </el-table-column>
       <el-table-column label="数据源分组" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.datasourceGroup }}
         </template>
       </el-table-column>
-      <el-table-column label="jdbc连接串" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.jdbcUrl ? scope.row.jdbcUrl:'-' }}</template>
+      <el-table-column label="数据源名称" width="150" align="center">
+        <template slot-scope="scope">{{ scope.row.datasourceName }}</template>
       </el-table-column>
-      <el-table-column label="ZK地址" width="200" align="center" :show-overflow-tooltip="true">
-        <template slot-scope="scope">{{ scope.row.zkAdress ? scope.row.zkAdress:'-' }}</template>
+      <el-table-column label="数据源类型" width="150" align="center">
+        <template slot-scope="scope">{{ scope.row.type }}</template>
       </el-table-column>
-      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">-->
-        <template slot-scope="scope">{{ scope.row.database ? scope.row.database:'-' }}</template>-->
+      <el-table-column label="连接参数" align="center" width="120">
+        <template slot-scope="scope">
+          <el-popover
+            placement="bottom"
+            width="300"
+            @show="getDatasourceParams(scope.row.connectionParams)"
+          >
+            <h5 v-html="datasourceParams" />
+            <el-button slot="reference" size="small">查看</el-button>
+          </el-popover>
+        </template>
       </el-table-column>
       <el-table-column label="备注" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.comments }}</template>
@@ -73,12 +76,12 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="800px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
-        <el-form-item label="数据源" prop="datasource">
+        <el-form-item label="数据源" prop="type">
           <el-select
-            v-model="temp.datasource"
+            v-model="temp.type"
             placeholder="数据源"
             style="width: 200px"
-            @change="selectDataSource(temp.datasource)"
+            @change="selectDataSource(temp.type)"
           >
             <el-option v-for="item in dataSources" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
@@ -90,21 +93,21 @@
           <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
         <el-form-item v-if="jdbc" label="用户名">
-          <el-input v-model="temp.userName" placeholder="用户名" style="width: 40%" />
+          <el-input v-model="temp.connectionParams.user" placeholder="用户名" style="width: 40%" />
         </el-form-item>
         <el-form-item v-if="visible" v-show="jdbc" label="密码">
-          <el-input v-model="temp.password" type="password" placeholder="密码" style="width: 40%">
+          <el-input v-model="temp.connectionParams.password" type="password" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
           </el-input>
         </el-form-item>
         <el-form-item v-show="jdbc" v-else label="密码">
-          <el-input v-model="temp.password" type="text" placeholder="密码" style="width: 40%">
+          <el-input v-model="temp.connectionParams.password" type="text" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
         </el-form-item>
         <el-form-item v-if="jdbc" label="jdbc url" prop="jdbcUrl">
           <el-input
-            v-model="temp.jdbcUrl"
+            v-model="temp.connectionParams.jdbcUrl"
             :autosize="{ minRows: 3, maxRows: 6}"
             type="textarea"
             placeholder="jdbc url"
@@ -113,21 +116,18 @@
         </el-form-item>
         <el-form-item v-if="mongodb" label="地址" prop="jdbcUrl">
           <el-input
-            v-model="temp.jdbcUrl"
+            v-model="temp.connectionParams.jdbcUrl"
             :autosize="{ minRows: 3, maxRows: 6}"
             type="textarea"
             placeholder="127.0.0.1:27017"
             style="width: 60%"
           />
         </el-form-item>
-        <el-form-item v-if="jdbc" label="jdbc驱动类" prop="jdbcDriverClass">
-          <el-input v-model="temp.jdbcDriverClass" placeholder="jdbc驱动类" style="width: 60%" />
+        <el-form-item v-if="hbase" label="ZK地址" prop="zkAddress">
+          <el-input v-model="temp.connectionParams.zkAddress" placeholder="127.0.0.1:2181" style="width: 60%" />
         </el-form-item>
-        <el-form-item v-if="hbase" label="ZK地址" prop="zkAdress">
-          <el-input v-model="temp.zkAdress" placeholder="127.0.0.1:2181" style="width: 60%" />
-        </el-form-item>
-        <el-form-item v-if="mongodb" label="数据库名称" prop="database">
-          <el-input v-model="temp.database" placeholder="数据库名称" style="width: 60%" />
+        <el-form-item label="数据库名称" prop="database">
+          <el-input v-model="temp.connectionParams.database" placeholder="数据库名称" style="width: 60%" />
         </el-form-item>
         <el-form-item label="注释">
           <el-input
@@ -166,8 +166,8 @@
 <script>
 import * as datasourceApi from '@/api/datax-jdbcDatasource'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
+import * as job from '@/api/datax-job-info'
 
 export default {
   name: 'JdbcDatasource',
@@ -203,67 +203,76 @@ export default {
       },
       rules: {
         datasourceName: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        userName: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        password: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        jdbcUrl: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        datasource: [{ required: true, message: 'this is required', trigger: 'change' }],
-        zkAdress: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        database: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        type: [{ required: true, message: 'this is required', trigger: 'change' }],
+        'connectionParams.user': [{ required: true, message: 'this is required', trigger: 'blur' }],
+        'connectionParams.password': [{ required: true, message: 'this is required', trigger: 'blur' }],
+        'connectionParams.jdbcUrl': [{ required: true, message: 'this is required', trigger: 'blur' }],
+        'connectionParams.zkAddress': [{ required: true, message: 'this is required', trigger: 'blur' }],
+        'connectionParams.database': [{ required: true, message: 'this is required', trigger: 'blur' }]
       },
       temp: {
         id: undefined,
         datasourceName: '',
         datasourceGroup: 'Default',
-        userName: '',
+        connectionParams: {
+          user: '',
+          password: '',
+          jdbcUrl: '',
+          zkAddress: '',
+          database: ''
+        },
+        user: '',
         password: '',
         jdbcUrl: '',
-        comments: '',
-        datasource: '',
-        zkAdress: '',
-        database: ''
+        zkAddress: '',
+        database: '',
+        type: '',
+        comments: ''
       },
       visible: true,
       dataSources: [
         { value: 'MYSQL', label: 'MYSQL' },
-        { value: 'oracle', label: 'oracle' },
-        { value: 'postgresql', label: 'postgresql' },
-        { value: 'greenplum', label: 'greenplum' }
-        { value: 'sqlserver', label: 'sqlserver' },
-        { value: 'hive', label: 'hive' },
-        { value: 'hbase', label: 'hbase' },
-        { value: 'mongodb', label: 'mongodb' },
-        { value: 'clickhouse', label: 'clickhouse' }
+        { value: 'ORACLE', label: 'ORACLE' },
+        { value: 'POSTGRESQL', label: 'POSTGRESQL' },
+        { value: 'GREENPLUM', label: 'GREENPLUM' },
+        { value: 'SQLSERVER', label: 'SQLSERVER' },
+        { value: 'HIVE', label: 'HIVE' },
+        { value: 'CLICKHOUSE', label: 'CLICKHOUSE' },
+        { value: 'DB2', label: 'DB2' },
+        { value: 'HBASE', label: 'HBASE' },
+        { value: 'MONGODB', label: 'MONGODB' }
       ],
       jdbc: true,
       hbase: false,
-      mongodb: false
+      mongodb: false,
+      datasourceParams: ''
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
-    selectDataSource(datasource) {
-      if (datasource === 'MYSQL') {
-        this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}/{database}'
-      } else if (datasource === 'oracle') {
-        this.temp.jdbcUrl = 'jdbc:oracle:thin:@//{host}:{port}/{database}'
-      } else if (datasource === 'postgresql') {
-        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}/{database}'
-        this.temp.jdbcDriverClass = 'org.postgresql.Driver'
-      } else if (datasource === 'greenplum') {
-        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}/{database}'
-        this.temp.jdbcDriverClass = 'org.postgresql.Driver'
-      } else if (datasource === 'sqlserver') {
-        this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
-      } else if (datasource === 'clickhouse') {
-        this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}/{database}'
-      } else if (datasource === 'hive') {
-        this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
+    selectDataSource(type) {
+      if (type === 'MYSQL') {
+        this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}'
+      } else if (type === 'ORACLE') {
+        this.temp.jdbcUrl = 'jdbc:oracle:thin:@//{host}:{port}'
+      } else if (type === 'POSTGRESQL') {
+        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}'
+      } else if (type === 'GREENPLUM') {
+        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}'
+      } else if (type === 'SQLSERVER') {
+        this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port}'
+      } else if (type === 'CLICKHOUSE') {
+        this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}'
+      } else if (type === 'HIVE') {
+        this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}'
         this.hbase = this.mongodb = false
         this.jdbc = true
+      } else if (type === 'DB2') {
+        this.temp.jdbcUrl = 'jdbc:db2://{host}[:{port}]'
       }
-      this.getShowStrategy(datasource)
+      this.getShowStrategy(type)
     },
     fetchData() {
       this.listLoading = true
@@ -280,10 +289,14 @@ export default {
         id: undefined,
         datasourceName: '',
         datasourceGroup: 'Default',
-        userName: '',
-        password: '',
-        jdbcUrl: '',
-        jdbcDriverClass: '',
+        connectionParams: {
+          user: '',
+          password: '',
+          jdbcUrl: '',
+          zkAddress: '',
+          database: ''
+        },
+        type: '',
         comments: ''
       }
     },
@@ -314,6 +327,11 @@ export default {
     testDataSource() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.temp.user = this.temp.connectionParams.user
+          this.temp.password = this.temp.connectionParams.password
+          this.temp.jdbcUrl = this.temp.connectionParams.jdbcUrl
+          this.temp.zkAddress = this.temp.connectionParams.zkAddress
+          this.temp.database = this.temp.connectionParams.database
           datasourceApi.test(this.temp).then(response => {
             if (response.data === false) {
               this.$notify({
@@ -335,8 +353,9 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.getShowStrategy(row.datasource)
-      this.temp = Object.assign({}, row) // copy obj
+      this.getShowStrategy(row.type)
+      this.temp = Object.assign({}, row)
+      this.temp.connectionParams = JSON.parse(row.connectionParams)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -347,6 +366,12 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
+          tempData.user = this.temp.connectionParams.user
+          tempData.password = this.temp.connectionParams.password
+          tempData.jdbcUrl = this.temp.connectionParams.jdbcUrl
+          tempData.zkAddress = this.temp.connectionParams.zkAddress
+          tempData.database = this.temp.connectionParams.database
+          console.log(tempData)
           datasourceApi.updated(tempData).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
@@ -360,11 +385,11 @@ export default {
         }
       })
     },
-    getShowStrategy(datasource) {
-      if (datasource === 'hbase') {
+    getShowStrategy(type) {
+      if (type === 'hbase') {
         this.jdbc = this.mongodb = false
         this.hbase = true
-      } else if (datasource === 'mongodb') {
+      } else if (type === 'mongodb') {
         this.jdbc = this.hbase = false
         this.mongodb = true
         this.temp.jdbcUrl = 'mongodb://[username:password@]host1[:port1][,...hostN[:portN]]][/[database][?options]]'
@@ -374,11 +399,8 @@ export default {
       }
     },
     handleDelete(row) {
-      console.log('删除')
       const idList = []
       idList.push(row.id)
-      // 拼成 idList=xx
-      // 多个比较麻烦，这里不处理
       datasourceApi.deleted({ idList: row.id }).then(response => {
         this.fetchData()
         this.$notify({
@@ -396,17 +418,11 @@ export default {
         this.dialogPvVisible = true
       })
     },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
-    },
     changePass(value) {
       this.visible = !(value === 'show')
+    },
+    getDatasourceParams(param) {
+      this.datasourceParams = param
     }
   }
 }
