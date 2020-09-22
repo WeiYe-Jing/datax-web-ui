@@ -95,10 +95,10 @@
         <el-form-item label="数据源分组" prop="datasourceGroup">
           <el-input v-model="temp.datasourceGroup" placeholder="数据源分组" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="jdbc" label="用户名">
+        <el-form-item v-if="jdbc || rabbitmq" label="用户名">
           <el-input v-model="temp.jdbcUsername" placeholder="用户名" style="width: 40%" />
         </el-form-item>
-        <el-form-item v-if="visible" v-show="jdbc" label="密码">
+        <el-form-item v-if="visible || rabbitmq" v-show="jdbc || rabbitmq" label="密码">
           <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
             <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
           </el-input>
@@ -114,6 +114,33 @@
             :autosize="{ minRows: 3, maxRows: 6}"
             type="textarea"
             placeholder="jdbc url"
+            style="width: 60%"
+          />
+        </el-form-item>
+        <el-form-item v-if="rabbitmq" label="Host" prop="jdbcUrl">
+          <el-input
+            v-model="temp.jdbcUrl"
+            :autosize="{ minRows: 3, maxRows: 6}"
+            type="textarea"
+            placeholder="rabbitmq host"
+            style="width: 60%"
+          />
+        </el-form-item>
+        <el-form-item v-if="parquetfile" label="文件/夹路径" prop="jdbcUrl">
+          <el-input
+            v-model="temp.jdbcUrl"
+            :autosize="{ minRows: 3, maxRows: 6}"
+            type="textarea"
+            placeholder="文件/夹路径"
+            style="width: 60%"
+          />
+        </el-form-item>
+        <el-form-item v-if="parquetfile || rabbitmq" label="同步属性" prop="columnx">
+          <el-input
+            v-model="temp.columnx"
+            :autosize="{ minRows: 3, maxRows: 6}"
+            type="textarea"
+            placeholder="同步属性"
             style="width: 60%"
           />
         </el-form-item>
@@ -135,6 +162,15 @@
         <el-form-item v-if="mongodb" label="数据库名称" prop="databaseName">
           <el-input v-model="temp.databaseName" placeholder="数据库名称" style="width: 60%" />
         </el-form-item>
+        <el-form-item v-if="enExtra" label="扩展属性" prop="extra">
+          <el-input
+            v-model="temp.extra"
+            :autosize="{ minRows: 3, maxRows: 6}"
+            type="textarea"
+            placeholder="扩展属性"
+            style="width: 60%"
+          />
+        </el-form-item>
         <el-form-item label="注释">
           <el-input
             v-model="temp.comments"
@@ -152,7 +188,7 @@
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
           确认
         </el-button>
-        <el-button type="primary" @click="testDataSource()">
+        <el-button type="primary" v-if="jdbc" @click="testDataSource()">
           测试连接
         </el-button>
       </div>
@@ -228,7 +264,9 @@ export default {
         comments: '',
         datasource: '',
         zkAdress: '',
-        databaseName: ''
+        databaseName: '',
+        extra: '',
+        columnx: ''
       },
       visible: true,
       dataSources: [
@@ -239,11 +277,16 @@ export default {
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
         { value: 'mongodb', label: 'mongodb' },
-        { value: 'clickhouse', label: 'clickhouse' }
+        { value: 'clickhouse', label: 'clickhouse' },
+        { value: 'parquetfile', label: 'parquetfile' },
+        { value: 'rabbitmq', label: 'rabbitmq' }
       ],
       jdbc: true,
       hbase: false,
-      mongodb: false
+      mongodb: false,
+      enExtra: false,
+      rabbitmq: false,
+      parquetfile: false
     }
   },
   created() {
@@ -254,23 +297,68 @@ export default {
       if (datasource === 'mysql') {
         this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'com.mysql.jdbc.Driver'
+        this.temp.extra = ''
+        this.temp.columnx = ''
+        this.enExtra = false
+        this.rabbitmq = false
+        this.parquetfile = false
       } else if (datasource === 'oracle') {
         this.temp.jdbcUrl = 'jdbc:oracle:thin:@//{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'oracle.jdbc.OracleDriver'
+        this.temp.extra = ''
+        this.temp.columnx = ''
+        this.enExtra = false
+        this.rabbitmq = false
+        this.parquetfile = false
       } else if (datasource === 'postgresql') {
         this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.postgresql.Driver'
+        this.temp.extra = ''
+        this.temp.columnx = ''
+        this.enExtra = false
+        this.rabbitmq = false
+        this.parquetfile = false
       } else if (datasource === 'sqlserver') {
         this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
         this.temp.jdbcDriverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+        this.temp.extra = ''
+        this.temp.columnx = ''
+        this.enExtra = false
+        this.rabbitmq = false
+        this.parquetfile = false
       } else if (datasource === 'clickhouse') {
         this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'ru.yandex.clickhouse.ClickHouseDriver'
+        this.temp.extra = ''
+        this.temp.columnx = ''
+        this.enExtra = false
+        this.rabbitmq = false
+        this.parquetfile = false
       } else if (datasource === 'hive') {
         this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.apache.hive.jdbc.HiveDriver'
+        this.temp.extra = ''
+        this.temp.columnx = ''
         this.hbase = this.mongodb = false
         this.jdbc = true
+        this.enExtra = false
+        this.rabbitmq = false
+        this.parquetfile = false
+      } else if (datasource === 'parquetfile') {
+        this.temp.jdbcUrl = '/{local_dir_absolute_path}/*'
+        this.temp.extra = ''
+        this.temp.columnx = '[{"name": "mmsi","type": "String"},{"name": "rot","type": "Integer"}]'
+        // this.temp.columnx = '[{"index": 0,"type": "string"},{"index": 1,"type": "integer"}]'
+        this.rabbitmq = false
+        this.parquetfile = true
+      } else if (datasource === 'rabbitmq') {
+        this.temp.jdbcUrl = '{host}'
+        this.temp.extra = '{"port": "5672"}'
+        this.temp.columnx = '[{"name": "mmsi","type": "String"},{"name": "rot","type": "Integer"}]'
+        this.jdbc = false
+        this.enExtra = true
+        this.rabbitmq = true
+        this.parquetfile = false
       }
       this.getShowStrategy(datasource)
     },
@@ -293,7 +381,8 @@ export default {
         jdbcPassword: '',
         jdbcUrl: '',
         jdbcDriverClass: '',
-        comments: ''
+        comments: '',
+        extra: ''
       }
     },
     handleCreate() {
@@ -373,13 +462,30 @@ export default {
       if (datasource === 'hbase') {
         this.jdbc = this.mongodb = false
         this.hbase = true
+        this.parquetfile = false
+        this.rabbitmq = false
       } else if (datasource === 'mongodb') {
         this.jdbc = this.hbase = false
         this.mongodb = true
+        this.parquetfile = false
+        this.rabbitmq = false
         this.temp.jdbcUrl = 'mongodb://[username:password@]host1[:port1][,...hostN[:portN]]][/[database][?options]]'
+      } else if (datasource === 'rabbitmq') {
+        this.temp.extra = '{"port": "5672"}'
+        this.enExtra = true
+        this.jdbc = false
+        this.rabbitmq = true
+        this.parquetfile = false
+      } else if (datasource === 'parquetfile') {
+        this.enExtra = false
+        this.jdbc = false
+        this.parquetfile = true
+        this.rabbitmq = false
       } else {
         this.hbase = this.mongodb = false
         this.jdbc = true
+        this.parquetfile = false
+        this.rabbitmq = false
       }
     },
     handleDelete(row) {

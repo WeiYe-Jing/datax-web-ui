@@ -230,6 +230,12 @@ export default {
         preSql: writeData.preSql,
         postSql: writeData.postSql
       }
+      const parquetFileReader = {
+
+      }
+      const rabbitmqWriter = {
+        
+      }
       const obj = {
         readerDatasourceId: readerData.datasourceId,
         readerTables: [readerData.tableName],
@@ -244,7 +250,9 @@ export default {
         hbaseReader: hbaseReader,
         hbaseWriter: hbaseWriter,
         mongoDBReader: mongoDBReader,
-        mongoDBWriter: mongoDBWriter
+        mongoDBWriter: mongoDBWriter,
+        parquetFileReader: parquetFileReader,
+        rabbitmqWriter: rabbitmqWriter
       }
       // 调api
       dataxJsonApi.buildJobJson(obj).then(response => {
