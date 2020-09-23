@@ -9,15 +9,23 @@
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
-        搜索
-      </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        添加
-      </el-button>
+      <el-button
+        v-waves
+        class="filter-item"
+        type="primary"
+        icon="el-icon-search"
+        @click="fetchData"
+      >搜索</el-button>
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px;"
+        type="primary"
+        icon="el-icon-edit"
+        @click="handleCreate"
+      >添加</el-button>
       <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
         reviewer
-      </el-checkbox> -->
+      </el-checkbox>-->
     </div>
     <el-table
       v-loading="listLoading"
@@ -29,7 +37,7 @@
     >
       <!-- <el-table-column align="center" label="序号" width="95">
         <template slot-scope="scope">{{ scope.$index }}</template>
-      </el-table-column> -->
+      </el-table-column>-->
       <el-table-column label="数据源" width="200" align="center">
         <template slot-scope="scope">{{ scope.row.datasource }}</template>
       </el-table-column>
@@ -37,8 +45,7 @@
         <template slot-scope="scope">{{ scope.row.datasourceName }}</template>
       </el-table-column>
       <el-table-column label="数据源分组" width="200" align="center">
-        <template slot-scope="scope">{{ scope.row.datasourceGroup }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.datasourceGroup }}</template>
       </el-table-column>
       <!--<el-table-column label="用户名" width="150" align="center">
         <template slot-scope="scope">{{ scope.row.jdbcUsername ? scope.row.jdbcUsername:'-' }}</template>
@@ -52,7 +59,8 @@
       <el-table-column label="ZK地址" width="200" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ scope.row.zkAdress ? scope.row.zkAdress:'-' }}</template>
       </el-table-column>
-      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">-->
+      <el-table-column label="数据库名" width="200" align="center" :show-overflow-tooltip="true">
+        -->
         <template slot-scope="scope">{{ scope.row.databaseName ? scope.row.databaseName:'-' }}</template>-->
       </el-table-column>
       <el-table-column label="备注" width="150" align="center">
@@ -60,12 +68,13 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            编辑
-          </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
-            删除
-          </el-button>
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">编辑</el-button>
+          <el-button
+            v-if="row.status!='deleted'"
+            size="mini"
+            type="danger"
+            @click="handleDelete(row)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,7 +87,13 @@
     />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="800px">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px">
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="temp"
+        label-position="left"
+        label-width="100px"
+      >
         <el-form-item label="数据源" prop="datasource">
           <el-select
             v-model="temp.datasource"
@@ -86,7 +101,12 @@
             style="width: 200px"
             @change="selectDataSource(temp.datasource)"
           >
-            <el-option v-for="item in dataSources" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option
+              v-for="item in dataSources"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="数据源名称" prop="datasourceName">
@@ -100,12 +120,24 @@
         </el-form-item>
         <el-form-item v-if="visible || rabbitmq" v-show="jdbc || rabbitmq" label="密码">
           <el-input v-model="temp.jdbcPassword" type="password" placeholder="密码" style="width: 40%">
-            <i slot="suffix" title="显示密码" style="cursor:pointer" class="el-icon-view" @click="changePass('show')" />
+            <i
+              slot="suffix"
+              title="显示密码"
+              style="cursor:pointer"
+              class="el-icon-view"
+              @click="changePass('show')"
+            />
           </el-input>
         </el-form-item>
         <el-form-item v-show="jdbc" v-else label="密码">
           <el-input v-model="temp.jdbcPassword" type="text" placeholder="密码" style="width: 40%">
-            <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
+            <i
+              slot="suffix"
+              title="隐藏密码"
+              style="cursor:pointer"
+              class="el-icon-check"
+              @click="changePass('hide')"
+            />
           </el-input>
         </el-form-item>
         <el-form-item v-if="jdbc" label="jdbc url" prop="jdbcUrl">
@@ -182,15 +214,9 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          取消
-        </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          确认
-        </el-button>
-        <el-button type="primary" v-if="jdbc" @click="testDataSource()">
-          测试连接
-        </el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
+        <el-button v-if="jdbc" type="primary" @click="testDataSource()">测试连接</el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="dialogPluginVisible" title="Reading statistics">
@@ -216,7 +242,7 @@ export default {
   components: { Pagination },
   directives: { waves },
   filters: {
-    statusFilter(status) {
+    statusFilter (status) {
       const statusMap = {
         published: 'success',
         draft: 'gray',
@@ -225,7 +251,7 @@ export default {
       return statusMap[status]
     }
   },
-  data() {
+  data () {
     return {
       list: null,
       listLoading: true,
@@ -289,11 +315,11 @@ export default {
       parquetfile: false
     }
   },
-  created() {
+  created () {
     this.fetchData()
   },
   methods: {
-    selectDataSource(datasource) {
+    selectDataSource (datasource) {
       if (datasource === 'mysql') {
         this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'com.mysql.jdbc.Driver'
@@ -362,7 +388,7 @@ export default {
       }
       this.getShowStrategy(datasource)
     },
-    fetchData() {
+    fetchData () {
       this.listLoading = true
       datasourceApi.list(this.listQuery).then(response => {
         const { records } = response
@@ -372,7 +398,7 @@ export default {
         this.listLoading = false
       })
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: undefined,
         datasourceName: '',
@@ -385,7 +411,7 @@ export default {
         extra: ''
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -393,7 +419,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           datasourceApi.created(this.temp).then(() => {
@@ -409,7 +435,7 @@ export default {
         }
       })
     },
-    testDataSource() {
+    testDataSource () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           datasourceApi.test(this.temp).then(response => {
@@ -432,7 +458,7 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.getShowStrategy(row.datasource)
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
@@ -441,7 +467,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
@@ -458,7 +484,7 @@ export default {
         }
       })
     },
-    getShowStrategy(datasource) {
+    getShowStrategy (datasource) {
       if (datasource === 'hbase') {
         this.jdbc = this.mongodb = false
         this.hbase = true
@@ -488,7 +514,7 @@ export default {
         this.rabbitmq = false
       }
     },
-    handleDelete(row) {
+    handleDelete (row) {
       console.log('删除')
       const idList = []
       idList.push(row.id)
@@ -505,13 +531,13 @@ export default {
       })
       // const index = this.list.indexOf(row)
     },
-    handleFetchPv(id) {
+    handleFetchPv (id) {
       datasourceApi.fetched(id).then(response => {
         this.pluginData = response
         this.dialogPvVisible = true
       })
     },
-    formatJson(filterVal, jsonData) {
+    formatJson (filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
         if (j === 'timestamp') {
           return parseTime(v[j])
@@ -520,7 +546,7 @@ export default {
         }
       }))
     },
-    changePass(value) {
+    changePass (value) {
       this.visible = !(value === 'show')
     }
   }
