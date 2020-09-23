@@ -1,6 +1,11 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="150px" :model="writerForm" :rules="rules">
+    <el-form
+      label-position="right"
+      label-width="150px"
+      :model="writerForm"
+      :rules="rules"
+    >
       <el-form-item label="数据库源：" prop="datasourceId">
         <el-select
           v-model="writerForm.datasourceId"
@@ -16,8 +21,21 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：" prop="tableSchema">
-        <el-select v-model="writerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
+      <el-form-item
+        v-show="
+          dataSource === 'postgresql' ||
+            dataSource === 'oracle' ||
+            dataSource === 'sqlserver'
+        "
+        label="Schema："
+        prop="tableSchema"
+      >
+        <el-select
+          v-model="writerForm.tableSchema"
+          filterable
+          style="width: 300px"
+          @change="schemaChange"
+        >
           <el-option
             v-for="item in schemaList"
             :key="item"
@@ -43,190 +61,310 @@
             :value="item"
           />
         </el-select>
-        <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
+        <el-input
+          v-show="writerForm.ifCreateTable"
+          v-model="writerForm.tableName"
+          style="width: 200px;"
+          :placeholder="readerForm.tableName"
+        />
         <!--<el-input v-model="createTableName" style="width: 195px" />
         <el-button type="primary" @click="createTable">新增</el-button>-->
       </el-form-item>
       <div style="margin: 5px 0;" />
       <el-form-item label="字段：">
-        <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
+        <el-checkbox
+          v-model="writerForm.checkAll"
+          :indeterminate="writerForm.isIndeterminate"
+          @change="wHandleCheckAllChange"
+          >全选</el-checkbox
+        >
         <div style="margin: 15px 0;" />
-        <el-checkbox-group v-model="writerForm.columns" @change="wHandleCheckedChange">
-          <el-checkbox v-for="c in fromColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
+        <el-checkbox-group
+          v-model="writerForm.columns"
+          @change="wHandleCheckedChange"
+        >
+          <el-checkbox v-for="c in fromColumnList" :key="c" :label="c">{{
+            c
+          }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="前置sql语句：">
-        <el-input v-model="writerForm.preSql" placeholder="前置sql在insert之前执行" type="textarea" style="width: 42%" />
-      </el-form-item>
-      <el-form-item label="postSql">
-        <el-input v-model="writerForm.postSql" placeholder="多个用;分隔" type="textarea" style="width: 42%" />
-      </el-form-item>
+      aaaaaaaaa
+      <template v-if="dataSource !== 'rabbitmq'">
+        <el-form-item label="前置sql语句：">
+          <el-input
+            v-model="writerForm.preSql"
+            placeholder="前置sql在insert之前执行"
+            type="textarea"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="postSql">
+          <el-input
+            v-model="writerForm.postSql"
+            placeholder="多个用;分隔"
+            type="textarea"
+            style="width: 42%"
+          />
+        </el-form-item>
+      </template>
+      <template v-else>
+        <el-form-item label="ExchangeName">
+          <el-input
+            v-model="writerForm.exchange"
+            placeholder="ExchangeName"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="Vhost">
+          <el-input
+            v-model="writerForm.vhost"
+            placeholder="Vhost"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="QueueName">
+          <el-input
+            v-model="writerForm.queue"
+            placeholder="QueueName"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="RoutingKey">
+          <el-input
+            v-model="writerForm.routingKey"
+            placeholder="RoutingKey"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="批量条数">
+          <el-input
+            v-model.number="writerForm.batchSize"
+            placeholder="批量条数"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="是否拼接">
+          <el-radio v-model="writerForm.jointColumn" :label="true">是</el-radio>
+          <el-radio v-model="writerForm.jointColumn" :label="false"
+            >否</el-radio
+          >
+        </el-form-item>
+        <el-form-item v-show="writerForm.jointColumn" label="拼接前缀">
+          <el-input
+            v-model="writerForm.messagePrefix"
+            placeholder="拼接前缀"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item v-show="writerForm.jointColumn" label="拼接后缀">
+          <el-input
+            v-model="writerForm.messageSuffix"
+            placeholder="拼接后缀"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item v-show="writerForm.jointColumn" label="拼接间隔符">
+          <el-input
+            v-model="writerForm.fieldDelimiter"
+            placeholder="拼接间隔符"
+            style="width: 42%"
+          />
+        </el-form-item>
+      </template>
     </el-form>
   </div>
 </template>
 
 <script>
-import * as dsQueryApi from '@/api/metadata-query'
-import { list as jdbcDsList } from '@/api/datax-jdbcDatasource'
-import Bus from '../busWriter'
+import * as dsQueryApi from "@/api/metadata-query";
+import { list as jdbcDsList } from "@/api/datax-jdbcDatasource";
+import Bus from "../busWriter";
 export default {
-  name: 'RabbitmqWriter',
+  name: "RabbitmqWriter",
   data() {
     return {
       jdbcDsQuery: {
         current: 1,
         size: 200,
-        ascs: 'datasource_name'
+        ascs: "datasource_name"
       },
       wDsList: [],
       schemaList: [],
-      fromTableName: '',
+      fromTableName: "",
       fromColumnList: [],
       wTbList: [],
-      dataSource: '',
-      createTableName: '',
+      dataSource: "rabbitmq",
+      createTableName: "",
       writerForm: {
         datasourceId: undefined,
-        tableName: '',
+        tableName: "",
         columns: [],
         checkAll: false,
         isIndeterminate: true,
-        preSql: '',
-        postSql: '',
+        preSql: "",
+        postSql: "",
         ifCreateTable: false,
-        tableSchema: ''
+        tableSchema: "",
+        exchange: "",
+        vhost: "",
+        queue: "",
+        routingKey: "",
+        batchSize: "",
+        jointColumn: true,
+        messagePrefix: "",
+        messageSuffix: "",
+        fieldDelimiter: ""
       },
       readerForm: this.getReaderData(),
       rules: {
-        datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
-        tableName: [{ required: true, message: 'this is required', trigger: 'change' }],
-        tableSchema: [{ required: true, message: 'this is required', trigger: 'change' }]
+        datasourceId: [
+          { required: true, message: "this is required", trigger: "change" }
+        ],
+        tableName: [
+          { required: true, message: "this is required", trigger: "change" }
+        ],
+        tableSchema: [
+          { required: true, message: "this is required", trigger: "change" }
+        ]
       }
-    }
+    };
   },
   watch: {
-    'writerForm.datasourceId': function(oldVal, newVal) {
-      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
-        this.getSchema()
+    "writerForm.datasourceId": function(oldVal, newVal) {
+      if (
+        this.dataSource === "postgresql" ||
+        this.dataSource === "oracle" ||
+        this.dataSource === "sqlserver"
+      ) {
+        this.getSchema();
       } else {
-        this.getTables('rabbitmqWriter')
+        this.getTables("rabbitmqWriter");
       }
     }
   },
   created() {
-    this.getJdbcDs()
+    this.getJdbcDs();
   },
   methods: {
     // 获取可用数据源
     getJdbcDs() {
-      this.loading = true
+      this.loading = true;
       jdbcDsList(this.jdbcDsQuery).then(response => {
-        const { records } = response
-        this.wDsList = records
-        this.loading = false
-      })
+        const { records } = response;
+        this.wDsList = records;
+        this.loading = false;
+      });
     },
     // 获取表名
     getTables(type) {
-      if (type === 'rabbitmqWriter') {
-        let obj = {}
-        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
+      if (type === "rabbitmqWriter") {
+        let obj = {};
+        if (
+          this.dataSource === "postgresql" ||
+          this.dataSource === "oracle" ||
+          this.dataSource === "sqlserver"
+        ) {
           obj = {
             datasourceId: this.writerForm.datasourceId,
             tableSchema: this.writerForm.tableSchema
-          }
+          };
         } else {
           obj = {
             datasourceId: this.writerForm.datasourceId
-          }
+          };
         }
         // 组装
         dsQueryApi.getTables(obj).then(response => {
-          this.wTbList = response
-        })
+          this.wTbList = response;
+        });
       }
     },
     getSchema() {
       const obj = {
         datasourceId: this.writerForm.datasourceId
-      }
+      };
       dsQueryApi.getTableSchema(obj).then(response => {
-        this.schemaList = response
-      })
+        this.schemaList = response;
+      });
     },
     // schema 切换
     schemaChange(e) {
-      this.writerForm.tableSchema = e
+      this.writerForm.tableSchema = e;
       // 获取可用表
-      this.getTables('rabbitmqWriter')
+      this.getTables("rabbitmqWriter");
     },
     wDsChange(e) {
       // 清空
-      this.writerForm.tableName = ''
-      this.writerForm.datasourceId = e
-      this.wDsList.find((item) => {
+      this.writerForm.tableName = "";
+      this.writerForm.datasourceId = e;
+      this.wDsList.find(item => {
         if (item.id === e) {
-          this.dataSource = item.datasource
+          this.dataSource = item.datasource;
         }
-      })
-      Bus.dataSourceId = e
-      this.$emit('selectDataSource', this.dataSource)
+      });
+      Bus.dataSourceId = e;
+      this.$emit("selectDataSource", this.dataSource);
     },
     // 获取表字段
     getColumns() {
       const obj = {
         datasourceId: this.writerForm.datasourceId,
         tableName: this.writerForm.tableName
-      }
+      };
       dsQueryApi.getColumns(obj).then(response => {
-        this.fromColumnList = response
-        this.writerForm.columns = response
-        this.writerForm.checkAll = true
-        this.writerForm.isIndeterminate = false
-      })
+        this.fromColumnList = response;
+        this.writerForm.columns = response;
+        this.writerForm.checkAll = true;
+        this.writerForm.isIndeterminate = false;
+      });
     },
     // 表切换
     wTbChange(t) {
-      this.writerForm.tableName = t
-      this.fromColumnList = []
-      this.writerForm.columns = []
-      this.getColumns('writer')
+      this.writerForm.tableName = t;
+      this.fromColumnList = [];
+      this.writerForm.columns = [];
+      this.getColumns("writer");
     },
     wHandleCheckAllChange(val) {
-      this.writerForm.columns = val ? this.fromColumnList : []
-      this.writerForm.isIndeterminate = false
+      this.writerForm.columns = val ? this.fromColumnList : [];
+      this.writerForm.isIndeterminate = false;
     },
     wHandleCheckedChange(value) {
-      const checkedCount = value.length
-      this.writerForm.checkAll = checkedCount === this.fromColumnList.length
-      this.writerForm.isIndeterminate = checkedCount > 0 && checkedCount < this.fromColumnList.length
+      const checkedCount = value.length;
+      this.writerForm.checkAll = checkedCount === this.fromColumnList.length;
+      this.writerForm.isIndeterminate =
+        checkedCount > 0 && checkedCount < this.fromColumnList.length;
     },
     getData() {
+      console.log(this.dataSource);
       if (Bus.dataSourceId) {
-        this.writerForm.datasourceId = Bus.dataSourceId
+        this.writerForm.datasourceId = Bus.dataSourceId;
       }
-      return this.writerForm
+      return this.writerForm;
     },
     getReaderData() {
-      return this.$parent.getReaderData()
+      return this.$parent.getReaderData();
     },
     getTableName() {
-      return this.fromTableName
+      return this.fromTableName;
     },
     createTable() {
       const obj = {
         datasourceId: this.writerForm.datasourceId,
         tableName: this.createTableName
-      }
-      dsQueryApi.createTable(obj).then(response => {
-        this.$notify({
-          title: 'Success',
-          message: 'Create Table Successfully',
-          type: 'success',
-          duration: 2000
+      };
+      dsQueryApi
+        .createTable(obj)
+        .then(response => {
+          this.$notify({
+            title: "Success",
+            message: "Create Table Successfully",
+            type: "success",
+            duration: 2000
+          });
         })
-      }).catch(() => console.log('promise catch err'))
+        .catch(() => console.log("promise catch err"));
     }
   }
-}
+};
 </script>
