@@ -88,22 +88,88 @@
           }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="前置sql语句：">
-        <el-input
-          v-model="writerForm.preSql"
-          placeholder="前置sql在insert之前执行"
-          type="textarea"
-          style="width: 42%"
-        />
-      </el-form-item>
-      <el-form-item label="postSql">
-        <el-input
-          v-model="writerForm.postSql"
-          placeholder="多个用;分隔"
-          type="textarea"
-          style="width: 42%"
-        />
-      </el-form-item>
+      <template v-if="dataSource !== 'rabbitmq'">
+        <el-form-item label="前置sql语句：">
+          <el-input
+            v-model="writerForm.preSql"
+            placeholder="前置sql在insert之前执行"
+            type="textarea"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="postSql">
+          <el-input
+            v-model="writerForm.postSql"
+            placeholder="多个用;分隔"
+            type="textarea"
+            style="width: 42%"
+          />
+        </el-form-item>
+      </template>
+      <template v-else>
+        <el-form-item label="ExchangeName">
+          <el-input
+            v-model="writerForm.exchange"
+            placeholder="ExchangeName"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="Vhost">
+          <el-input
+            v-model="writerForm.vhost"
+            placeholder="Vhost"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="QueueName">
+          <el-input
+            v-model="writerForm.queue"
+            placeholder="QueueName"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="RoutingKey">
+          <el-input
+            v-model="writerForm.routingKey"
+            placeholder="RoutingKey"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="批量条数">
+          <el-input
+            v-model.number="writerForm.batchSize"
+            placeholder="批量条数"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item label="是否拼接">
+          <el-radio v-model="writerForm.jointColumn" :label="true">是</el-radio>
+          <el-radio v-model="writerForm.jointColumn" :label="false"
+            >否</el-radio
+          >
+        </el-form-item>
+        <el-form-item v-show="writerForm.jointColumn" label="拼接前缀">
+          <el-input
+            v-model="writerForm.messagePrefix"
+            placeholder="拼接前缀"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item v-show="writerForm.jointColumn" label="拼接后缀">
+          <el-input
+            v-model="writerForm.messageSuffix"
+            placeholder="拼接后缀"
+            style="width: 42%"
+          />
+        </el-form-item>
+        <el-form-item v-show="writerForm.jointColumn" label="拼接间隔符">
+          <el-input
+            v-model="writerForm.fieldDelimiter"
+            placeholder="拼接间隔符"
+            style="width: 42%"
+          />
+        </el-form-item>
+      </template>
     </el-form>
   </div>
 </template>
@@ -113,7 +179,7 @@ import * as dsQueryApi from "@/api/metadata-query";
 import { list as jdbcDsList } from "@/api/datax-jdbcDatasource";
 import Bus from "../busWriter";
 export default {
-  name: "RDBMSWriter",
+  name: "RabbitmqWriter",
   data() {
     return {
       jdbcDsQuery: {
@@ -126,7 +192,7 @@ export default {
       fromTableName: "",
       fromColumnList: [],
       wTbList: [],
-      dataSource: "",
+      dataSource: "rabbitmq",
       createTableName: "",
       writerForm: {
         datasourceId: undefined,
@@ -137,7 +203,16 @@ export default {
         preSql: "",
         postSql: "",
         ifCreateTable: false,
-        tableSchema: ""
+        tableSchema: "",
+        exchange: "",
+        vhost: "",
+        queue: "",
+        routingKey: "",
+        batchSize: "",
+        jointColumn: true,
+        messagePrefix: "",
+        messageSuffix: "",
+        fieldDelimiter: ""
       },
       readerForm: this.getReaderData(),
       rules: {
@@ -162,7 +237,7 @@ export default {
       ) {
         this.getSchema();
       } else {
-        this.getTables("rdbmsWriter");
+        this.getTables("rabbitmqWriter");
       }
     }
   },
@@ -181,7 +256,7 @@ export default {
     },
     // 获取表名
     getTables(type) {
-      if (type === "rdbmsWriter") {
+      if (type === "rabbitmqWriter") {
         let obj = {};
         if (
           this.dataSource === "postgresql" ||
@@ -215,7 +290,7 @@ export default {
     schemaChange(e) {
       this.writerForm.tableSchema = e;
       // 获取可用表
-      this.getTables("rdbmsWriter");
+      this.getTables("rabbitmqWriter");
     },
     wDsChange(e) {
       // 清空
@@ -260,6 +335,7 @@ export default {
         checkedCount > 0 && checkedCount < this.fromColumnList.length;
     },
     getData() {
+      console.log(this.dataSource);
       if (Bus.dataSourceId) {
         this.writerForm.datasourceId = Bus.dataSourceId;
       }
