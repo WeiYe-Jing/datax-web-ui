@@ -367,12 +367,12 @@ export default {
         this.temp.columnx = ''
         this.hbase = this.mongodb = false
         this.jdbc = true
-        this.enExtra = false
+        this.enExtra = true
         this.rabbitmq = false
         this.parquetfile = false
       } else if (datasource === 'parquetfile') {
         this.temp.jdbcUrl = '/{local_dir_absolute_path}/*'
-        this.temp.extra = ''
+        this.temp.extra = '{"encoding": "UTF-8"}'
         this.temp.columnx = '[{"name": "mmsi","type": "String"},{"name": "rot","type": "Integer"}]'
         // this.temp.columnx = '[{"index": 0,"type": "string"},{"index": 1,"type": "integer"}]'
         this.rabbitmq = false
@@ -490,11 +490,13 @@ export default {
         this.hbase = true
         this.parquetfile = false
         this.rabbitmq = false
+        this.enExtra = false
       } else if (datasource === 'mongodb') {
         this.jdbc = this.hbase = false
         this.mongodb = true
         this.parquetfile = false
         this.rabbitmq = false
+        this.enExtra = false
         this.temp.jdbcUrl = 'mongodb://[username:password@]host1[:port1][,...hostN[:portN]]][/[database][?options]]'
       } else if (datasource === 'rabbitmq') {
         this.temp.extra = '{"port": "5672"}'
@@ -503,7 +505,7 @@ export default {
         this.rabbitmq = true
         this.parquetfile = false
       } else if (datasource === 'parquetfile') {
-        this.enExtra = false
+        this.enExtra = true
         this.jdbc = false
         this.parquetfile = true
         this.rabbitmq = false
@@ -512,6 +514,7 @@ export default {
         this.jdbc = true
         this.parquetfile = false
         this.rabbitmq = false
+        this.enExtra = false
       }
     },
     handleDelete (row) {

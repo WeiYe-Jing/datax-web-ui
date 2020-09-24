@@ -88,7 +88,6 @@
           }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      aaaaaaaaa
       <template v-if="dataSource !== 'rabbitmq'">
         <el-form-item label="前置sql语句：">
           <el-input
