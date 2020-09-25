@@ -108,6 +108,24 @@
             <i slot="suffix" title="隐藏密码" style="cursor:pointer" class="el-icon-check" @click="changePass('hide')" />
           </el-input>
         </el-form-item>
+        <el-form-item v-show="temp.datasource==='sqlserver'" label="采用jtds：">
+          <el-switch
+            v-model="temp.jtdsState"
+            on-value="1"
+            off-value="0"
+            @change=changJdbc(temp.datasource,temp.jtdsState)>
+          </el-switch>
+        </el-form-item>
+        <el-form-item v-if="jdbc" label="驱动文件">
+          <el-select
+            v-model="temp.jdbcDriverName"
+            placeholder="驱动"
+            style="width: 200px"
+          >
+            <el-option label="不指定" value="" />
+            <el-option v-for="item in jdbcDriverNames" :key="item" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item v-if="jdbc" label="jdbc url" prop="jdbcUrl">
           <el-input
             v-model="temp.jdbcUrl"
@@ -225,10 +243,12 @@ export default {
         jdbcPassword: '',
         jdbcUrl: '',
         jdbcDriverClass: '',
+        jdbcDriverName: null,
         comments: '',
         datasource: '',
         zkAdress: '',
-        databaseName: ''
+        databaseName: '',
+        jtdsState: false
       },
       visible: true,
       dataSources: [
@@ -243,13 +263,25 @@ export default {
       ],
       jdbc: true,
       hbase: false,
-      mongodb: false
+      mongodb: false,
+      jdbcDriverNames: []
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
+    changJdbc(datasource, jtdsState) {
+      if (datasource === 'sqlserver') {
+        if (jtdsState) {
+          this.temp.jdbcUrl = 'jdbc:jtds:sqlserver://{host}:{port}/{database}'
+          this.temp.jdbcDriverClass = 'net.sourceforge.jtds.jdbc.Driver'
+        } else {
+          this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
+          this.temp.jdbcDriverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
+        }
+      }
+    },
     selectDataSource(datasource) {
       if (datasource === 'mysql') {
         this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}/{database}'
@@ -261,6 +293,7 @@ export default {
         this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'org.postgresql.Driver'
       } else if (datasource === 'sqlserver') {
+        this.temp.jtdsState = false
         this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port};DatabaseName={database}'
         this.temp.jdbcDriverClass = 'com.microsoft.sqlserver.jdbc.SQLServerDriver'
       } else if (datasource === 'clickhouse') {
@@ -283,6 +316,9 @@ export default {
         this.list = records
         this.listLoading = false
       })
+      datasourceApi.getJdbcJars().then(response => {
+        this.jdbcDriverNames = response
+      })
     },
     resetTemp() {
       this.temp = {
@@ -293,7 +329,8 @@ export default {
         jdbcPassword: '',
         jdbcUrl: '',
         jdbcDriverClass: '',
-        comments: ''
+        comments: '',
+        jtdsState: false
       }
     },
     handleCreate() {
@@ -346,6 +383,9 @@ export default {
     handleUpdate(row) {
       this.getShowStrategy(row.datasource)
       this.temp = Object.assign({}, row) // copy obj
+      if (this.temp.datasource === 'sqlserver' && this.temp.jdbcUrl.indexOf('jtds') >= 0) {
+        this.temp.jtdsState = true
+      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {

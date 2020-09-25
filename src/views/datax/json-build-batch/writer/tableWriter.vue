@@ -26,6 +26,16 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item v-show="dataSource==='hive'" label="WriteMode：">
+        <el-select v-model="writerForm.writeMode" filterable style="width: 300px">
+          <el-option
+            v-for="item in writeModeList"
+            :key="item"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </el-form-item>
       <div style="margin: 5px 0;" />
       <el-form-item label="数据库表名：">
         <el-checkbox v-model="writerForm.checkAll" :indeterminate="writerForm.isIndeterminate" @change="wHandleCheckAllChange">全选</el-checkbox>
@@ -53,6 +63,11 @@ export default {
       },
       wDsList: [],
       schemaList: [],
+      writeModeList: [
+        { value: 'append', label: 'append' },
+        { value: 'nonConflict', label: 'nonConflict' },
+        { value: 'truncate', label: 'truncate' }
+      ],
       fromTableName: '',
       wTbList: [],
       dataSource: '',
@@ -62,7 +77,8 @@ export default {
         tables: [],
         checkAll: false,
         isIndeterminate: true,
-        tableSchema: ''
+        tableSchema: '',
+        writeMode: ''
       },
       readerForm: this.getReaderData(),
       rules: {

@@ -56,3 +56,11 @@ export function getDataSourceList(params) {
     params
   })
 }
+
+export function getJdbcJars(params) {
+  return request({
+    url: '/api/jobJdbcDatasource/getJdbcJars',
+    method: 'get',
+    params
+  })
+}

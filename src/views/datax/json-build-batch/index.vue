@@ -179,6 +179,9 @@ export default {
       const rdbmsReader = {
         readerSplitPk: readerData.splitPk
       }
+      const hiveWriter = {
+        writeMode: writeData.writeMode
+      }
       const rdbmsWriter = {}
       const obj = {
         readerDatasourceId: readerData.datasourceId,
@@ -187,6 +190,7 @@ export default {
         writerTables: writerTables,
         rdbmsReader: rdbmsReader,
         rdbmsWriter: rdbmsWriter,
+        hiveWriter: hiveWriter,
         templateId: this.temp.templateId
       }
       // 调api
