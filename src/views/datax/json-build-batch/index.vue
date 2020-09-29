@@ -176,6 +176,8 @@ export default {
       const writeData = this.$refs.writer.getData()
       const readerTables = this.$refs.mapper.getLTables()
       const writerTables = this.$refs.mapper.getRTables()
+      const readerSchema = readerData.tableSchema
+      const writerSchema = writeData.tableSchema
       const rdbmsReader = {
         readerSplitPk: readerData.splitPk
       }
@@ -186,8 +188,10 @@ export default {
       const obj = {
         readerDatasourceId: readerData.datasourceId,
         readerTables: readerTables,
+        readerSchema: readerSchema,
         writerDatasourceId: writeData.datasourceId,
         writerTables: writerTables,
+        writerSchema: writerSchema,
         rdbmsReader: rdbmsReader,
         rdbmsWriter: rdbmsWriter,
         hiveWriter: hiveWriter,
