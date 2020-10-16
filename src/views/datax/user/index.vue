@@ -39,12 +39,12 @@
       </el-table-column>
       <el-table-column label="AccessKey" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.accesskey }}</span>
+          <span>{{ scope.row.accessKey }}</span>
         </template>
       </el-table-column>
       <el-table-column label="SecretKey" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.secretkey }}</span>
+          <span>{{ scope.row.secretKey }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
