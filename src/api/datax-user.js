@@ -18,6 +18,14 @@ export function updateUser(data) {
   })
 }
 
+export function updateUserKey(data) {
+  return request({
+    url: '/api/user/updateKey',
+    method: 'post',
+    data
+  })
+}
+
 export function createUser(data) {
   return request({
     url: '/api/user/add',
