@@ -207,8 +207,8 @@ export default {
       const tempData = {'id': row.id, 'username': row.username}
       user.updateUserKey(tempData).then(response => {
         const { content } = response
-        istde[index].accesskey = content.accesskey
-        istde[index].secretkey = content.secretkey
+        istde[index].accessKey = content.accessKey
+        istde[index].secretKey = content.secretKey
         this.list = istde;
       })
     },
