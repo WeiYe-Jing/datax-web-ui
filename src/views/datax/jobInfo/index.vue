@@ -143,7 +143,7 @@
             >
               <cron v-model="temp.jobCron" />
               <span slot="footer" class="dialog-footer">
-                <el-button @click="showCronBox = false;">关闭</el-button>
+                <el-button @click="showCronBox = false">关闭</el-button>
                 <el-button type="primary" @click="showCronBox = false">确 定</el-button>
               </span>
             </el-dialog>
@@ -203,6 +203,12 @@
               <el-select v-model="temp.childJobId" multiple placeholder="子任务" value-key="id">
                 <el-option v-for="item in jobIdList" :key="item.id" :label="item.jobDesc" :value="item" />
               </el-select>
+              <el-switch
+                v-model="temp.showProjectJob"
+                on-value="1"
+                off-value="0"
+                @change=changProjectJob(temp.showProjectJob)>
+              </el-switch>
             </el-form-item>
           </el-col>
           <el-col :span="12" />
@@ -402,6 +408,7 @@ export default {
         executorRouteStrategy: '',
         executorBlockStrategy: '',
         childJobId: '',
+        showProjectJob: false,
         executorFailRetryCount: '',
         alarmEmail: '',
         executorTimeout: '',
@@ -426,6 +433,7 @@ export default {
       },
       resetTemp() {
         this.temp = this.$options.data().temp
+        this.temp.showProjectJob = false
         this.jobJson = ''
         this.glueSource = ''
         this.timeOffset = 0
@@ -525,6 +533,15 @@ export default {
       jobProjectApi.getJobProjectList().then(response => {
         this.jobProjectList = response
       })
+    },
+    changProjectJob(showProjectJob) {
+      if (showProjectJob) {
+        this.jobIdList = this.jobIdList.filter((item) => {
+          return item.projectId === this.temp.projectId
+        })
+      } else {
+        this.getJobIdList()
+      }
     },
     getDataSourceList() {
       datasourceApi.getDataSourceList().then(response => {
