@@ -123,7 +123,7 @@
             style="width: 200px"
           >
             <el-option label="不指定" value="" />
-            <el-option v-for="item in jdbcDriverNames" :key="item" :label="item.label" :value="item.value" />
+            <el-option v-for="item in jdbcDriverNames" :key="item.label" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item v-if="jdbc" label="jdbc url" prop="jdbcUrl">

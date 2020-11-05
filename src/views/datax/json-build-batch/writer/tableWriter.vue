@@ -30,7 +30,7 @@
         <el-select v-model="writerForm.writeMode" filterable style="width: 300px">
           <el-option
             v-for="item in writeModeList"
-            :key="item"
+            :key="item.label"
             :label="item.label"
             :value="item.value"
           />
