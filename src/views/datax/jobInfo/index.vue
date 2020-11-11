@@ -434,6 +434,7 @@ export default {
       resetTemp() {
         this.temp = this.$options.data().temp
         this.temp.showProjectJob = false
+        this.jobIdList = this.jobIdListBack
         this.jobJson = ''
         this.glueSource = ''
         this.timeOffset = 0
@@ -442,6 +443,7 @@ export default {
       },
       executorList: '',
       jobIdList: '',
+      jobIdListBack: '',
       jobProjectList: '',
       dataSourceList: '',
       blockStrategies: [
@@ -527,6 +529,7 @@ export default {
       job.getJobIdList().then(response => {
         const { content } = response
         this.jobIdList = content
+        this.jobIdListBack = this.jobIdList
       })
     },
     getJobProject() {
@@ -536,11 +539,11 @@ export default {
     },
     changProjectJob(showProjectJob) {
       if (showProjectJob) {
-        this.jobIdList = this.jobIdList.filter((item) => {
-          return item.projectId === this.temp.projectId
+        this.jobIdList = this.jobIdListBack.filter((item) => {
+          return item.projectId === this.temp.projectId && item.id !== this.temp.id
         })
       } else {
-        this.getJobIdList()
+        this.jobIdList = this.jobIdListBack
       }
     },
     getDataSourceList() {
