@@ -76,7 +76,7 @@ export default {
       customType: '',
       customValue: '',
       dataSource: '',
-      needSchema:false,
+      needSchema: false,
       readerForm: {
         datasourceId: undefined,
         tableName: '',

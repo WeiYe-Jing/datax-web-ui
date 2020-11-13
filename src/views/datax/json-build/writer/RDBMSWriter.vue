@@ -84,7 +84,7 @@ export default {
       fromColumnList: [],
       wTbList: [],
       dataSource: '',
-      needSchema:false,
+      needSchema: false,
       createTableName: '',
       writerForm: {
         datasourceId: undefined,
@@ -127,7 +127,7 @@ export default {
       jdbcDsList(this.jdbcDsQuery).then(response => {
         const { records } = response
         this.wDsList = records
-        this.wDsList.unshift({ id: -1, datasourceName: 'TXT文件', datasource: 'txtfile' })
+        this.wDsList.push({ id: -1, datasourceName: 'TXT文件', datasource: 'txtfile' })
         this.dataSource = this.wDsList[0].datasource
         this.writerForm.datasourceId = this.wDsList[0].id
         if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {

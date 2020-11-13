@@ -23,15 +23,15 @@ export default {
     },
     sendRuleSettings() {
       const arrays = []
-      arrays.push('Hiding')
-      arrays.push('Floor')
-      arrays.push('Enumerate')
-      arrays.push('Prefix Preserve')
+      // arrays.push('Hiding')
+      // arrays.push('Floor')
+      // arrays.push('Enumerate')
+      // arrays.push('Prefix Preserve')
       arrays.push('MD5')
-      // arrays.push("EDP");
-      // arrays.push("AES");
-      // arrays.push("FPE");
-      // arrays.push("RSA");
+      // arrays.push("EDP")
+      // arrays.push("AES")
+      // arrays.push("FPE")
+      // arrays.push("RSA")
       this.$refs.mapper.ruleSettings = arrays
     },
     getLColumns() {
