@@ -167,7 +167,6 @@
 import * as datasourceApi from '@/api/datax-jdbcDatasource'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination'
-import * as job from '@/api/datax-job-info'
 
 export default {
   name: 'JdbcDatasource',
