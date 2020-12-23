@@ -253,23 +253,21 @@ export default {
   methods: {
     selectDataSource(type) {
       if (type === 'MYSQL') {
-        this.temp.jdbcUrl = 'jdbc:mysql://{host}:{port}'
+        this.temp.connectionParams.jdbcUrl = 'jdbc:mysql://{host}:{port}'
       } else if (type === 'ORACLE') {
-        this.temp.jdbcUrl = 'jdbc:oracle:thin:@//{host}:{port}'
+        this.temp.connectionParams.jdbcUrl = 'jdbc:oracle:thin:@//{host}:{port}'
       } else if (type === 'POSTGRESQL') {
-        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}'
+        this.temp.connectionParams.jdbcUrl = 'jdbc:postgresql://{host}:{port}'
       } else if (type === 'GREENPLUM') {
-        this.temp.jdbcUrl = 'jdbc:postgresql://{host}:{port}'
+        this.temp.connectionParams.jdbcUrl = 'jdbc:postgresql://{host}:{port}'
       } else if (type === 'SQLSERVER') {
-        this.temp.jdbcUrl = 'jdbc:sqlserver://{host}:{port}'
+        this.temp.connectionParams.jdbcUrl = 'jdbc:sqlserver://{host}:{port}'
       } else if (type === 'CLICKHOUSE') {
-        this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}'
+        this.temp.connectionParams.jdbcUrl = 'jdbc:clickhouse://{host}:{port}'
       } else if (type === 'HIVE') {
-        this.temp.jdbcUrl = 'jdbc:hive2://{host}:{port}'
-        this.hbase = this.mongodb = false
-        this.jdbc = true
+        this.temp.connectionParams.jdbcUrl = 'jdbc:hive2://{host}:{port}'
       } else if (type === 'DB2') {
-        this.temp.jdbcUrl = 'jdbc:db2://{host}[:{port}]'
+        this.temp.connectionParams.jdbcUrl = 'jdbc:db2://{host}[:{port}]'
       }
       this.getShowStrategy(type)
     },
@@ -310,6 +308,11 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.temp.user = this.temp.connectionParams.user
+          this.temp.password = this.temp.connectionParams.password
+          this.temp.jdbcUrl = this.temp.connectionParams.jdbcUrl
+          this.temp.zkAddress = this.temp.connectionParams.zkAddress
+          this.temp.database = this.temp.connectionParams.database
           datasourceApi.created(this.temp).then(() => {
             this.fetchData()
             this.dialogFormVisible = false
@@ -385,10 +388,10 @@ export default {
       })
     },
     getShowStrategy(type) {
-      if (type === 'hbase') {
+      if (type === 'HBASE') {
         this.jdbc = this.mongodb = false
         this.hbase = true
-      } else if (type === 'mongodb') {
+      } else if (type === 'MONGODB') {
         this.jdbc = this.hbase = false
         this.mongodb = true
         this.temp.jdbcUrl = 'mongodb://[username:password@]host1[:port1][,...hostN[:portN]]][/[database][?options]]'
