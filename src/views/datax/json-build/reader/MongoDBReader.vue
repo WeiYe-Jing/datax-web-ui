@@ -61,9 +61,9 @@ export default {
         isIndeterminate: true
       },
       rules: {
-        mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        tableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        mode: [{ required: true, message: '必填项', trigger: 'blur' }],
+        datasourceId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        tableName: [{ required: true, message: '必填项', trigger: 'blur' }]
       }
     }
   },

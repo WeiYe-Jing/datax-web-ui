@@ -139,7 +139,7 @@ export const asyncRoutes = [
   {
     path: '/datax/project',
     component: Layout,
-    redirect: '/datax/jobProject',
+    redirect: 'noRedirect',
     name: 'datasource',
     meta: { title: '项目管理', icon: 'project' },
     children: [
@@ -154,7 +154,7 @@ export const asyncRoutes = [
   {
     path: '/datax/job',
     component: Layout,
-    redirect: '/datax/job',
+    redirect: '/datax/job/jobInfo',
     name: 'job',
     meta: { title: '任务管理', icon: 'work' },
     children: [
@@ -188,7 +188,7 @@ export const asyncRoutes = [
   {
     path: '/datax/datasource',
     component: Layout,
-    redirect: '/datax/jdbc-datasource',
+    redirect: 'noRedirect',
     name: 'datasource',
     meta: { title: '数据源管理', icon: 'cfg-datasouce' },
     children: [
@@ -203,7 +203,7 @@ export const asyncRoutes = [
   {
     path: '/datax/log',
     component: Layout,
-    redirect: '/datax/jobLog',
+    redirect: 'noRedirect',
     name: 'log',
     meta: { title: '日志管理', icon: 'work' },
     children: [
@@ -218,7 +218,7 @@ export const asyncRoutes = [
   {
     path: '/datax/executor',
     component: Layout,
-    redirect: '/datax/executor',
+    redirect: 'noRedirect',
     name: 'executor',
     meta: { title: '执行器管理', icon: 'work' },
     children: [
@@ -233,7 +233,7 @@ export const asyncRoutes = [
   {
     path: '/datax/user',
     component: Layout,
-    redirect: '/datax/user',
+    redirect: 'noRedirect',
     name: 'user',
     meta: { title: '用户管理', icon: 'work', roles: ['ROLE_ADMIN'] },
     children: [
@@ -248,7 +248,7 @@ export const asyncRoutes = [
   {
     path: '/datax/registry',
     component: Layout,
-    redirect: '/datax/registry',
+    redirect: 'noRedirect',
     name: 'registry',
     meta: { title: '资源监控', icon: 'work' },
     children: [

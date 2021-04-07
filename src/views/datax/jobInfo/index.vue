@@ -343,13 +343,13 @@ export default {
   data() {
     const validateIncParam = (rule, value, callback) => {
       if (!value) {
-        callback(new Error('Increment parameters is required'))
+        callback(new Error('增量参数必填'))
       }
       callback()
     }
     const validatePartitionParam = (rule, value, callback) => {
       if (!this.partitionField) {
-        callback(new Error('Partition parameters is required'))
+        callback(new Error('分区参数必填'))
       }
       callback()
     }
@@ -377,14 +377,14 @@ export default {
         create: 'Create'
       },
       rules: {
-        jobGroup: [{ required: true, message: 'jobGroup is required', trigger: 'change' }],
-        executorRouteStrategy: [{ required: true, message: 'executorRouteStrategy is required', trigger: 'change' }],
-        executorBlockStrategy: [{ required: true, message: 'executorBlockStrategy is required', trigger: 'change' }],
-        glueType: [{ required: true, message: 'jobType is required', trigger: 'change' }],
-        projectId: [{ required: true, message: 'projectId is required', trigger: 'change' }],
-        jobDesc: [{ required: true, message: 'jobDesc is required', trigger: 'blur' }],
-        jobProject: [{ required: true, message: 'jobProject is required', trigger: 'blur' }],
-        jobCron: [{ required: true, message: 'jobCron is required', trigger: 'blur' }],
+        jobGroup: [{ required: true, message: '必填项', trigger: 'change' }],
+        executorRouteStrategy: [{ required: true, message: '必填项', trigger: 'change' }],
+        executorBlockStrategy: [{ required: true, message: '必填项', trigger: 'change' }],
+        glueType: [{ required: true, message: '必填项', trigger: 'change' }],
+        projectId: [{ required: true, message: '必填项', trigger: 'change' }],
+        jobDesc: [{ required: true, message: '必填项', trigger: 'blur' }],
+        jobProject: [{ required: true, message: '必填项', trigger: 'blur' }],
+        jobCron: [{ required: true, message: '必填项', trigger: 'blur' }],
         incStartId: [{ trigger: 'blur', validator: validateIncParam }],
         replaceParam: [{ trigger: 'blur', validator: validateIncParam }],
         primaryKey: [{ trigger: 'blur', validator: validateIncParam }],

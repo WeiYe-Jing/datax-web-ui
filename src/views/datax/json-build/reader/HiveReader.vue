@@ -85,11 +85,11 @@ export default {
         skipHeader: ''
       },
       rules: {
-        path: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        defaultFS: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fileType: [{ required: true, message: 'this is required', trigger: 'change' }],
-        datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        tableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        path: [{ required: true, message: '必填项', trigger: 'blur' }],
+        defaultFS: [{ required: true, message: '必填项', trigger: 'blur' }],
+        fileType: [{ required: true, message: '必填项', trigger: 'change' }],
+        datasourceId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        tableName: [{ required: true, message: '必填项', trigger: 'blur' }]
       },
       fileTypes: [
         { value: 'text', label: 'text' },

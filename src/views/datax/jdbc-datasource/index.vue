@@ -208,14 +208,14 @@ export default {
         create: 'Create'
       },
       rules: {
-        datasourceName: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        jdbcUsername: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        jdbcPassword: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        jdbcUrl: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        jdbcDriverClass: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        datasource: [{ required: true, message: 'this is required', trigger: 'change' }],
-        zkAdress: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        databaseName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        datasourceName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        jdbcUsername: [{ required: true, message: '必填项', trigger: 'blur' }],
+        jdbcPassword: [{ required: true, message: '必填项', trigger: 'blur' }],
+        jdbcUrl: [{ required: true, message: '必填项', trigger: 'blur' }],
+        jdbcDriverClass: [{ required: true, message: '必填项', trigger: 'blur' }],
+        datasource: [{ required: true, message: '必填项', trigger: 'change' }],
+        zkAdress: [{ required: true, message: '必填项', trigger: 'blur' }],
+        databaseName: [{ required: true, message: '必填项', trigger: 'blur' }]
       },
       temp: {
         id: undefined,

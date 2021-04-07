@@ -128,8 +128,8 @@ export default {
         create: 'Create'
       },
       rules: {
-        name: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        description: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        name: [{ required: true, message: '必填项', trigger: 'blur' }],
+        description: [{ required: true, message: '必填项', trigger: 'blur' }]
       },
       temp: {
         id: undefined,

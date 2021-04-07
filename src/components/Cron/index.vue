@@ -128,6 +128,10 @@ export default {
 </script>
 
 <style lang="css">
+.el-dialog__body{padding:10px;}
+.row{padding-bottom:5px;}
+.el-checkbox-group{margin-top:5px;padding-left:10px;line-height:25px;}
+
 .cron {
   text-align: left;
   padding: 10px;

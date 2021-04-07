@@ -88,9 +88,9 @@ export default {
         tableSchema: ''
       },
       rules: {
-        datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
-        tableName: [{ required: true, message: 'this is required', trigger: 'change' }],
-        tableSchema: [{ required: true, message: 'this is required', trigger: 'change' }]
+        datasourceId: [{ required: true, message: '必填项', trigger: 'change' }],
+        tableName: [{ required: true, message: '必填项', trigger: 'change' }],
+        tableSchema: [{ required: true, message: '必填项', trigger: 'change' }]
       }
     }
   },
