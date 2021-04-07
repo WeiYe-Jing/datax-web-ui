@@ -88,9 +88,9 @@ export default {
         { value: false, label: '不做更新' }
       ],
       rules: {
-        mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fromTableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        mode: [{ required: true, message: '必填项', trigger: 'blur' }],
+        datasourceId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        fromTableName: [{ required: true, message: '必填项', trigger: 'blur' }]
       },
       readerForm: this.getReaderData()
     }

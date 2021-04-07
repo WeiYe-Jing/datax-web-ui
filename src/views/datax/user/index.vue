@@ -128,9 +128,9 @@ export default {
         create: 'Create'
       },
       rules: {
-        role: [{ required: true, message: 'role is required', trigger: 'change' }],
-        username: [{ required: true, message: 'username is required', trigger: 'blur' }],
-        password: [{ required: false, message: 'password is required', trigger: 'blur' }]
+        role: [{ required: true, message: '必填项', trigger: 'change' }],
+        username: [{ required: true, message: '必填项', trigger: 'blur' }],
+        password: [{ required: false, message: '必填项', trigger: 'blur' }]
       },
       temp: {
         id: undefined,

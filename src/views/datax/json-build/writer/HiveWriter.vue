@@ -105,14 +105,14 @@ export default {
         fieldDelimiter: ''
       },
       rules: {
-        path: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        defaultFS: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fileName: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fileType: [{ required: true, message: 'this is required', trigger: 'change' }],
-        writeMode: [{ required: true, message: 'this is required', trigger: 'change' }],
-        fieldDelimiter: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fromTableName: [{ required: true, message: 'this is required', trigger: 'blur' }]
+        path: [{ required: true, message: '必填项', trigger: 'blur' }],
+        defaultFS: [{ required: true, message: '必填项', trigger: 'blur' }],
+        fileName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        fileType: [{ required: true, message: '必填项', trigger: 'change' }],
+        writeMode: [{ required: true, message: '必填项', trigger: 'change' }],
+        fieldDelimiter: [{ required: true, message: '必填项', trigger: 'blur' }],
+        datasourceId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        fromTableName: [{ required: true, message: '必填项', trigger: 'blur' }]
       },
       readerForm: this.getReaderData(),
       fileTypes: [

@@ -42,7 +42,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current" :limit.sync="listQuery.size" @pagination="fetchData" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left:50px;">
         <el-form-item label="AppName" prop="appName">
           <el-input v-model="temp.appName" placeholder="AppName" />
         </el-form-item>
@@ -114,10 +114,10 @@ export default {
         create: 'Create'
       },
       rules: {
-        appName: [{ required: true, message: 'appName is required', trigger: 'blur' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }],
-        order: [{ required: true, message: 'title is required', trigger: 'blur' }],
-        addressType: [{ required: true, message: 'title is required', trigger: 'change' }]
+        appName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        title: [{ required: true, message: '必填项', trigger: 'blur' }],
+        order: [{ required: true, message: '必填项', trigger: 'blur' }],
+        addressType: [{ required: true, message: '必填项', trigger: 'change' }]
       },
       temp: {
         id: undefined,

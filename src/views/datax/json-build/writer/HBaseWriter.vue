@@ -118,9 +118,9 @@ export default {
         { value: 'empty', label: '写入new byte [0]' }
       ],
       rules: {
-        mode: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        datasourceId: [{ required: true, message: 'this is required', trigger: 'blur' }],
-        fromTableName: [{ required: true, message: 'this is required', trigger: 'blur' }],
+        mode: [{ required: true, message: '必填项', trigger: 'blur' }],
+        datasourceId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        fromTableName: [{ required: true, message: '必填项', trigger: 'blur' }],
         rowkeyColumn: [{ required: true, trigger: 'blur', validator: checkJson }]
       },
       readerForm: this.getReaderData()

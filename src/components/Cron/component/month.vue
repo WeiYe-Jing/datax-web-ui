@@ -1,12 +1,12 @@
 <template lang="html">
   <div :val="value_">
-    <div>
+    <div class="row">
       <el-radio v-model="type" label="1" size="mini" border>每月</el-radio>
     </div>
-    <div>
+    <div class="row">
       <el-radio v-model="type" label="5" size="mini" border>不指定</el-radio>
     </div>
-    <div>
+    <div class="row">
       <el-radio v-model="type" label="2" size="mini" border>周期</el-radio>
       <span style="margin-left: 10px; margin-right: 5px;">从</span>
       <el-input-number v-model="cycle.start" :min="1" :max="12" size="mini" style="width: 100px;" @change="type = '2'" />
@@ -14,7 +14,7 @@
       <el-input-number v-model="cycle.end" :min="2" :max="12" size="mini" style="width: 100px;" @change="type = '2'" />
       月
     </div>
-    <div>
+    <div class="row">
       <el-radio v-model="type" label="3" size="mini" border>循环</el-radio>
       <span style="margin-left: 10px; margin-right: 5px;">从</span>
       <el-input-number v-model="loop.start" :min="1" :max="12" size="mini" style="width: 100px;" @change="type = '3'" />
@@ -22,10 +22,10 @@
       <el-input-number v-model="loop.end" :min="1" :max="12" size="mini" style="width: 100px;" @change="type = '3'" />
       月执行一次
     </div>
-    <div>
+    <div class="row">
       <el-radio v-model="type" label="4" size="mini" border>指定</el-radio>
-      <el-checkbox-group v-model="appoint" style="margin-left: 0px;  line-height: 25px;">
-        <el-checkbox v-for="i in 12" :key="i" :label="i" @change="type = '4'" />
+      <el-checkbox-group v-model="appoint">
+        <el-checkbox v-for="i in 12" :key="i" :label="((i+'').length>1?'':'0') + '' + i" @change="type = '4'" />
       </el-checkbox-group>
     </div>
   </div>
@@ -135,9 +135,3 @@ export default {
   }
 }
 </script>
-
-<style lang="css">
-.el-checkbox+.el-checkbox {
-    margin-left: 10px;
-}
-</style>
