@@ -90,12 +90,36 @@ export function getJobIdList(params) {
     params
   })
 }
+
+export function getJobConnList(data) {
+  return request({
+    url: 'api/job/connList',
+    method: 'post',
+    data
+  })
+}
 // batchAdd
 export function batchAddJob(data) {
   return request({
     url: '/api/job/batchAdd',
     method: 'post',
     data
+  })
+}
+
+export function getMaxId(params) {
+  return request({
+    url: 'api/job/getMaxId',
+    method: 'get',
+    params
+  })
+}
+
+export function getMaxTime(params) {
+  return request({
+    url: 'api/job/getMaxTime',
+    method: 'get',
+    params
   })
 }
 

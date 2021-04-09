@@ -58,7 +58,7 @@ export default {
     return {
       jdbcDsQuery: {
         current: 1,
-        size: 200,
+        size: 500,
         ascs: 'datasource_name'
       },
       wDsList: [],

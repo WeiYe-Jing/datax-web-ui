@@ -224,6 +224,19 @@
         </el-row>
         <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 1" :gutter="20">
           <el-col :span="12">
+            <el-form-item label="获取增量位置" prop="incFlag">
+              <el-radio-group v-model="temp.incFlag">
+                <el-radio :label="0" size="mini">前置</el-radio>
+                <el-radio :label="1" size="mini">后置</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="获取增量值" prop="incrementType">
+              <el-button type="primary" @click=getIncStartId(temp.datasourceId,temp.readerTable,temp.primaryKey)>获取增量值</el-button>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="增量主键开始ID" prop="incStartId">
               <el-input v-model="temp.incStartId" placeholder="首次增量使用" style="width: 56%" />
             </el-form-item>
@@ -234,14 +247,14 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="reader数据源" prop="datasourceId">
+            <el-form-item label="数据源" prop="datasourceId">
               <el-select v-model="temp.datasourceId" placeholder="reader数据源" class="filter-item">
                 <el-option v-for="item in dataSourceList" :key="item.id" :label="item.datasourceName" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="7">
-            <el-form-item label="reader表" prop="readerTable">
+            <el-form-item label="表" prop="readerTable">
               <el-input v-model="temp.readerTable" placeholder="读表的表名" />
             </el-form-item>
           </el-col>
@@ -252,6 +265,19 @@
           </el-col>
         </el-row>
         <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 2" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="获取增量位置" prop="incFlag">
+              <el-radio-group v-model="temp.incFlag">
+                <el-radio :label="0" size="mini">前置</el-radio>
+                <el-radio :label="1" size="mini">后置</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="获取增量值" prop="incrementType">
+              <el-button type="primary" @click=getIncStartTime(temp.datasourceId,temp.readerTable,temp.primaryKey)>获取增量值</el-button>
+            </el-form-item>
+          </el-col>
           <el-col :span="12">
             <el-form-item label="增量开始时间" prop="incStartTime">
               <el-date-picker
@@ -275,7 +301,23 @@
               </el-select>
             </el-form-item>
           </el-col>
-
+          <el-col :span="12">
+            <el-form-item label="数据源" prop="datasourceId">
+              <el-select v-model="temp.datasourceId" placeholder="reader数据源" class="filter-item">
+                <el-option v-for="item in dataSourceList" :key="item.id" :label="item.datasourceName" :value="item.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item label="表" prop="readerTable">
+              <el-input v-model="temp.readerTable" placeholder="读表的表名" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item label="主键" label-width="40px" prop="primaryKey">
+              <el-input v-model="temp.primaryKey" placeholder="请填写主键字段名" />
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row v-if="temp.glueType==='BEAN' && temp.incrementType === 3" :gutter="20">
           <el-col :span="12">
@@ -313,6 +355,24 @@
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
           确定
         </el-button>
+        <el-button @click="open()">
+          打开
+        </el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="编辑任务关系" :visible.sync="dialogTaskVisible" width="1000px" :before-close="handleClose">
+      <div id="jobContainer">
+        <div class="col1">
+          <div v-for="item in jobIdList" :key="item.id" :id="item.id" name="cell">{{ item.jobDesc }}</div>
+        </div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogTaskVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="saveRela()">
+          确定
+        </el-button>
       </div>
     </el-dialog>
   </div>
@@ -331,6 +391,8 @@ import PowershellEditor from '@/components/PowershellEditor'
 import * as datasourceApi from '@/api/datax-jdbcDatasource'
 import * as jobProjectApi from '@/api/datax-job-project'
 import { isJSON } from '@/utils/validate'
+import jsPlumb from 'jsplumb'
+import qs from 'qs'
 
 export default {
   name: 'JobInfo',
@@ -377,6 +439,7 @@ export default {
       dialogPluginVisible: false,
       pluginData: [],
       dialogFormVisible: false,
+      dialogTaskVisible: false,
       dialogStatus: '',
       textMap: {
         update: 'Edit',
@@ -429,10 +492,12 @@ export default {
         primaryKey: '',
         projectId: '',
         datasourceId: '',
+        incFlag: 0,
         readerTable: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
+        this.temp.incFlag = 0
         this.temp.showProjectJob = false
         this.jobIdList = this.jobIdListBack
         this.jobJson = ''
@@ -442,8 +507,10 @@ export default {
         this.partitionField = ''
       },
       executorList: '',
+      jsPlumb: null,
       jobIdList: '',
       jobIdListBack: '',
+      jobConnList: '',
       jobProjectList: '',
       dataSourceList: '',
       blockStrategies: [
@@ -532,6 +599,12 @@ export default {
         this.jobIdListBack = this.jobIdList
       })
     },
+    getJobConnList(ids) {
+      job.getJobConnList(qs.stringify({ ids: ids }, { indices: false })).then(response => {
+        const { content } = response
+        this.jobConnList = content
+      })
+    },
     getJobProject() {
       jobProjectApi.getJobProjectList().then(response => {
         this.jobProjectList = response
@@ -540,7 +613,8 @@ export default {
     changProjectJob(showProjectJob) {
       if (showProjectJob) {
         this.jobIdList = this.jobIdListBack.filter((item) => {
-          return item.projectId === this.temp.projectId && item.id !== this.temp.id
+          // return item.projectId === this.temp.projectId && item.id !== this.temp.id
+          return item.projectId === this.temp.projectId
         })
       } else {
         this.jobIdList = this.jobIdListBack
@@ -565,6 +639,72 @@ export default {
       })
     },
     incStartTimeFormat(vData) {
+    },
+    open() {
+      this.dialogTaskVisible = true
+      var ids = []
+      for (let i = 0; i < this.jobIdList.length; i++) {
+        ids.push(this.jobIdList[i].id)
+      }
+      this.getJobConnList(ids)
+
+      this.jsPlumb = jsPlumb.jsPlumb.getInstance({
+        Container: 'jobContainer', // 选择器id
+        EndpointStyle: { radius: 4, fill: '#acd' }, // 端点样式
+        PaintStyle: { stroke: '#fafafa', strokeWidth: 4 }, // 绘画样式，默认8px线宽  #456
+        HoverPaintStyle: { stroke: '#1E90FF' }, // 默认悬停样式  默认为null
+        EndpointHoverStyle: { fill: '#F00', radius: 6 }, // 端点悬停样式
+        ConnectionOverlays: [
+          ['Arrow', {
+            location: 1,
+            paintStyle: {
+              stroke: '#00688B',
+              fill: '#00688B'
+            }
+          }]
+        ],
+        Connector: ['Straight', { gap: 1 }], // 要使用的默认连接器的类型：折线，流程等
+        DrapOptions: { cursor: 'crosshair', zIndex: 2000 }
+      })
+
+      this.jsPlumb.batch(() => {
+        this.initAll()
+        this.connectionAll()
+      })
+      // this.switchContainer(true, true, false)
+    },
+    initAll() {
+      for (let i = 0; i < this.jobIdList.length; i++) {
+        this.init(this.jobIdList[i].id)
+      }
+    },
+    // 初始化规则使其可以连线、拖拽
+    init(id) {
+      this.jsPlumb.makeSource(id, {
+        anchor: ['Perimeter', { anchorCount: 200, shape: 'Rectangle' }],
+        allowLoopback: false,
+        maxConnections: 1
+      })
+      this.jsPlumb.makeTarget(id, {
+        anchor: ['Perimeter', { anchorCount: 200, shape: 'Rectangle' }],
+        allowLoopback: false,
+        maxConnections: 1
+      })
+      this.jsPlumb.draggable(id, {
+        containment: true
+      })
+    },
+    connectionAll() {
+      this.jsPlumb.ready(() => {
+        for (let i = 0; i < this.jobConnList.length; i++) {
+          const conn = this.jobConnList[i]
+          const connection = this.jsPlumb.connect({
+            source: conn.sourceId,
+            target: conn.targetId
+          })
+          connection.setPaintStyle({ stroke: '#fafafa', strokeWidth: 4 })
+        }
+      })
     },
     handleCreate() {
       this.resetTemp()
@@ -762,6 +902,18 @@ export default {
         const { content } = response
         this.registerNode.push(content)
       })
+    },
+    getIncStartId(datasourceId, tableName, primaryKey) {
+      job.getMaxId({ datasourceId, tableName, primaryKey }).then(response => {
+        const { content } = response
+        this.temp.incStartId = content
+      })
+    },
+    getIncStartTime(datasourceId, tableName, primaryKey) {
+      job.getMaxTime({ datasourceId, tableName, primaryKey, format: 'yyyy-MM-dd HH:mm:ss' }).then(response => {
+        const { content } = response
+        this.temp.incStartTime = content
+      })
     }
   }
 }
@@ -774,5 +926,29 @@ export default {
   }
   .el-dropdown + .el-dropdown {
     margin-left: 15px;
+  }
+
+  #jobContainer{
+    margin: 50px;
+    position: relative;
+    background: #efefef;
+    width: 400px;
+    height: 400px;
+  }
+  .col2,.col1{
+    float: left;
+  }
+  .col1{
+    margin-left: 40px;
+  }
+  .col2{
+    margin-left: 150px;
+  }
+  #jobContainer>div>div{
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+    background: lightcyan;
+    margin-top: 40px;
   }
 </style>

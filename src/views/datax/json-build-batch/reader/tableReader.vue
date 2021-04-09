@@ -11,7 +11,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item v-show="dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver'" label="Schema：">
+      <el-form-item v-show="(schemaList !== null && schemaList.length > 0) && (dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver')" label="Schema：">
         <el-select v-model="readerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
           <el-option
             v-for="item in schemaList"
@@ -20,6 +20,10 @@
             :value="item"
           />
         </el-select>
+      </el-form-item>
+      <el-form-item v-show="(schemaList === null || schemaList.length === 0) && (dataSource==='postgresql' || dataSource==='oracle' ||dataSource==='sqlserver')" label="Schema：">
+        <el-input v-model="readerForm.tableSchema" filterable style="width: 300px" @change="schemaChange">
+        </el-input>
       </el-form-item>
       <el-form-item label="切分字段：">
         <el-input v-model="readerForm.splitPk" placeholder="切分主键" style="width: 13%" />
@@ -51,7 +55,7 @@ export default {
     return {
       jdbcDsQuery: {
         current: 1,
-        size: 200,
+        size: 500,
         ascs: 'datasource_name'
       },
       rDsList: [],
