@@ -8,6 +8,9 @@
       <el-select v-model="listQuery.glueType" placeholder="任务类型" style="width: 200px" class="filter-item">
         <el-option v-for="item in glueTypes" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
+      <el-select v-model="listQuery.triggerStatus" placeholder="任务状态" style="width: 120px" class="filter-item">
+        <el-option v-for="item in triggerStatusList" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         搜索
       </el-button>
@@ -535,6 +538,11 @@ export default {
         { value: 'GLUE_SHELL', label: 'Shell任务' },
         { value: 'GLUE_PYTHON', label: 'Python任务' },
         { value: 'GLUE_POWERSHELL', label: 'PowerShell任务' }
+      ],
+      triggerStatusList: [
+        { value: '-1', label: '无' },
+        { value: '0', label: '关闭' },
+        { value: '1', label: '开启' }
       ],
       incrementTypes: [
         { value: 0, label: '无' },
