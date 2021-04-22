@@ -540,9 +540,9 @@ export default {
         { value: 'GLUE_POWERSHELL', label: 'PowerShell任务' }
       ],
       triggerStatusList: [
-        { value: '-1', label: '无' },
-        { value: '0', label: '关闭' },
-        { value: '1', label: '开启' }
+        { value: -1, label: '全部' },
+        { value: 0, label: '关闭' },
+        { value: 1, label: '开启' }
       ],
       incrementTypes: [
         { value: 0, label: '无' },
