@@ -165,6 +165,9 @@ export default {
         }
         if (this.active === 4) {
           this.temp.jobJson = this.configJson
+          delete this.temp.addTime
+          delete this.temp.glueUpdatetime
+          delete this.temp.updateTime
           job.createJob(this.temp).then(() => {
             this.$notify({
               title: 'Success',

@@ -237,6 +237,7 @@ export default {
         { value: 'postgresql', label: 'postgresql' },
         { value: 'sqlserver', label: 'sqlserver' },
         { value: 'db2', label: 'db2' },
+        { value: 'oscar', label: 'oscar' },
         { value: 'hive', label: 'hive' },
         { value: 'hbase', label: 'hbase' },
         { value: 'mongodb', label: 'mongodb' },
@@ -267,6 +268,9 @@ export default {
       } else if (datasource === 'db2') {
         this.temp.jdbcUrl = 'jdbc:db2://{host}[:{port}]/{database}'
         this.temp.jdbcDriverClass = 'com.ibm.db2.jcc.DB2Driver'
+      } else if (datasource === 'oscar') {
+        this.temp.jdbcUrl = 'jdbc:oscar://{host}[:{port}]/{database}'
+        this.temp.jdbcDriverClass = 'com.oscar.Driver'
       } else if (datasource === 'clickhouse') {
         this.temp.jdbcUrl = 'jdbc:clickhouse://{host}:{port}/{database}'
         this.temp.jdbcDriverClass = 'ru.yandex.clickhouse.ClickHouseDriver'
