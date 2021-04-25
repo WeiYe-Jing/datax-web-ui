@@ -90,6 +90,9 @@
           </el-popover>
         </template>
       </el-table-column>
+      <el-table-column label="任务状态" align="center" width="80">
+        <template slot-scope="scope"> {{ jobStatusList.find(t => t.value === scope.row.jobStatus).label }}</template>
+      </el-table-column>
       <el-table-column label="执行状态" align="center" width="80">
         <template slot-scope="scope"> {{ statusList.find(t => t.value === scope.row.lastHandleCode).label }}</template>
       </el-table-column>
@@ -575,6 +578,10 @@ export default {
         { value: 502, label: '失败(超时)' },
         { value: 200, label: '成功' },
         { value: 0, label: '无' }
+      ],
+      jobStatusList: [
+        { value: 0, label: '未执行' },
+        { value: 1, label: '执行中' }
       ]
     }
   },
