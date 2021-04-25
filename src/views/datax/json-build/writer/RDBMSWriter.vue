@@ -78,6 +78,7 @@ export default {
         size: 200,
         ascs: 'datasource_name'
       },
+      needShemaList: ['postgresql', 'oracle', 'sqlserver', 'db2', 'oscar'],
       wDsList: [],
       schemaList: [],
       fromTableName: '',
@@ -108,7 +109,7 @@ export default {
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
       // 当需要选择schemas时，先选择schemas再加载表
-      if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
+      if (this.needShemaList.includes(this.dataSource)) {
         this.getSchema()
         this.needSchema = true
       } else {
@@ -129,7 +130,7 @@ export default {
         this.wDsList = records
         this.dataSource = this.wDsList[0].datasource
         this.writerForm.datasourceId = this.wDsList[0].id;
-        if(this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2'){
+        if(this.needShemaList.includes(this.dataSource)){
            this.needSchema = true;
         }else{
           this.needSchema = false;
