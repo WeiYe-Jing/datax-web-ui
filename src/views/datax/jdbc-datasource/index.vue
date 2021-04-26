@@ -360,9 +360,12 @@ export default {
     handleUpdate(row) {
       datasourceApi.fetched(row.id).then(response => {
         this.dialogStatus = 'update'
-        this.getShowStrategy(response.type)
-        this.temp = Object.assign({}, response)
-        this.temp.connectionParams = JSON.parse(response.connectionParams)
+        this.getShowStrategy(row.type)
+        this.temp = Object.assign({}, row)
+        this.temp.connectionParams = JSON.parse(row.connectionParams)
+         let responseParams = JSON.parse(response.connectionParams)
+        this.temp.connectionParams.user = responseParams.user
+        this.temp.connectionParams.password = responseParams.password
         this.dialogFormVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
