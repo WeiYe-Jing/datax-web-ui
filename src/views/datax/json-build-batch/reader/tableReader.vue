@@ -54,6 +54,7 @@ export default {
         size: 200,
         ascs: 'datasource_name'
       },
+      needShemaList: ['POSTGRESQL', ,'GREENPLUM', 'ORACLE', 'SQLSERVER', 'DB2', 'OSCAR'],
       rDsList: [],
       rTbList: [],
       schemaList: [],
@@ -80,7 +81,7 @@ export default {
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
-      if (this.dataSource === 'postgresql' || this.dataSource === 'greenplum' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2') {
+      if (this.needShemaList.includes(this.dataSource)) {
         this.getSchema()
         this.needSchema = true
       } else {
@@ -101,7 +102,7 @@ export default {
         this.rDsList = records
         this.dataSource = this.rDsList[0].datasource
         this.readerForm.datasourceId = this.rDsList[0].id
-        if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver' || this.dataSource === 'db2'){
+        if (this.needShemaList.includes(this.dataSource)){
           this.needSchema = true
         } else {
           this.needSchema = false
