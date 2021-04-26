@@ -122,6 +122,7 @@ export default {
         this.readerForm.datasourceId = this.rDsList[0].id
         if (this.needShemaList.includes(this.dataSource)) {
           this.needSchema = true
+          this.getSchema()
         } else {
           this.needSchema = false
         }
