@@ -10,6 +10,13 @@ export function getList(params) {
   })
 }
 
+export function getNodeMenuList() {
+  return request({
+    url: 'api/job/getNodeMenuList',
+    method: 'get'
+  })
+}
+
 export function triggerJob(data) {
   return request({
     url: '/api/job/trigger',
@@ -123,3 +130,26 @@ export function getMaxTime(params) {
   })
 }
 
+export function saveChain(data) {
+  return request({
+    url: '/api/job/saveChain',
+    method: 'post',
+    data
+  })
+}
+
+export function saveChainJson(data) {
+  return request({
+    url: '/api/job/saveChainJson',
+    method: 'post',
+    data
+  })
+}
+
+export function getChainJson(params) {
+  return request({
+    url: '/api/job/getChainJson',
+    method: 'post',
+    params
+  })
+}

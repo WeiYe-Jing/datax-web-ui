@@ -11,6 +11,9 @@
       <el-select v-model="listQuery.triggerStatus" placeholder="任务状态" style="width: 120px" class="filter-item">
         <el-option v-for="item in triggerStatusList" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
+      <el-select v-model="listQuery.chainFlag" placeholder="任务链" style="width: 120px" class="filter-item">
+        <el-option v-for="item in chainFlagList" :key="item.value" :label="item.label" :value="item.value" />
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
         搜索
       </el-button>
@@ -108,6 +111,7 @@
               <el-dropdown-item @click.native="handlerExecute(row)">执行一次</el-dropdown-item>
               <el-dropdown-item @click.native="handlerViewLog(row)">查询日志</el-dropdown-item>
               <el-dropdown-item divided @click.native="handlerUpdate(row)">编辑</el-dropdown-item>
+              <el-dropdown-item v-if="row.chainFlag===1" @click.native="open(row)">任务链</el-dropdown-item>
               <el-dropdown-item @click.native="handlerDelete(row)">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -213,8 +217,17 @@
                 v-model="temp.showProjectJob"
                 on-value="1"
                 off-value="0"
-                @change=changProjectJob(temp.showProjectJob)>
-              </el-switch>
+                @change="changProjectJob(temp.showProjectJob)"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="是否任务链">
+              <el-switch
+                v-model="temp.chainFlag"
+                :active-value="1"
+                :inactive-value="0"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="12" />
@@ -239,7 +252,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="获取增量值" prop="incrementType">
-              <el-button type="primary" @click=getIncStartId(temp.datasourceId,temp.readerTable,temp.primaryKey)>获取增量值</el-button>
+              <el-button type="primary" @click="getIncStartId(temp.datasourceId,temp.readerTable,temp.primaryKey)">获取增量值</el-button>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -281,7 +294,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="获取增量值" prop="incrementType">
-              <el-button type="primary" @click=getIncStartTime(temp.datasourceId,temp.readerTable,temp.primaryKey)>获取增量值</el-button>
+              <el-button type="primary" @click="getIncStartTime(temp.datasourceId,temp.readerTable,temp.primaryKey)">获取增量值</el-button>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -361,24 +374,11 @@
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
           确定
         </el-button>
-        <el-button @click="open()">
-          打开
-        </el-button>
       </div>
     </el-dialog>
-    <el-dialog title="编辑任务关系" :visible.sync="dialogTaskVisible" width="1000px" :before-close="handleClose">
-      <div id="jobContainer">
-        <div class="col1">
-          <div v-for="item in jobIdList" :key="item.id" :id="item.id" name="cell">{{ item.jobDesc }}</div>
-        </div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogTaskVisible = false">
-          取消
-        </el-button>
-        <el-button type="primary" @click="saveRela()">
-          确定
-        </el-button>
+    <el-dialog v-if="dialogTaskVisible" title="编辑任务流" :visible.sync="dialogTaskVisible" width="80%" :before-close="handleClose">
+      <div>
+        <Panel ref="panel" :node-menu-list="nodeMenuList" :job-info="temp" />
       </div>
     </el-dialog>
   </div>
@@ -397,12 +397,13 @@ import PowershellEditor from '@/components/PowershellEditor'
 import * as datasourceApi from '@/api/datax-jdbcDatasource'
 import * as jobProjectApi from '@/api/datax-job-project'
 import { isJSON } from '@/utils/validate'
-import jsPlumb from 'jsplumb'
+// import jsPlumb from 'jsplumb'
 import qs from 'qs'
+import Panel from '../../flow/ef/panel'
 
 export default {
   name: 'JobInfo',
-  components: { Pagination, JsonEditor, ShellEditor, PythonEditor, PowershellEditor, Cron },
+  components: { Pagination, JsonEditor, ShellEditor, PythonEditor, PowershellEditor, Cron, Panel },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -439,7 +440,8 @@ export default {
         projectIds: '',
         triggerStatus: -1,
         jobDesc: '',
-        glueType: ''
+        glueType: '',
+        chainFlag: -1
       },
       showCronBox: false,
       dialogPluginVisible: false,
@@ -477,6 +479,7 @@ export default {
         executorRouteStrategy: '',
         executorBlockStrategy: '',
         childJobId: '',
+        chainFlag: 0,
         showProjectJob: false,
         executorFailRetryCount: '',
         alarmEmail: '',
@@ -499,7 +502,8 @@ export default {
         projectId: '',
         datasourceId: '',
         incFlag: 0,
-        readerTable: ''
+        readerTable: '',
+        chainJson: ''
       },
       resetTemp() {
         this.temp = this.$options.data().temp
@@ -518,6 +522,7 @@ export default {
       jobIdListBack: '',
       jobConnList: '',
       jobProjectList: '',
+      nodeMenuList: '',
       dataSourceList: '',
       blockStrategies: [
         { value: 'SERIAL_EXECUTION', label: '单机串行' },
@@ -546,6 +551,11 @@ export default {
         { value: -1, label: '全部' },
         { value: 0, label: '关闭' },
         { value: 1, label: '开启' }
+      ],
+      chainFlagList: [
+        { value: -1, label: '全部' },
+        { value: 0, label: '否' },
+        { value: 1, label: '是' }
       ],
       incrementTypes: [
         { value: 0, label: '无' },
@@ -591,6 +601,7 @@ export default {
     this.getJobIdList()
     this.getJobProject()
     this.getDataSourceList()
+    this.getNodeMenuList()
   },
 
   methods: {
@@ -655,72 +666,78 @@ export default {
     },
     incStartTimeFormat(vData) {
     },
-    open() {
+    open(row) {
+      // 先清空panel
+      this.temp = Object.assign({}, row)
       this.dialogTaskVisible = true
-      var ids = []
-      for (let i = 0; i < this.jobIdList.length; i++) {
-        ids.push(this.jobIdList[i].id)
-      }
-      this.getJobConnList(ids)
-
-      this.jsPlumb = jsPlumb.jsPlumb.getInstance({
-        Container: 'jobContainer', // 选择器id
-        EndpointStyle: { radius: 4, fill: '#acd' }, // 端点样式
-        PaintStyle: { stroke: '#fafafa', strokeWidth: 4 }, // 绘画样式，默认8px线宽  #456
-        HoverPaintStyle: { stroke: '#1E90FF' }, // 默认悬停样式  默认为null
-        EndpointHoverStyle: { fill: '#F00', radius: 6 }, // 端点悬停样式
-        ConnectionOverlays: [
-          ['Arrow', {
-            location: 1,
-            paintStyle: {
-              stroke: '#00688B',
-              fill: '#00688B'
-            }
-          }]
-        ],
-        Connector: ['Straight', { gap: 1 }], // 要使用的默认连接器的类型：折线，流程等
-        DrapOptions: { cursor: 'crosshair', zIndex: 2000 }
-      })
-
-      this.jsPlumb.batch(() => {
-        this.initAll()
-        this.connectionAll()
-      })
-      // this.switchContainer(true, true, false)
+      // this.$nextTick(() => (this.dialogTaskVisible = true))
     },
-    initAll() {
-      for (let i = 0; i < this.jobIdList.length; i++) {
-        this.init(this.jobIdList[i].id)
-      }
-    },
-    // 初始化规则使其可以连线、拖拽
-    init(id) {
-      this.jsPlumb.makeSource(id, {
-        anchor: ['Perimeter', { anchorCount: 200, shape: 'Rectangle' }],
-        allowLoopback: false,
-        maxConnections: 1
-      })
-      this.jsPlumb.makeTarget(id, {
-        anchor: ['Perimeter', { anchorCount: 200, shape: 'Rectangle' }],
-        allowLoopback: false,
-        maxConnections: 1
-      })
-      this.jsPlumb.draggable(id, {
-        containment: true
-      })
-    },
-    connectionAll() {
-      this.jsPlumb.ready(() => {
-        for (let i = 0; i < this.jobConnList.length; i++) {
-          const conn = this.jobConnList[i]
-          const connection = this.jsPlumb.connect({
-            source: conn.sourceId,
-            target: conn.targetId
-          })
-          connection.setPaintStyle({ stroke: '#fafafa', strokeWidth: 4 })
-        }
-      })
-    },
+    // open() {
+    //   this.dialogTaskVisible = true
+    //   var ids = []
+    //   for (let i = 0; i < this.jobIdList.length; i++) {
+    //     ids.push(this.jobIdList[i].id)
+    //   }
+    //   this.getJobConnList(ids)
+    //
+    //   this.jsPlumb = jsPlumb.jsPlumb.getInstance({
+    //     Container: 'jobContainer', // 选择器id
+    //     EndpointStyle: { radius: 4, fill: '#acd' }, // 端点样式
+    //     PaintStyle: { stroke: '#fafafa', strokeWidth: 4 }, // 绘画样式，默认8px线宽  #456
+    //     HoverPaintStyle: { stroke: '#1E90FF' }, // 默认悬停样式  默认为null
+    //     EndpointHoverStyle: { fill: '#F00', radius: 6 }, // 端点悬停样式
+    //     ConnectionOverlays: [
+    //       ['Arrow', {
+    //         location: 1,
+    //         paintStyle: {
+    //           stroke: '#00688B',
+    //           fill: '#00688B'
+    //         }
+    //       }]
+    //     ],
+    //     Connector: ['Straight', { gap: 1 }], // 要使用的默认连接器的类型：折线，流程等
+    //     DrapOptions: { cursor: 'crosshair', zIndex: 2000 }
+    //   })
+    //
+    //   this.jsPlumb.batch(() => {
+    //     this.initAll()
+    //     this.connectionAll()
+    //   })
+    //   // this.switchContainer(true, true, false)
+    // },
+    // initAll() {
+    //   for (let i = 0; i < this.jobIdList.length; i++) {
+    //     this.init(this.jobIdList[i].id)
+    //   }
+    // },
+    // // 初始化规则使其可以连线、拖拽
+    // init(id) {
+    //   this.jsPlumb.makeSource(id, {
+    //     anchor: ['Perimeter', { anchorCount: 200, shape: 'Rectangle' }],
+    //     allowLoopback: false,
+    //     maxConnections: 1
+    //   })
+    //   this.jsPlumb.makeTarget(id, {
+    //     anchor: ['Perimeter', { anchorCount: 200, shape: 'Rectangle' }],
+    //     allowLoopback: false,
+    //     maxConnections: 1
+    //   })
+    //   this.jsPlumb.draggable(id, {
+    //     containment: true
+    //   })
+    // },
+    // connectionAll() {
+    //   this.jsPlumb.ready(() => {
+    //     for (let i = 0; i < this.jobConnList.length; i++) {
+    //       const conn = this.jobConnList[i]
+    //       const connection = this.jsPlumb.connect({
+    //         source: conn.sourceId,
+    //         target: conn.targetId
+    //       })
+    //       connection.setPaintStyle({ stroke: '#fafafa', strokeWidth: 4 })
+    //     }
+    //   })
+    // },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
@@ -928,6 +945,12 @@ export default {
       job.getMaxTime({ datasourceId, tableName, primaryKey, format: 'yyyy-MM-dd HH:mm:ss' }).then(response => {
         const { content } = response
         this.temp.incStartTime = content
+      })
+    },
+    getNodeMenuList() {
+      job.getNodeMenuList().then(response => {
+        const { content } = response
+        this.nodeMenuList = content
       })
     }
   }
