@@ -34,7 +34,7 @@
       </el-col>
     </el-row>
     <div style="display: flex;height: calc(100% - 47px);">
-      <div style="width: 230px;border-right: 1px solid #dce3e8;">
+      <div style="width: 230px;overflow:auto;border-right: 1px solid #dce3e8;">
         <node-menu
           ref="nodeMenu"
           :node-menu-list="this.nodeMenuList"
@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { jsPlumb } from './jsplumb'
+import { jsPlumb } from 'jsplumb'
 import { easyFlowMixin } from '@/views/flow/ef/mixins'
 import flowNode from '@/views/flow/ef/node'
 import nodeMenu from '@/views/flow/ef/node_menu'

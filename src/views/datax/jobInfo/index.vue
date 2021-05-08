@@ -507,8 +507,6 @@ export default {
       },
       resetTemp() {
         this.temp = this.$options.data().temp
-        this.temp.incFlag = 0
-        this.temp.showProjectJob = false
         this.jobIdList = this.jobIdListBack
         this.jobJson = ''
         this.glueSource = ''
@@ -667,6 +665,7 @@ export default {
     incStartTimeFormat(vData) {
     },
     open(row) {
+      this.resetTemp()
       // 先清空panel
       this.temp = Object.assign({}, row)
       this.dialogTaskVisible = true
