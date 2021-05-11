@@ -10,7 +10,7 @@
             type="text"
             icon="el-icon-delete"
             size="large"
-            :disabled="!this.activeElement.type"
+            :disabled="(this.activeElement.nodeId == this.jobInfo.id) || !this.activeElement.nodeId"
             @click="deleteElement"
           >delete</el-button>
           <el-divider direction="vertical" />
@@ -27,6 +27,13 @@
             size="large"
             @click="clearLine"
           >clearLine</el-button>
+          <el-button
+            type="text"
+            icon="el-icon-delete"
+            size="large"
+            @click="triggerOnce"
+            v-text="this.activeElement.nodeId"
+          />
           <div style="float: right;margin-right: 5px">
             <el-button type="info" plain round icon="el-icon-document" size="mini" @click="dataInfo">流程信息</el-button>
           </div>
@@ -438,12 +445,8 @@ export default {
     },
     clickNode(nodeId) {
       // eslint-disable-next-line eqeqeq
-      if (nodeId != this.jobInfo.id) {
-        this.activeElement.type = 'node'
-        this.activeElement.nodeId = nodeId
-      } else {
-        this.resetActiceElement()
-      }
+      this.activeElement.type = 'node'
+      this.activeElement.nodeId = nodeId
     },
     // 是否具有该线
     hasLine(from, to) {
@@ -528,6 +531,25 @@ export default {
       this.activeElement.nodeId = undefined
       this.activeElement.sourceId = undefined
       this.activeElement.targetId = undefined
+    },
+    triggerOnce() {
+      this.$confirm('确定执行该节点吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const param = {}
+        param.jobId = Math.abs(this.activeElement.nodeId.substring(this.activeElement.nodeId.lastIndexOf('-')))
+        param.groupId = this.jobInfo.id
+        job.triggerJob(param).then(response => {
+          this.$notify({
+            title: 'Success',
+            message: 'Execute Successfully',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      })
     }
   }
 }
