@@ -78,6 +78,7 @@ export default {
         size: 200,
         ascs: 'datasource_name'
       },
+      needShemaList: ['POSTGRESQL', ,'GREENPLUM', 'ORACLE', 'SQLSERVER', 'DB2', 'OSCAR'],
       wDsList: [],
       schemaList: [],
       fromTableName: '',
@@ -108,7 +109,7 @@ export default {
   watch: {
     'writerForm.datasourceId': function(oldVal, newVal) {
       // 当需要选择schemas时，先选择schemas再加载表
-      if (this.dataSource === 'POSTGRESQL' || this.dataSource === 'GREENPLUM' || this.dataSource === 'ORACLE' || this.dataSource === 'SQLSERVER' || this.dataSource === 'DB2') {
+      if (this.needShemaList.includes(this.dataSource)) {
         this.getSchema()
         this.needSchema = true
       } else {
@@ -130,7 +131,7 @@ export default {
         //this.wDsList.push({ id: -1, datasourceName: 'TXT文件', datasource: 'txtfile' })
         this.dataSource = this.wDsList[0].type
         this.writerForm.datasourceId = this.wDsList[0].id
-        if (this.dataSource === 'POSTGRESQL' || this.dataSource === 'GREENPLUM' || this.dataSource === 'ORACLE' || this.dataSource === 'SQLSERVER' || this.dataSource === 'DB2') {
+        if (this.needShemaList.includes(this.dataSource)) {
           this.needSchema = true
         } else {
           this.needSchema = false

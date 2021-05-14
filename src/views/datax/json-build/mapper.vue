@@ -10,11 +10,18 @@ export default {
   components: { FieldMapper },
   methods: {
     sendColumns(fromColumnsList, toColumnsList) {
-      this.$refs.mapper.fromColumnsList = JSON.parse(JSON.stringify(fromColumnsList))
+      //this.$refs.mapper.fromColumnsList = JSON.parse(JSON.stringify(fromColumnsList))
+      let lcolumnsTemp = JSON.parse(JSON.stringify(fromColumnsList))
+      for(var i = 0; i < lcolumnsTemp.length; i++){
+        if(lcolumnsTemp[i].trim()){
+          this.$refs.mapper.fromColumnsList.push(lcolumnsTemp[i])
+          this.$refs.mapper.readerForm.lcolumns.push(lcolumnsTemp[i])
+        }
+      }
       this.$refs.mapper.toColumnsList = JSON.parse(JSON.stringify(toColumnsList))
       this.$refs.mapper.fromColumnsListChecked = JSON.parse(JSON.stringify(fromColumnsList))
       this.$refs.mapper.toColumnsListChecked = JSON.parse(JSON.stringify(toColumnsList))
-      this.$refs.mapper.readerForm.lcolumns = JSON.parse(JSON.stringify(fromColumnsList))
+      //this.$refs.mapper.readerForm.lcolumns = JSON.parse(JSON.stringify(fromColumnsList))
       this.$refs.mapper.readerForm.rcolumns = JSON.parse(JSON.stringify(toColumnsList))
       this.$refs.mapper.readerForm.rules = Array.from(
         { length: fromColumnsList.length },

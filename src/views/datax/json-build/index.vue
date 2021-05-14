@@ -161,28 +161,37 @@ export default {
       } else {
         // 将第一步和第二步得到的字段名字发送到第三步
         if (this.active === 2) {
+          //如果目标端字段多于源端，补全源端下拉框
+          let dif = toColumnsList.length - fromColumnList.length
+          if (dif > 0) {
+            let t = ""
+            for(var i = 0; i < dif; i++) {
+              t += " "
+              fromColumnList.push(t)
+            }
+          }
           this.$refs.mapper.sendColumns(fromColumnList, toColumnsList)
           this.$refs.mapper.sendRuleSettings()
         }
         if (this.active === 3) {
           const readerColumns = this.$refs.mapper.getLColumns()
           const writerColumns = this.$refs.mapper.getRColumns()
-          var tmps = JSON.parse(JSON.stringify(readerColumns)).sort()
-          for (var i = 0; i < tmps.length - 1; i++) {
-            if (tmps[i] === tmps[i + 1]) {
-              this.$message('源端有相同字段【' + tmps[i] + '】，请注意修改')
-              throw new Error('源端有相同字段【' + tmps[i] + '】，请注意修改')
-            }
+          if(readerColumns.length != writerColumns.length) {
+            this.$message('源端与目标端字段数量不一致，请注意修改')
+            throw new Error('源端与目标端字段数量不一致，请注意修改')
           }
+          //var tmps = JSON.parse(JSON.stringify(readerColumns)).sort()
+          // for (var i = 0; i < tmps.length - 1; i++) {
+          //   if (tmps[i] === tmps[i + 1]) {
+          //     this.$message('源端有相同字段【' + tmps[i] + '】，请注意修改')
+          //     throw new Error('源端有相同字段【' + tmps[i] + '】，请注意修改')
+          //   }
+          // }
           var tmps1 = JSON.parse(JSON.stringify(writerColumns)).sort()
-          for (i = 0; i < tmps1.length - 1; i++) {
+          for (var i = 0; i < tmps1.length - 1; i++) {
             if (tmps1[i] === tmps1[i + 1]) {
-              this.$message(
-                '目标端含有相同字段【' + tmps1[i] + '】，请注意修改'
-              )
-              throw new Error(
-                '目标端含有相同字段【' + tmps1[i] + '】，请注意修改'
-              )
+              this.$message('目标端含有相同字段【' + tmps1[i] + '】，请注意修改')
+              throw new Error('目标端含有相同字段【' + tmps1[i] + '】，请注意修改')
             }
           }
         }

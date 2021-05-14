@@ -238,6 +238,7 @@ export default {
         { value: 'HIVE', label: 'HIVE' },
         { value: 'CLICKHOUSE', label: 'CLICKHOUSE' },
         { value: 'DB2', label: 'DB2' },
+        { value: 'OSCAR', label: 'OSCAR' },
         { value: 'HBASE', label: 'HBASE' },
         { value: 'MONGODB', label: 'MONGODB' }
       ],
@@ -267,8 +268,10 @@ export default {
       } else if (type === 'HIVE') {
         this.temp.connectionParams.jdbcUrl = 'jdbc:hive2://{host}:{port}'
       } else if (type === 'DB2') {
-        this.temp.connectionParams.jdbcUrl = 'jdbc:db2://{host}[:{port}]'
-      }
+        this.temp.connectionParams.jdbcUrl = 'jdbc:db2://{host}[:{port}]/{database}'
+      } else if (type === 'OSCAR') {
+        this.temp.connectionParams.jdbcUrl = 'jdbc:oscar://{host}[:{port}]/{database}'
+       }
       this.getShowStrategy(type)
     },
     fetchData() {
@@ -355,13 +358,18 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.getShowStrategy(row.type)
-      this.temp = Object.assign({}, row)
-      this.temp.connectionParams = JSON.parse(row.connectionParams)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      datasourceApi.fetched(row.id).then(response => {
+        this.dialogStatus = 'update'
+        this.getShowStrategy(row.type)
+        this.temp = Object.assign({}, row)
+        this.temp.connectionParams = JSON.parse(row.connectionParams)
+         let responseParams = JSON.parse(response.connectionParams)
+        this.temp.connectionParams.user = responseParams.user
+        this.temp.connectionParams.password = responseParams.password
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
     updateData() {
