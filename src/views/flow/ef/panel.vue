@@ -10,7 +10,7 @@
             type="text"
             icon="el-icon-delete"
             size="large"
-            :disabled="(this.activeElement.nodeId == this.jobInfo.id) || !this.activeElement.nodeId"
+            :disabled="(this.activeElement.nodeId == this.jobInfo.id) || !this.activeElement.type"
             @click="deleteElement"
           >delete</el-button>
           <el-divider direction="vertical" />
@@ -19,14 +19,14 @@
             icon="el-icon-delete"
             size="large"
             @click="clearNode"
-          >clearNode</el-button>
+          >clearAllNode</el-button>
           <el-divider direction="vertical" />
           <el-button
             type="text"
             icon="el-icon-delete"
             size="large"
             @click="clearLine"
-          >clearLine</el-button>
+          >clearAllLine</el-button>
           <el-button
             type="text"
             icon="el-icon-delete"
@@ -163,6 +163,8 @@ export default {
         sourceId: undefined,
         targetId: undefined
       },
+      // 上一次选中的线
+      connLine: undefined,
       flowJsonData: {},
       options: {
         mode: { name: 'javascript', json: true },
@@ -171,7 +173,6 @@ export default {
     }
   },
   mounted() {
-    this.jsPlumb = jsPlumb.getInstance()
     this.$nextTick(() => {
       // 数据加载
       this.reloadData()
@@ -193,9 +194,14 @@ export default {
         this.loadEasyFlow()
         // 单点击了连接线, https://www.cnblogs.com/ysx215/p/7615677.html
         this.jsPlumb.bind('click', (conn, originalEvent) => {
+          if (this.connLine !== undefined) {
+            this.connLine.removeType('custom')
+          }
           this.activeElement.type = 'line'
           this.activeElement.sourceId = conn.sourceId
           this.activeElement.targetId = conn.targetId
+          conn.setType('custom')
+          this.connLine = conn
         })
         // 连线
         this.jsPlumb.bind('connection', (evt) => {
@@ -444,6 +450,9 @@ export default {
       return true
     },
     clickNode(nodeId) {
+      if (this.connLine !== undefined) {
+        this.connLine.removeType('custom')
+      }
       // eslint-disable-next-line eqeqeq
       this.activeElement.type = 'node'
       this.activeElement.nodeId = nodeId
@@ -491,6 +500,13 @@ export default {
         this.data = data
         this.$nextTick(() => {
           this.jsPlumb = jsPlumb.getInstance()
+          const setting = {
+            paintStyle: { stroke: '#27e512', strokeWidth: 1 },
+            connectorStyle: { stroke: '#124de5', strokeWidth: 1 },
+            connectorHoverStyle: { stroke: '#e51255', strokeWidth: 3 },
+            hoverPaintStyle: { stroke: '#f6bc55', strokeWidth: 3 }
+          }
+          this.jsPlumb.registerConnectionType('custom', setting)
           this.$nextTick(() => {
             this.jsPlumbInit()
           })
