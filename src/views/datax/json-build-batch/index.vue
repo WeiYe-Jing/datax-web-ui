@@ -172,6 +172,12 @@ export default {
     },
     // Create job
     createJob() {
+      const loading = this.$loading({ // 声明一个loading对象
+        lock: true, // 是否锁屏
+        text: '拼命读取中', // 加载动画的文字
+        spinner: 'el-icon-loading', // 引入的loading图标
+        background: 'rgba(108,101,101,0.7)' // 背景颜色
+      })
       const readerData = this.$refs.reader.getData()
       const writeData = this.$refs.writer.getData()
       const readerTables = this.$refs.mapper.getLTables()
@@ -207,6 +213,7 @@ export default {
         })
         // 切回第一步
         this.active = 1
+        loading.close()
       })
     },
     handleCopy(text, event) {
