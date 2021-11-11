@@ -12,6 +12,9 @@ export default {
     sendColumns(fromColumnsList, toColumnsList) {
       //this.$refs.mapper.fromColumnsList = JSON.parse(JSON.stringify(fromColumnsList))
       let lcolumnsTemp = JSON.parse(JSON.stringify(fromColumnsList))
+      //clear old values
+      this.$refs.mapper.fromColumnsList = []
+      this.$refs.mapper.readerForm.lcolumns = []
       for(var i = 0; i < lcolumnsTemp.length; i++){
         if(lcolumnsTemp[i].trim()){
           this.$refs.mapper.fromColumnsList.push(lcolumnsTemp[i])

@@ -148,8 +148,8 @@ export default {
   },
   methods: {
     next() {
-      const fromColumnList = this.$refs.reader.getData().columns
-      const toColumnsList = this.$refs.writer.getData().columns
+      let fromColumnList = [...this.$refs.reader.getData().columns]
+      let toColumnsList = [...this.$refs.writer.getData().columns]
       // const fromTableName = this.$refs.reader.getData().tableName
       // 第一步 reader 判断是否已选字段
       if (this.active === 1) {
