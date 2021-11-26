@@ -313,6 +313,8 @@ export default {
     handleCurrentChange(val) {
       this.temp = Object.assign({}, val)
       this.temp.id = undefined
+      this.temp.addTime = undefined
+      this.temp.updateTime = undefined
       this.temp.jobDesc = this.getReaderData().tableName
       this.$refs.jobTemplateSelectDrawer.closeDrawer()
       this.jobTemplate = val.id + '(' + val.jobDesc + ')'
