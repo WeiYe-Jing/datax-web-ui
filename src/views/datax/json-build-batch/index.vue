@@ -160,8 +160,10 @@ export default {
       const rdbmsWriter = {}
       const obj = {
         readerDatasourceId: readerData.datasourceId,
+        readerTableSchema: readerData.tableSchema,
         readerTables: readerTables,
         writerDatasourceId: writeData.datasourceId,
+        writerTableSchema: writeData.tableSchema,
         writerTables: writerTables,
         rdbmsReader: rdbmsReader,
         rdbmsWriter: rdbmsWriter,

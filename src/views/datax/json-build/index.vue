@@ -265,9 +265,11 @@ export default {
       }
       const obj = {
         readerDatasourceId: readerData.datasourceId,
+        readerTableSchema: readerData.tableSchema,
         readerTables: [readerData.tableName],
         readerColumns: readerColumns,
         writerDatasourceId: writeData.datasourceId,
+        writerTableSchema: writeData.tableSchema,
         writerTables: [writeData.tableName],
         writerColumns: writerColumns,
         transformer: transformer,
