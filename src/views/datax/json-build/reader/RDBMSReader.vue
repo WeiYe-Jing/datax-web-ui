@@ -184,8 +184,7 @@ export default {
     getTableColumns() {
       const obj = {
         datasourceId: this.readerForm.datasourceId,
-        tableName: this.readerForm.tableName,
-        tableSchema: this.readerForm.tableSchema
+        tableName: this.readerForm.tableName
       }
       dsQueryApi.getColumns(obj).then(response => {
         this.rColumnList = response

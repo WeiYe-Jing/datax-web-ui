@@ -193,8 +193,7 @@ export default {
     getColumns() {
       const obj = {
         datasourceId: this.writerForm.datasourceId,
-        tableName: this.writerForm.tableName,
-        tableSchema: this.writerForm.tableSchema
+        tableName: this.writerForm.tableName
       }
       dsQueryApi.getColumns(obj).then(response => {
         this.fromColumnList = response
