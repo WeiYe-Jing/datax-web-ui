@@ -37,25 +37,12 @@
           <span>{{ scope.row.role }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="AccessKey" align="center" width="200">
-        <template slot-scope="scope">
-          <span>{{ scope.row.accessKey }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="SecretKey" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.secretKey }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleKeyUpdate(scope.$index, scope.row)">
-            重置
-          </el-button>
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">
+        <template slot-scope="{row}">
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="scope.row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">
+          <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -207,16 +194,6 @@ export default {
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
-      })
-    },
-    handleKeyUpdate(index, row){
-      let istde = [...this.list]
-      const tempData = {'id': row.id, 'username': row.username}
-      user.updateUserKey(tempData).then(response => {
-        const { content } = response
-        istde[index].accessKey = content.accessKey
-        istde[index].secretKey = content.secretKey
-        this.list = istde;
       })
     },
     updateData() {
