@@ -143,6 +143,13 @@ export default {
       }
     }
   },
+  watch: {
+    '$route': function(to, from) {
+      if (to.name === 'JsonBuild') {
+        location.reload()
+      }
+    }
+  },
   created() {
     // this.getJdbcDs()
   },
@@ -173,7 +180,9 @@ export default {
               duration: 2000
             })
             // 切回第一步
-            this.active = 1
+            // this.active = 1
+            // 跳转到任务管理
+            this.$router.push('/datax/job/jobInfo')
           })
         } else {
           this.active++
