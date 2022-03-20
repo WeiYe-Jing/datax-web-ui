@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="dataxApp">
     <router-view />
   </div>
 </template>
