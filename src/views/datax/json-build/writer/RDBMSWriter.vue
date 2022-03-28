@@ -46,7 +46,7 @@
         <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
         <!-- <el-input v-model="createTableName" style="width: 195px" /> -->
         <!-- <el-button type="primary" @click="createTable">新增</el-button> -->
-        <el-button v-if="dataSource === 'clickhouse'" type="primary" @click="createNewTable">自动建表</el-button>
+        <el-button v-if="dataSource === 'clickhouse'" type="primary" @click="createNewTable">自动同步</el-button>
       </el-form-item>
       <div style="margin: 5px 0;" />
       <el-form-item label="字段：">
@@ -65,7 +65,7 @@
     </el-form>
 
     <el-dialog
-      title="自动建表"
+      title="自动同步"
       :visible.sync="isNewTable"
       width="600px"
     >
@@ -128,7 +128,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isNewTable = false;">取消</el-button>
-        <el-button type="primary" @click="createTable">创建</el-button>
+        <el-button type="primary" @click="createTable">同步</el-button>
       </span>
     </el-dialog>
   </div>
