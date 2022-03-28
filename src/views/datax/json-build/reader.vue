@@ -35,6 +35,9 @@ export default {
     showDataSource(data) {
       this.dataSource = data
       this.getData()
+    },
+    getReaderDatabase() {
+      return this.$refs.rdbmsreader.getReaderDatabase()
     }
   }
 }

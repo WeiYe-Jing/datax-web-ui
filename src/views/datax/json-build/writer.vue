@@ -54,6 +54,11 @@ export default {
     sendTableNameAndColumns(fromTableName, fromColumnList) {
       this.$refs.hivewriter.fromTableName = fromTableName
       this.$refs.hivewriter.fromColumnList = fromColumnList
+    },
+    sendNewTableNameAndColumns(originTableNames, originColumnList, originTableName) {
+      this.$refs.rdbmswriter.originTableNames = originTableNames
+      this.$refs.rdbmswriter.originColumnList = originColumnList
+      this.$refs.rdbmswriter.originTableName = originTableName
     }
   }
 }

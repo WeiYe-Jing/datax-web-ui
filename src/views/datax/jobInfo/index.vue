@@ -425,6 +425,7 @@ export default {
         readerTable: ''
       },
       resetTemp() {
+        console.log('%cindex.vue line:428 this.$options', 'color: white; background-color: #007acc;', this.$options.data())
         this.temp = this.$options.data().temp
         this.jobJson = ''
         this.glueSource = ''
