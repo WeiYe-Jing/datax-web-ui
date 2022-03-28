@@ -266,6 +266,7 @@ export const asyncRoutes = [
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
+  base: window.__POWERED_BY_QIANKUN__ ? '/datax' : '/',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })

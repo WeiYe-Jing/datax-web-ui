@@ -3,7 +3,10 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">
+          <img src="../../../public/logo-DataLink-light.png">
+          <span>数据接入平台</span>
+        </h3>
       </div>
 
       <el-form-item prop="username">
@@ -113,6 +116,12 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
+    console.log('%cindex.vue line:116 this.parentData', 'color: white; background-color: #007acc;', this.parentData)
+    if (this.parentData) {
+      this.loginForm.username = this.parentData.u
+      this.loginForm.password = this.parentData.p
+      this.handleLogin()
+    }
     if (this.loginForm.username === '') {
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
@@ -282,13 +291,23 @@ $light_gray:#eee;
 
   .title-container {
     position: relative;
-
     .title {
+      display: inline-block;
       font-size: 26px;
       color: $light_gray;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      >span {
+         font-size: 16px;
+         display: inline-block;
+         padding-left: 10px;
+         padding-top: 5px;
+         color: #eee;
+      }
     }
   }
 

@@ -1,5 +1,7 @@
-import Vue from 'vue'
 
+import './public-path'
+import Vue from 'vue'
+import VueRouter from 'vue-router';
 import Cookies from 'js-cookie'
 
 import 'normalize.css/normalize.css' // a modern alternative to CSS resets
@@ -12,7 +14,6 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
-
 import './icons' // icon
 import './permission' // permission control
 import './utils/error-log' // error log
@@ -44,9 +45,33 @@ Object.keys(filters).forEach(key => {
 
 Vue.config.productionTip = false
 
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
-})
+let instance = null
+
+const render = (props) => {
+  const { container } = props;
+  instance = new Vue({
+    el: '#dataxApp',
+    router,
+    store,
+    render: h => h(App)
+  }).$mount(container ? container.querySelector('#dataxApp') : '#dataxApp')
+}
+
+if (!window.__POWERED_BY_QIANKUN__) {
+  render(document);
+}
+
+export async function bootstrap(props) {
+  console.log('[vue] vue app bootstraped', props)
+  Vue.prototype.parentData = {...props.data}
+}
+export async function mount(props) {
+  console.log('[vue] props from main framework', props)
+  render(props)
+}
+export async function unmount() {
+  instance.$destroy()
+  instance.$el.innerHTML = ''
+  instance = null
+  // router = null;
+}

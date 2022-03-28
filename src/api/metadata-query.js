@@ -43,7 +43,7 @@ export function createTable(params) {
   return request({
     url: '/api/metadata/createTable',
     method: 'post',
-    params
+    data: params
   })
 }
 // 判断字段是否存在，存在，即更新值，否则添加字段

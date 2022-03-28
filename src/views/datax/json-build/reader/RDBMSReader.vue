@@ -91,11 +91,17 @@ export default {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
         tableName: [{ required: true, message: 'this is required', trigger: 'change' }],
         tableSchema: [{ required: true, message: 'this is required', trigger: 'change' }]
+      },
+      readerDatabase: {
+        datasourceId: '',
+        rDsList: []
       }
     }
   },
   watch: {
     'readerForm.datasourceId': function(oldVal, newVal) {
+      this.readerDatabase.datasourceId = newVal || oldVal
+      this.readerDatabase.rDsList = this.rDsList
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
         this.getSchema()
       } else {
@@ -220,6 +226,9 @@ export default {
         this.readerForm.datasourceId = Bus.dataSourceId
       }
       return this.readerForm
+    },
+    getReaderDatabase() {
+      return this.readerDatabase
     }
   }
 }
