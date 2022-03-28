@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import LogoImg from '../../../../public/logo-DataLink.png'
+import LogoImg from '../../../../public/logo@7247x1171.png'
 export default {
   name: 'SidebarLogo',
   props: {
@@ -57,7 +57,7 @@ export default {
 
     & .sidebar-logo {
       // width: 32px;
-      height: 32px;
+      height: 25px;
       vertical-align: middle;
       margin-right: 12px;
     }

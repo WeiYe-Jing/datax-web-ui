@@ -157,11 +157,13 @@ export default {
     next() {
       const fromColumnList = this.$refs.reader.getData().columns
       const toColumnsList = this.$refs.writer.getData().columns
-      // const fromTableName = this.$refs.reader.getData().tableName
+      const fromTableName = this.$refs.reader.getData().tableName
+      const readerDatabase = this.$refs.reader.getReaderDatabase()
       // 第一步 reader 判断是否已选字段
       if (this.active === 1) {
         // 实现第一步骤读取的表和字段直接带到第二步骤
         // this.$refs.writer.sendTableNameAndColumns(fromTableName, fromColumnList)
+        this.$refs.writer.sendNewTableNameAndColumns(readerDatabase, fromColumnList, fromTableName)
         // 取子组件的数据
         // console.info(this.$refs.reader.getData())
         this.active++

@@ -44,8 +44,9 @@
           />
         </el-select>
         <el-input v-show="writerForm.ifCreateTable" v-model="writerForm.tableName" style="width: 200px;" :placeholder="readerForm.tableName" />
-        <!--<el-input v-model="createTableName" style="width: 195px" />
-        <el-button type="primary" @click="createTable">新增</el-button>-->
+        <!-- <el-input v-model="createTableName" style="width: 195px" /> -->
+        <!-- <el-button type="primary" @click="createTable">新增</el-button> -->
+        <el-button v-if="dataSource === 'clickhouse'" type="primary" @click="createNewTable">自动同步</el-button>
       </el-form-item>
       <div style="margin: 5px 0;" />
       <el-form-item label="字段：">
@@ -62,6 +63,74 @@
         <el-input v-model="writerForm.postSql" placeholder="多个用;分隔" type="textarea" style="width: 42%" />
       </el-form-item>
     </el-form>
+
+    <el-dialog
+      title="自动同步"
+      :visible.sync="isNewTable"
+      width="600px"
+    >
+      <el-form label-position="right" label-width="150px">
+        <el-form-item label="源数据库：">
+          <el-select
+            v-model="newCreateForm.srcDatasourceId"
+            filterable
+            style="width: 300px;"
+            disabled
+          >
+            <el-option
+              v-for="item in originTableNames.rDsList"
+              :key="item.id"
+              :label="item.datasourceName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="目标数据库：">
+          <el-select
+            v-model="newCreateForm.desDatasourceId"
+            filterable
+            style="width: 300px;"
+            disabled
+          >
+            <el-option
+              v-for="item in wDsList"
+              :key="item.id"
+              :label="item.datasourceName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="同步所有表：" style="margin-right: 110px">
+          <el-switch
+            v-model="newCreateForm.syncAllTables"
+            active-text="是"
+            inactive-text="否"
+          />
+        </el-form-item>
+        <template v-if="!isSyncAll">
+          <el-form-item label="表名称：" style="margin-right: 110px">
+            <el-input v-model="newCreateForm.tableName" disabled />
+          </el-form-item>
+          <el-form-item v-if="originColumnList.length" label="表字段：">
+            <!-- <el-checkbox
+                v-model="readerForm.checkAll"
+                :indeterminate="readerForm.isIndeterminate"
+                @change="rHandleCheckAllChange"
+              >全选
+              </el-checkbox> -->
+            <div style="margin: 15px 0; max-height: 100px; overflow: auto;">
+              <el-checkbox-group v-model="newCreateForm.columns" disabled>
+                <el-checkbox v-for="c in originColumnList" :key="c" :label="c">{{ c }}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </el-form-item>
+        </template>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isNewTable = false;">取消</el-button>
+        <el-button type="primary" @click="createTable">同步</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -101,22 +170,58 @@ export default {
         datasourceId: [{ required: true, message: 'this is required', trigger: 'change' }],
         tableName: [{ required: true, message: 'this is required', trigger: 'change' }],
         tableSchema: [{ required: true, message: 'this is required', trigger: 'change' }]
+      },
+      isNewTable: false,
+      originTableNames: {
+        datasourceId: ''
+      },
+      originTableName: '',
+      originColumnList: [],
+      newCreateForm: {
+        srcDatasourceId: '',
+        desDatasourceId: '',
+        tableName: '',
+        columns: [],
+        syncAllTables: 0
       }
     }
   },
+  computed: {
+    isSyncAll() {
+      return !!this.newCreateForm.syncAllTables
+    }
+  },
   watch: {
-    'writerForm.datasourceId': function(oldVal, newVal) {
+    'writerForm.datasourceId': function() {
+      this.newCreateForm.desDatasourceId = this.writerForm.datasourceId
       if (this.dataSource === 'postgresql' || this.dataSource === 'oracle' || this.dataSource === 'sqlserver') {
         this.getSchema()
       } else {
         this.getTables('rdbmsWriter')
       }
+    },
+    'originTableName': function(oldVal, newVal) {
+      this.newCreateForm.tableName = newVal || oldVal
+    },
+    'originTableNames.datasourceId': function() {
+      this.newCreateForm.srcDatasourceId = this.originTableNames.datasourceId
+    },
+    'originColumnList': function(oldVal, newVal) {
+      const arr = newVal.length > 0 ? newVal : oldVal
+      this.newCreateForm.columns = arr
     }
   },
   created() {
     this.getJdbcDs()
   },
   methods: {
+    createNewTable() {
+      this.isNewTable = true
+    },
+    rHandleCheckAllChange(val) {
+      this.readerForm.columns = val ? this.rColumnList : []
+      this.readerForm.isIndeterminate = false
+    },
     // 获取可用数据源
     getJdbcDs() {
       this.loading = true
@@ -215,8 +320,9 @@ export default {
     },
     createTable() {
       const obj = {
-        datasourceId: this.writerForm.datasourceId,
-        tableName: this.createTableName
+        // datasourceId: this.writerForm.datasourceId,
+        // tableName: this.createTableName
+        ...this.newCreateForm
       }
       dsQueryApi.createTable(obj).then(response => {
         this.$notify({
@@ -225,6 +331,8 @@ export default {
           type: 'success',
           duration: 2000
         })
+        this.isNewTable = false
+        this.getTables('rdbmsWriter')
       }).catch(() => console.log('promise catch err'))
     }
   }
