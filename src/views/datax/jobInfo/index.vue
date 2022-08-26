@@ -350,6 +350,11 @@
               <el-input v-model="temp.jvmParam" placeholder="-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError" />
             </el-form-item>
           </el-col>
+          <el-col :span="24">
+            <el-form-item label="自定义启动参数">
+              <el-input v-model="temp.customParam" placeholder="-DP_DAY=`date -d last-day +%d`" />
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <json-editor v-if="temp.glueType==='DATAX' || temp.glueType==='JAVA_BEAN'" ref="jsonEditor" v-model="jobJson" />
@@ -472,6 +477,7 @@ export default {
         replaceParam: '',
         replaceParamType: 'Timestamp',
         jvmParam: '',
+        customParam: '',
         incStartTime: '',
         partitionInfo: '',
         incrementType: 0,
