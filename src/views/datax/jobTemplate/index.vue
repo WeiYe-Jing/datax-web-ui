@@ -193,6 +193,14 @@
               />
             </el-form-item>
           </el-col>
+          <el-col :span="24">
+            <el-form-item label="自定义启动参数">
+              <el-input
+                v-model="temp.customParam"
+                placeholder="-DP_DAY=`date -d last-day +%d`"
+              />
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -302,6 +310,7 @@ export default {
         glueType: 'DATAX',
         executorParam: '',
         jvmParam: '',
+        customParam: '',
         projectId: '',
         datasourceId: 0,
         readerTable: ''
