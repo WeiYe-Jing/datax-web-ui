@@ -1,28 +1,47 @@
 <template>
   <div class="app-container">
     <el-form label-position="left" label-width="80px" :model="readerForm">
-      <el-form-item label="源端表">
-        <el-checkbox
-          v-model="readerForm.lcheckAll"
-          :indeterminate="readerForm.isIndeterminate"
-          @change="lHandleCheckAllChange"
-        >全选</el-checkbox>
-        <div style="margin: 15px 0;" />
-        <el-checkbox-group v-model="readerForm.ltables" @change="lHandleCheckedChange">
-          <el-checkbox v-for="c in fromTablesList" :key="c" :label="c">{{ c }}</el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="目标表">
-        <el-checkbox
-          v-model="readerForm.rcheckAll"
-          :indeterminate="readerForm.isIndeterminate"
-          @change="rHandleCheckAllChange"
-        >全选</el-checkbox>
-        <div style="margin: 20px 0;" />
-        <el-checkbox-group v-model="readerForm.rtables" @change="rHandleCheckedChange">
-          <el-checkbox v-for="c in toTablesList" :key="c" :label="c">{{ c }}</el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
+      <el-row>
+        <el-col :span="10">
+          <el-form-item label="源端表"  >
+            <el-checkbox
+              v-model="readerForm.lcheckAll"
+              :indeterminate="readerForm.isIndeterminate"
+              @change="lHandleCheckAllChange"
+            >全选</el-checkbox>
+            <div style="margin: 15px 0;" />
+            <el-checkbox-group v-model="readerForm.ltables" @change="lHandleCheckedChange">
+              <el-checkbox
+              style="width: 100%;"
+              v-for="(c,index) in fromTablesList"
+              :key="c"
+              :label="c"
+              @mouseover.native="CheckBoxClick(index)"
+              v-dragging="{ item: c, list: fromTablesList, group: 'c' }">{{ c }}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="10">
+          <el-form-item label="目标表"  >
+            <el-checkbox
+              style="width: 100%;"
+              v-model="readerForm.rcheckAll"
+              :indeterminate="readerForm.isIndeterminate"
+              @change="rHandleCheckAllChange"
+            >全选</el-checkbox>
+            <div style="margin: 20px 0;" />
+            <el-checkbox-group v-model="readerForm.rtables" @change="rHandleCheckedChange">
+              <el-checkbox
+              style="width: 100%;"
+              v-for="(c2,index) in toTablesList"
+              :key="c2"
+              :label="c2"
+              @mouseover.native="CheckBoxClick(index)"
+              v-dragging="{ item: c2, list: toTablesList, group: 'c2' }">{{ c2 }}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
   </div>
 </template>
@@ -35,6 +54,8 @@ export default {
       mapperJson: {},
       fromTablesList: [],
       toTablesList: [],
+      activeIndex: 0,
+      checkedCities: [],
       readerForm: {
         ltables: [],
         rtables: [],
@@ -45,8 +66,13 @@ export default {
     }
   },
   mounted() {
+    this.$dragging.$on('dragged', ({ value }) => {})
+    this.$dragging.$on('dragend', () => {})
   },
   methods: {
+    CheckBoxClick(i) {
+      this.activeIndex = i
+    },
     lHandleCheckAllChange(val) {
       this.readerForm.ltables = val ? this.fromTablesList : []
       this.readerForm.isIndeterminate = false

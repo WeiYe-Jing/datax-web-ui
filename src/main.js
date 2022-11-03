@@ -17,6 +17,9 @@ import './icons' // icon
 import './permission' // permission control
 import './utils/error-log' // error log
 
+import VueDND from 'awe-dnd'
+Vue.use(VueDND)
+
 import * as filters from './filters' // global filters
 import echarts from 'echarts'
 Vue.prototype.$echarts = echarts
