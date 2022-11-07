@@ -265,9 +265,11 @@ export default {
       }
       const obj = {
         readerDatasourceId: readerData.datasourceId,
+        readerTableSchema: readerData.tableSchema,
         readerTables: [readerData.tableName],
         readerColumns: readerColumns,
         writerDatasourceId: writeData.datasourceId,
+        writerTableSchema: writeData.tableSchema,
         writerTables: [writeData.tableName],
         writerColumns: writerColumns,
         transformer: transformer,
@@ -313,6 +315,8 @@ export default {
     handleCurrentChange(val) {
       this.temp = Object.assign({}, val)
       this.temp.id = undefined
+      this.temp.addTime = undefined
+      this.temp.updateTime = undefined
       this.temp.jobDesc = this.getReaderData().tableName
       this.$refs.jobTemplateSelectDrawer.closeDrawer()
       this.jobTemplate = val.id + '(' + val.jobDesc + ')'
